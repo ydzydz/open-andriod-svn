@@ -34,6 +34,7 @@ import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNCommitClient;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNUpdateClient;
+import org.tmatesoft.svn.core.wc.admin.SVNLookClient;
 
 import com.valleytg.oasvn.android.database.DatabaseHelper;
 import com.valleytg.oasvn.android.model.Connection;
@@ -90,19 +91,34 @@ public class OASVNApplication extends Application {
     BasicAuthenticationManager myAuthManager;
     
     /**
-     * 
+     * The SVNClientManager class is used to manage SVN*Client objects
      */
-    SVNClientManager cm;
+    SVNClientManager clientManager;
     
     /**
-     * 
+     * The SVNLookClient class provides API for examining different aspects of a 
+     * Subversion repository. Its functionality is similar to the one of the 
+     * Subversion command-line utility called svnlook. The following table matches 
+     * methods of SVNLookClient to the corresponding commands of the svnlook 
+     * utility (to make sense what its different methods are for):
      */
-    SVNUpdateClient uc;
+    SVNLookClient lookClient;
     
     /**
-     * 
+     * This class provides methods which allow to check out, update, switch and 
+     * relocate a Working Copy as well as export an unversioned directory or file 
+     * from a repository.
      */
-    SVNCommitClient cc;
+    SVNUpdateClient updateClient;
+    
+    /**
+     * The SVNCommitClient class provides methods to perform operations that relate 
+     * to committing changes to an SVN repository. These operations are similar to 
+     * respective commands of the native SVN command line client and include ones 
+     * which operate on working copy items as well as ones that operate only on a 
+     * repository.
+     */
+    SVNCommitClient commitClient;
     
     /**
      * 
@@ -152,22 +168,54 @@ public class OASVNApplication extends Application {
 		this.initalizeSettings();
     }
     
+    /**
+	 * Try to retrieve the settings from the database if they exist.
+	 * If they do not yet exist, create them.
+	 */
+	public void initalizeSettings() {
+		// try to retrieve the data
+		this.retrieveSettings();
+		
+		// see if settings existed
+		if(Settings.getInstance().getRootFolder().length() == 0) {
+			// there are no settings in the database create default
+			Settings.getInstance().setRootFolder("OASVN/");
+			Settings.getInstance().saveToLocalDB(this);
+		}
+		
+		// initialize the auth manager
+		this.initAuthManager();
+		this.initClientManager();
+		this.initManagerChildren();
+	}
+    
     public void initAuthManager() {
     	try {
 	    	// check to see that we have a current connection
 	    	if(currentConnection != null) { 
 	    		// initialize the Auth manager
 	    		myAuthManager = new BasicAuthenticationManager(this.currentConnection.getUsername(), this.currentConnection.getPassword());
-	    		
-	    		cm = SVNClientManager.newInstance();
-		        cm.setAuthenticationManager(myAuthManager); 
-		        uc = cm.getUpdateClient();
-		        cc = cm.getCommitClient();
 	    	}
     	}
     	catch(Exception e) {
     		e.printStackTrace();
     	}
+    }
+    
+    public void initClientManager() {
+    	clientManager = SVNClientManager.newInstance();
+    	clientManager.setAuthenticationManager(myAuthManager); 
+    }
+    
+    public void initManagerChildren() {
+    	// Update Client
+    	updateClient = clientManager.getUpdateClient();
+    	
+    	// Commit Client
+    	commitClient = clientManager.getCommitClient();
+    	
+    	// look client
+    	lookClient = clientManager.getLookClient();
     }
     
 
@@ -253,7 +301,10 @@ public class OASVNApplication extends Application {
     	}
     }
     
-
+    /**
+     * Does full checkout of the Head revision
+     * @return
+     */
     public String fullHeadCheckout() {
     	try {
     		// initialize the auth manager
@@ -267,7 +318,7 @@ public class OASVNApplication extends Application {
     		SVNRevision myRevision = SVNRevision.HEAD;
     		
     		try {
-    			uc.doCheckout(myURL, myFile, myRevision, myRevision, true, true);
+    			updateClient.doCheckout(myURL, myFile, myRevision, myRevision, true, true);
     		}
     		catch(SVNException e) {
     			String msg = e.getMessage();
@@ -281,9 +332,12 @@ public class OASVNApplication extends Application {
 		return "success";
     }
     
+    /**
+     * Does a full commit to the repository
+     * @return Response from the server (error code or success)
+     */
     public String fullCommit() {
-    	// initialize the auth manager
-		this.initAuthManager();
+    	
 		
 		// make sure the path is ready
 		initializePath();
@@ -293,7 +347,7 @@ public class OASVNApplication extends Application {
 		SVNRevision myRevision = SVNRevision.HEAD;
 
 		try {
-			setInfo(cc.doCommit( new File[] {myFile} , false, this.commitComments , false , true));
+			setInfo(commitClient.doCommit( new File[] {myFile} , false, this.commitComments , false , true));
 			System.out.println("Revision " + getInfo().getNewRevision());
 		}
 		catch(SVNException e) {
@@ -305,6 +359,10 @@ public class OASVNApplication extends Application {
 		
     }
     
+    /**
+     * Gets the revision number.
+     * @return integer value of the current checked out revision
+     */
     public Integer getRevisionNumber() {
     	
     	try {
@@ -313,7 +371,7 @@ public class OASVNApplication extends Application {
         		// initialize the auth manager
         		this.initAuthManager();
         		
-        		return (int) cm.getStatusClient().doStatus(this.assignPath(), false).getRevision().getNumber();
+        		return (int) clientManager.getStatusClient().doStatus(this.assignPath(), false).getRevision().getNumber();
         	}
         	else {
         		return 0;
@@ -326,6 +384,10 @@ public class OASVNApplication extends Application {
 		}
 
     }
+    
+    //public ArrayList<Revision> getAllRevisions() {
+    //	lookClient.
+    //}
     
     
     /**
@@ -357,22 +419,7 @@ public class OASVNApplication extends Application {
 		dbCursor.close();
     }
     
-    /**
-	 * Try to retrieve the settings from the database if they exist.
-	 * If they do not yet exist, create them.
-	 */
-	public void initalizeSettings() {
-		// try to retrieve the data
-		this.retrieveSettings();
-		
-		// see if settings existed
-		if(Settings.getInstance().getRootFolder().length() == 0) {
-			// there are no settings in the database create default
-			Settings.getInstance().setRootFolder("OASVN/");
-			Settings.getInstance().saveToLocalDB(this);
-		}
-		
-	}
+   
     
     public void retrieveSettings() {
     	String sql = "select * from setting where id = 1;";
@@ -439,19 +486,19 @@ public class OASVNApplication extends Application {
 	}
 
 	public SVNClientManager getCm() {
-		return cm;
+		return clientManager;
 	}
 
-	public void setCm(SVNClientManager cm) {
-		this.cm = cm;
+	public void setCm(SVNClientManager clientManager) {
+		this.clientManager = clientManager;
 	}
 
 	public SVNUpdateClient getUc() {
-		return uc;
+		return updateClient;
 	}
 
-	public void setUc(SVNUpdateClient uc) {
-		this.uc = uc;
+	public void setUc(SVNUpdateClient updateClient) {
+		this.updateClient = updateClient;
 	}
 
 	public void setAllConnections(ArrayList<Connection> allConnections) {

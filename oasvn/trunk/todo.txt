@@ -1,0 +1,12 @@
+Allow user to delete repository from the list and db (ask about the local folder)
+check to see if the folder name requested is available when adding a new repo
+Allow checkout of specific revision
+	- show author 
+	- show the comments for the available revisions in the list
+file browsing 
+	- individual asset checkin
+	- individual asset checkout
+Merging
+	....
+Tagging / Branching
+	....

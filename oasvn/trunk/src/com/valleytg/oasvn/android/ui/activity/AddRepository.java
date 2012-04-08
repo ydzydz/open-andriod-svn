@@ -117,4 +117,8 @@ public class AddRepository extends Activity {
 		thisConnection.saveToLocalDB(this.app);
 	}
 	
+	private void checkRequired() {
+		if(this.url.getText().toString().substring(0, 4).toLowerCase() == "http" || 
+	}
+	
 }

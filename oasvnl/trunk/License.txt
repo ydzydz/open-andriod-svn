@@ -1,16 +1,26 @@
-This software is produced by Valley Technologies Group and uses slightly modified 
-libraries (svnkit).  Modifications are limited to changes required to run the 
-library on the Dalvik VM.
+OASVN (Open Android SVN)
+Copyright (C) 2012 Brian Gormanly
+Valley Technologies Group
+http://www.valleytg.com
+ 
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version. 
 
-In compliance with the libraries license agreement you can get all of the source
-code for this software at http://http://www.valleytg.com/svn/valleytgopen/OASVN/
-username: guest password: guest
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
 
-Please contact valleytechgroup@gmail.com with any comments.
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-The TMate Open Source License.
-
+OASVN uses SVNKit an open source software licensed under the TMate 
+Open Source License. In compliance with this license, OASVN is 
+available as open source software available under the Lesser GNU.
 
 This license applies to all portions of TMate SVNKit library, which 
 are not externally-maintained libraries (e.g. Ganymed SSH library).
@@ -56,4 +66,4 @@ LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
 PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
 LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
 OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
-ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  

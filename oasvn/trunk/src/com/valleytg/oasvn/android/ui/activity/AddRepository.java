@@ -25,12 +25,12 @@ package com.valleytg.oasvn.android.ui.activity;
 
 import android.app.*;
 import android.os.*;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import com.valleytg.oasvn.android.*;
 import com.valleytg.oasvn.android.application.*;
 import com.valleytg.oasvn.android.model.*;
-import com.valleytg.oasvn.android.ui.activity.*;
 
 public class AddRepository extends Activity {
 	
@@ -69,7 +69,7 @@ public class AddRepository extends Activity {
 		password = (EditText) findViewById(R.id.add_password);
 		folder = (EditText) findViewById(R.id.add_folder);
         
-        // check to see if we are editing a cannection
+        // check to see if we are editing a connection
         if(app.getCurrentConnection() != null) {
         	thisConnection = app.getCurrentConnection();
         	
@@ -116,8 +116,11 @@ public class AddRepository extends Activity {
 	}
 	
 	private void checkRequired() {
-		if(this.url.getText().toString().substring(0, 4).toLowerCase() == "http" || this.url.getText().toString().substring(0, 4).toLowerCase() == "svn:" || this.url.getText().toString().substring(0, 4).toLowerCase() == "svn+") {
 				
+		if(this.url.getText().toString().length() >= 7 && (this.url.getText().toString().substring(0, 4).toLowerCase().equals("http") 
+				|| this.url.getText().toString().substring(0, 3).toLowerCase().equals("svn"))) {
+			// url includes protocol
+			
 		}
 		else {
 			// invalid url

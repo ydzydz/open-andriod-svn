@@ -34,7 +34,26 @@ import com.valleytg.oasvn.android.application.OASVNApplication;
 import com.valleytg.oasvn.android.util.DateUtil;
 
 public class Connection extends OASVNModelLocalDB {
-	public enum PROTOCOL_TYPE {HTTP, HTTPS, SVN};
+
+	/**
+	 * Setup a the protocol type enum for the supported protocols
+	 * @author brian.gormanly
+	 *
+	 */
+	public enum PROTOCOL_TYPE  
+	{  
+	    HTTP("HTTP"),  
+	    HTTPS("HTTPS"),  
+	    SVN("SVN"), 
+	    SVNSSH("SVN+SSH");
+	  
+	    private final String label;  
+	  
+	    private PROTOCOL_TYPE(String label) { this.label = label; }  
+	  
+	    @Override  
+	    public String toString() { return label; }  
+	}
 	
 	private String name = "";
 	private String textURL = "";
@@ -117,14 +136,17 @@ public class Connection extends OASVNModelLocalDB {
 		}
 		
 		try {
-			if(results.getString(results.getColumnIndex("protocol")).equals(PROTOCOL_TYPE.HTTP.toString())) {
+			if(results.getString(results.getColumnIndex("protocol")).equals(PROTOCOL_TYPE.HTTP.label.toString())) {
 				this.type = PROTOCOL_TYPE.HTTP;
 			}
-			else if (results.getString(results.getColumnIndex("protocol")).equals(PROTOCOL_TYPE.HTTPS.toString())) {
+			else if (results.getString(results.getColumnIndex("protocol")).equals(PROTOCOL_TYPE.HTTPS.label.toString())) {
 				this.type = PROTOCOL_TYPE.HTTPS;
 			}
-			else if (results.getString(results.getColumnIndex("protocol")).equals(PROTOCOL_TYPE.SVN.toString())) {
+			else if (results.getString(results.getColumnIndex("protocol")).equals(PROTOCOL_TYPE.SVN.label.toString())) {
 				this.type = PROTOCOL_TYPE.SVN;
+			}
+			else if (results.getString(results.getColumnIndex("protocol")).equals(PROTOCOL_TYPE.SVNSSH.label.toString())) {
+				this.type = PROTOCOL_TYPE.SVNSSH;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -160,7 +182,7 @@ public class Connection extends OASVNModelLocalDB {
 	 */
 	public void initializeAuthManager() {
 		try {
-		// check the user name and password exist
+			// check the user name and password exist
 			if(this.username.length() > 0 && this.password.length() > 0) {
 				this.authManager = new BasicAuthenticationManager(this.username, this.password);
 			}
@@ -242,15 +264,25 @@ public class Connection extends OASVNModelLocalDB {
 	}
 	
 	public void setType(String url) {
-		if(url.substring(0, 4).toLowerCase().equals("http")) {
-			this.type = Connection.PROTOCOL_TYPE.HTTP;
-		}
-		else if(url.substring(0, 5).toLowerCase().equals("https")) {
+		if(url.substring(0, 5).toLowerCase().equals("https")) {
 			this.type = Connection.PROTOCOL_TYPE.HTTPS;
 		}
-		else if(url.substring(0, 3).toLowerCase().equals("svn")) {
+		
+		else if(url.substring(0, 5).toLowerCase().equals("http:")) {
+			this.type = Connection.PROTOCOL_TYPE.HTTP;
+		}
+		
+		else if(url.substring(0, 7).toLowerCase().equals("svn+ssh")) {
+			this.type = Connection.PROTOCOL_TYPE.SVNSSH;
+		}
+		else if(url.substring(0, 4).toLowerCase().equals("svn:")) {
 			this.type = Connection.PROTOCOL_TYPE.SVN;
 		}
+		// default to HTTP
+		else {
+			this.type = Connection.PROTOCOL_TYPE.HTTP;
+		}
+		
 		dateUpdated();
 	}
 

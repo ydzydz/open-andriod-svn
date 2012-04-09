@@ -226,6 +226,7 @@ public class OASVNApplication extends Application {
 	    	if(this.currentConnection != null && this.currentConnection.getFolder().length() > 0) {
 	    		// get the sd card directory
 				File file = new File(this.getRootPath(), this.currentConnection.getFolder());
+				String a = "a";
 				return file;
 	    	}
     	}

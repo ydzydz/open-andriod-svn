@@ -20,9 +20,9 @@
     <string name="folder">Local Folder</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
-	<string name="url_invalid">You have entered an invalid URL.  The url must start with one of the following: http://, https://, svn://, svn+ssl://</string>
+	<string name="url_invalid">You have entered an invalid URL. The URL must be at least 7 characters long and start with one of the following: http://, https://, svn://, svn+ssl://</string>
 	<string name="folder_invalid">The folder name you entered is either invalid, blank, or is already in use.</string>
-	<string name="name_invalid">A uniquie name is required for.the repository.</string>
+	<string name="name_invalid">A unique name is required for.the repository.</string>
 	
     
     <!-- Connection Details -->

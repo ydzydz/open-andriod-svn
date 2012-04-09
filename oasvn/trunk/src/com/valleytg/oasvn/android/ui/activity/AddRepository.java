@@ -23,18 +23,14 @@
 
 package com.valleytg.oasvn.android.ui.activity;
 
-import com.valleytg.oasvn.android.R;
-import com.valleytg.oasvn.android.application.OASVNApplication;
-import com.valleytg.oasvn.android.model.Connection;
-
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
+import android.app.*;
+import android.os.*;
+import android.view.*;
+import android.widget.*;
+import com.valleytg.oasvn.android.*;
+import com.valleytg.oasvn.android.application.*;
+import com.valleytg.oasvn.android.model.*;
+import com.valleytg.oasvn.android.ui.activity.*;
 
 public class AddRepository extends Activity {
 	
@@ -100,8 +96,7 @@ public class AddRepository extends Activity {
 			
 			public void onClick(View v) {
 				// do the save
-				AddRepository.this.save();
-				AddRepository.this.finish();
+				AddRepository.this.checkRequired();
 			}
 		});
 	}
@@ -115,10 +110,31 @@ public class AddRepository extends Activity {
 		thisConnection.setFolder(folder.getText().toString());
 		
 		thisConnection.saveToLocalDB(this.app);
+		
+		// close the activity
+		this.finish();
 	}
 	
 	private void checkRequired() {
-		if(this.url.getText().toString().substring(0, 4).toLowerCase() == "http" || 
+		if(this.url.getText().toString().substring(0, 4).toLowerCase() == "http" || this.url.getText().toString().substring(0, 4).toLowerCase() == "svn:" || this.url.getText().toString().substring(0, 4).toLowerCase() == "svn+") {
+				
+		}
+		else {
+			// invalid url
+			Toast.makeText(this, getString(R.string.url_invalid), 5000).show();
+			return;
+		}
+		if(this.name.getText().toString().length() == 0) {
+			Toast.makeText(this, getString(R.string.name_invalid), 5000).show();	
+			return;
+		}
+		if(this.folder.getText().toString().length() == 0) {
+			Toast.makeText(this, getString(R.string.folder_invalid), 5000).show();	
+			return;
+		}
+		
+		// we made it do the save
+		this.save();
 	}
 	
 }

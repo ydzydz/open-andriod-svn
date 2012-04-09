@@ -374,6 +374,7 @@ public class ConnectionDetails extends Activity {
 				
 				// save the current connection
 				app.getCurrentConnection().saveToLocalDB(app);
+
 				
 			}
 	        catch(Exception e) {

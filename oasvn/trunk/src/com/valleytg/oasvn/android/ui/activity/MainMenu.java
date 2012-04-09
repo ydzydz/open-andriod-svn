@@ -103,6 +103,9 @@ public class MainMenu extends ListActivity {
 			// set the current connection
 			app.setCurrentConnection(thisConnection);
 			
+			// initialize the connection and bind it to the svn client manager
+			app.initAuthManager();
+			
 			// go to the connection screen
 			Intent intent = new Intent(MainMenu.this, ConnectionDetails.class);
 			startActivity(intent);

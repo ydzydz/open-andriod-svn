@@ -182,13 +182,13 @@ public class OASVNApplication extends Application {
 			Settings.getInstance().setRootFolder("OASVN/");
 			Settings.getInstance().saveToLocalDB(this);
 		}
-		
-		// initialize the auth manager
-		this.initAuthManager();
-		this.initClientManager();
-		this.initManagerChildren();
 	}
     
+	/**
+	 * This method should be called anytime a new currentConnection is chosen
+	 * before any action is attempted.
+	 * 
+	 */
     public void initAuthManager() {
     	try {
 	    	// check to see that we have a current connection
@@ -200,6 +200,12 @@ public class OASVNApplication extends Application {
     	catch(Exception e) {
     		e.printStackTrace();
     	}
+    	
+    	// initialize the clientManager
+    	this.initClientManager();
+    	
+    	// initialize the clientManager children
+    	this.initManagerChildren();
     }
     
     public void initClientManager() {
@@ -370,9 +376,10 @@ public class OASVNApplication extends Application {
     		// make sure there is a selected connection
         	if(this.getCurrentConnection() != null) {
         		// initialize the auth manager
-        		this.initAuthManager();
+        		//this.initAuthManager();
         		
-        		return (int) clientManager.getStatusClient().doStatus(this.assignPath(), false).getRevision().getNumber();
+        		Integer rev = (int) clientManager.getStatusClient().doStatus(this.assignPath(), false).getRevision().getNumber();
+        		return rev;
         	}
         	else {
         		return 0;

@@ -21,7 +21,7 @@
  * 
  */
 
-package com.valleytg.oasvn.android.ui.activity;
+package com.valleytg.oasvnlite.android.ui.activity;
 
 import java.io.File;
 
@@ -30,9 +30,9 @@ import android.os.*;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
-import com.valleytg.oasvn.android.*;
-import com.valleytg.oasvn.android.application.*;
-import com.valleytg.oasvn.android.model.*;
+import com.valleytg.oasvnlite.android.*;
+import com.valleytg.oasvnlite.android.application.*;
+import com.valleytg.oasvnlite.android.model.*;
 
 public class AddRepository extends Activity {
 	

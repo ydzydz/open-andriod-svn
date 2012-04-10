@@ -21,13 +21,13 @@
  * 
  */
 
-package com.valleytg.oasvn.android.ui.activity;
+package com.valleytg.oasvnlite.android.ui.activity;
 
 import java.io.File;
 
-import com.valleytg.oasvn.android.R;
-import com.valleytg.oasvn.android.application.OASVNApplication;
-import com.valleytg.oasvn.android.ui.activity.ConnectionDetails;
+import com.valleytg.oasvnlite.android.R;
+import com.valleytg.oasvnlite.android.application.OASVNApplication;
+import com.valleytg.oasvnlite.android.ui.activity.ConnectionDetails;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -140,15 +140,14 @@ public class ConnectionDetails extends Activity {
         this.btnCommit.setOnClickListener(new View.OnClickListener() {
 			
 			public void onClick(View v) {
-				// try to text the phone number
-	        	try {
-	                Intent callIntent = new Intent(ConnectionDetails.this, CommitActivity.class);
-	                // set the current contact
-	                //callIntent.putExtra("number", myList.get(position).getPhoneNumber());
-	                ConnectionDetails.this.startActivity(callIntent);
-	            } catch (ActivityNotFoundException e) {
-	                e.printStackTrace();
-	            }
+				// open the add repository activity
+				if(running	== false) {
+
+					Toast.makeText(ConnectionDetails.this, "Only Available with the Pro version", 3000).show();
+				}
+				else {
+					Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 1500).show();
+				}
 			}
 		});
         

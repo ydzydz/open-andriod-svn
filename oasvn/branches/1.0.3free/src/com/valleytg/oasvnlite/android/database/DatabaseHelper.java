@@ -21,7 +21,7 @@
  * 
  */
 
-package com.valleytg.oasvn.android.database;
+package com.valleytg.oasvnlite.android.database;
 
 /**
  * @author brian.gormanly
@@ -48,8 +48,8 @@ package com.valleytg.oasvn.android.database;
  * 
  */
 
-import com.valleytg.oasvn.android.R;
-import com.valleytg.oasvn.android.application.OASVNApplication;
+import com.valleytg.oasvnlite.android.R;
+import com.valleytg.oasvnlite.android.application.OASVNApplication;
 
 import android.content.Context;
 import android.database.SQLException;
@@ -68,7 +68,7 @@ import android.util.Log;
 public class DatabaseHelper extends SQLiteOpenHelper {
 Context mContext;
 	
-	public static final String DB_NAME = "OASVN";
+	public static final String DB_NAME = "OASVNlite";
 	public static final int VERSION = 1;
 	
 	public String pNumber;

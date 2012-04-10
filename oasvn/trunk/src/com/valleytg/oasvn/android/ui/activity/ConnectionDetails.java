@@ -25,8 +25,6 @@ package com.valleytg.oasvn.android.ui.activity;
 
 import java.io.File;
 
-import org.tmatesoft.svn.core.SVNCommitInfo;
-
 import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.application.OASVNApplication;
 import com.valleytg.oasvn.android.ui.activity.ConnectionDetails;
@@ -41,8 +39,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,6 +74,7 @@ public class ConnectionDetails extends Activity {
 	Button btnCommit;
 	Button btnEdit;
 	Button btnDelete;
+	Button btnRepoDelete;
 	
 	/**
 	 * Thread control
@@ -110,9 +109,13 @@ public class ConnectionDetails extends Activity {
         btnCommit = (Button) findViewById(R.id.conndetail_full_commit);
         btnDelete = (Button) findViewById(R.id.conndetail_delete_local);
         btnEdit = (Button) findViewById(R.id.conndetail_edit);
+        btnRepoDelete = (Button) findViewById(R.id.conndetail_delete_connection);
         
         // populate the top
         populateTopInfo();
+        
+        // Make sure the device does not go to sleep while in this acitvity
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         
         this.btnCheckoutHead.setOnClickListener(new View.OnClickListener() {
 			
@@ -193,6 +196,86 @@ public class ConnectionDetails extends Activity {
 			            		}
 			            	}
 							
+			            }
+
+			        });
+		        builder.setNegativeButton(R.string.no, null);
+		        builder.show();	
+					
+				}
+				else {
+					Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
+				}
+			}
+		});
+        
+        this.btnRepoDelete.setOnClickListener(new View.OnClickListener() {
+			
+			public void onClick(View v) {
+				
+				// open the add repository activity
+				if(running	== false) {
+
+					// double check the users intention
+					AlertDialog.Builder builder = new AlertDialog.Builder(ConnectionDetails.this);
+					
+					builder.setIcon(android.R.drawable.ic_dialog_alert);
+					builder.setTitle(R.string.confirm);
+					builder.setMessage(getString(R.string.delete_repo_message));
+					builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+			            public void onClick(DialogInterface dialog, int which) {
+			            	// check to see if the user wants to delete the local folder as well
+			            	// double check the users intention
+							AlertDialog.Builder builder2 = new AlertDialog.Builder(ConnectionDetails.this);
+							
+							builder2.setIcon(android.R.drawable.ic_dialog_alert);
+							builder2.setTitle(R.string.confirm);
+							builder2.setMessage(getString(R.string.delete_folder_too));
+							builder2.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+					            public void onClick(DialogInterface dialog2, int which) {
+					            	// user choose to delete the local folder
+					            	synchronized (this) {
+					            		try{
+					            			app.initializePath();
+					            			File tree = app.assignPath();
+					            			app.deleteRecursive(tree);
+					            			
+					            			// close the activity
+					            			ConnectionDetails.this.finish();
+					            		} 
+					            		catch(Exception e) {
+					            			e.printStackTrace();
+					            		}
+					            	}
+					            }
+				            });
+							builder2.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+
+					            public void onClick(DialogInterface dialog2, int which) {
+					            	// close the activity
+			            			ConnectionDetails.this.finish();
+					            }
+							});
+					        builder2.show();	
+			            	
+					        // remove the connection from the local database
+			            	synchronized (this) {
+			            		try{
+			            			// remove from the database
+			            			app.getCurrentConnection().deleteFromDatabase(app);
+			            			
+			            			// remove from the allConnections array
+			            			app.getAllConnections().remove(app.getCurrentConnection());
+			            			
+			            		} 
+			            		catch(Exception e) {
+			            			e.printStackTrace();
+			            		}
+			            	}
+			            	
+			            	
 			            }
 
 			        });

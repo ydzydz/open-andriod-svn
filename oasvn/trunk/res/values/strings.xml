@@ -21,7 +21,8 @@
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
 	<string name="url_invalid">You have entered an invalid URL. The URL must be at least 7 characters long and start with one of the following: http://, https://, svn://, svn+ssl://</string>
-	<string name="folder_invalid">The folder name you entered is either invalid, blank, or is already in use.</string>
+	<string name="folder_invalid">The folder name you entered is either invalid or blank.</string>
+	<string name="folder_exists">The folder name you entered is already in use.</string>
 	<string name="name_invalid">A unique name is required for.the repository.</string>
 	
     
@@ -31,7 +32,8 @@
     <string name="head">Revision</string>
     <string name="checkout">Checkout</string>
     <string name="commit">Commit</string>
-    <string name="delete">Delete Local Folder</string>
+    <string name="delete">Delete Folder</string>
+    <string name="delete_connection">Delete Repo</string>
     <string name="performing_checkout">Performing Checkout!!!</string>
     <string name="performing_commit">Performing Commit!!!</string>
     <string name="idle">Idle...</string>
@@ -39,6 +41,8 @@
     <string name="in_progress">Operation in progress, please wait...</string>
     <string name="confirm">Are you sure?</string>
     <string name="delete_message">You will delete the entire local folder!</string>
+    <string name="delete_repo_message">You are about to delete this repository connection. Are you sure?</string>
+    <string name="delete_folder_too">Do you want to remove the local folder as well?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="edit">Edit Connection</string>

@@ -32,6 +32,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -65,6 +66,9 @@ public class CommitActivity extends Activity {
 		btnCommit = (Button) findViewById(R.id.commit_button);
 		comments = (EditText) findViewById(R.id.commit_comments);
 		status = (TextView) findViewById(R.id.commit_status);
+		
+		// Make sure the device does not go to sleep while in this acitvity
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
         this.btnCommit.setOnClickListener(new View.OnClickListener() {
 			

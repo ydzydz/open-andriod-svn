@@ -23,6 +23,8 @@
 
 package com.valleytg.oasvn.android.ui.activity;
 
+import java.io.File;
+
 import android.app.*;
 import android.os.*;
 import android.util.Log;
@@ -131,13 +133,38 @@ public class AddRepository extends Activity {
 			Toast.makeText(this, getString(R.string.name_invalid), 5000).show();	
 			return;
 		}
+		
+		// check to see if the user typed a folder name
 		if(this.folder.getText().toString().length() == 0) {
 			Toast.makeText(this, getString(R.string.folder_invalid), 5000).show();	
 			return;
 		}
 		
+		// check to see if the folder already exists on the local disk and in the database
+		File file = new File(app.getFullPathToMain().toString() + this.thisConnection.getFolder().toString() + this.folder.getText().toString());
+		
+		// check all existing connection
+		if(app.getAllConnections().size() > 0) {
+			for(Connection thisConnection2 : app.getAllConnections()) {
+				Log.d("check database for folder", thisConnection2.getFolder() + " - " + this.folder.getText().toString());
+				if(thisConnection2.getFolder().equals(this.folder.getText().toString())) {
+					// match
+					Toast.makeText(this, getString(R.string.folder_exists), 5000).show();	
+					return;
+				}
+			}
+		}
+		
+		if(file.exists()) {
+			Toast.makeText(this, getString(R.string.folder_exists), 5000).show();	
+			return;
+		}
+		
 		// we made it do the save
 		this.save();
+		
+		// and add this connection to the allConnections array
+		app.getAllConnections().add(thisConnection);
 	}
 	
 }

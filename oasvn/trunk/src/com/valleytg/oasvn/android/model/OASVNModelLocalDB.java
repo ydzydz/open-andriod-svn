@@ -225,6 +225,21 @@ public abstract class OASVNModelLocalDB extends OASVNModel {
 		}
 	}
 
+	/**
+	 * <p>Delete the database row for this object</p>
+	 * @param app - Pass the application containing the database connection
+	 */
+	public void deleteFromDatabase(OASVNApplication app) {
+		try {
+			String where = "id = ?";
+			String[] values = new String[1];
+			values[0] = this.getLocalDBId().toString();
+			app.database.delete(tableName, where, values);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	// gettors and settors
 	

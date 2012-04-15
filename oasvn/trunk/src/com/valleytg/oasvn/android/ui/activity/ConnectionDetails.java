@@ -153,9 +153,6 @@ public class ConnectionDetails extends Activity {
 		});
         
         
-        
-        
-        
         this.btnEdit.setOnClickListener(new View.OnClickListener() {
 			
 			public void onClick(View v) {
@@ -189,6 +186,13 @@ public class ConnectionDetails extends Activity {
 			            			app.initializePath();
 			            			File tree = app.assignPath();
 			            			app.deleteRecursive(tree);
+			            			
+			            			// set the connection revision back to 0
+		    				        app.getCurrentConnection().setHead(0);
+		    				        app.saveConnection(app.getCurrentConnection());
+		    				        
+		    				        // update the header
+		    				        populateTopInfo();
 		    				        
 			            		} 
 			            		catch(Exception e) {
@@ -199,8 +203,8 @@ public class ConnectionDetails extends Activity {
 			            }
 
 			        });
-		        builder.setNegativeButton(R.string.no, null);
-		        builder.show();	
+					builder.setNegativeButton(R.string.no, null);
+					builder.show();	
 					
 				}
 				else {

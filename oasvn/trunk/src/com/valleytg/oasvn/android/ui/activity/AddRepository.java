@@ -26,6 +26,7 @@ package com.valleytg.oasvn.android.ui.activity;
 import java.io.File;
 
 import android.app.*;
+import android.content.DialogInterface;
 import android.os.*;
 import android.util.Log;
 import android.view.*;
@@ -48,6 +49,12 @@ public class AddRepository extends Activity {
 	EditText username;
 	EditText password;
 	EditText folder;
+	
+	/**
+	 * Flag to track whether this is an edit so the original 
+	 * folder name can remain.
+	 */
+	private Boolean isEdit;
 	
 	/**
 	 * working connection
@@ -105,19 +112,25 @@ public class AddRepository extends Activity {
 
 	private void save() {
 		
+		// prep data for save
 		thisConnection.setName(name.getText().toString());
 		thisConnection.setUrl(url.getText().toString());
 		thisConnection.setUsername(username.getText().toString());
 		thisConnection.setPassword(password.getText().toString());
 		thisConnection.setFolder(folder.getText().toString());
 		
-		thisConnection.saveToLocalDB(this.app);
+		app.saveConnection(thisConnection);
+
+		// save to the database and in-memory array
 		
 		// close the activity
 		this.finish();
 	}
 	
 	private void checkRequired() {
+		
+		// initialize a flag that will allow a save at the end if all checks have passed
+		Boolean ready = false;
 				
 		if(this.url.getText().toString().length() >= 7 && (this.url.getText().toString().substring(0, 4).toLowerCase().equals("http") 
 				|| this.url.getText().toString().substring(0, 3).toLowerCase().equals("svn"))) {
@@ -140,31 +153,80 @@ public class AddRepository extends Activity {
 			return;
 		}
 		
-		// check to see if the folder already exists on the local disk and in the database
-		File file = new File(app.getFullPathToMain().toString() + this.thisConnection.getFolder().toString() + this.folder.getText().toString());
+		// check to see if the folder already exists in the database
+		Log.d("path considered", app.getFullPathToMain().toString() + this.folder.getText().toString());
+		File file = new File(app.getFullPathToMain().toString() + this.folder.getText().toString());
 		
 		// check all existing connection
 		if(app.getAllConnections().size() > 0) {
 			for(Connection thisConnection2 : app.getAllConnections()) {
 				Log.d("check database for folder", thisConnection2.getFolder() + " - " + this.folder.getText().toString());
 				if(thisConnection2.getFolder().equals(this.folder.getText().toString())) {
-					// match
-					Toast.makeText(this, getString(R.string.folder_exists), 5000).show();	
-					return;
+					// check to see if this is a new or existing connection
+					if(this.app.getCurrentConnection() != null) {
+						// existing connection, check to see if local database id's match (same entry can overwrite same folder name)
+						if(thisConnection2.getLocalDBId() == this.app.getCurrentConnection().getLocalDBId()) {
+							// ok
+						}
+						else {
+							// different connection, should not change folder name to existing one
+							Toast.makeText(this, getString(R.string.folder_exists), 5000).show();	
+							return;
+						}
+					}
+					else {
+						// new connection, folder should not exist in the database
+						Toast.makeText(this, getString(R.string.folder_exists), 5000).show();	
+						return;
+					}
 				}
 			}
 		}
-		
-		if(file.exists()) {
-			Toast.makeText(this, getString(R.string.folder_exists), 5000).show();	
-			return;
+		else {
+			ready = true;
 		}
 		
-		// we made it do the save
-		this.save();
+		// check to see if the file physically exists in storage and warn the user that there is already possibly data there
+		Log.d("file test", Boolean.toString(file.exists()));
+		Log.d("file test2", Boolean.toString(file.isDirectory()));
+		if(file.exists()) {
+			ready = false;
+			AlertDialog.Builder builder = new AlertDialog.Builder(AddRepository.this);
+			
+			builder.setIcon(android.R.drawable.ic_dialog_alert);
+			builder.setTitle(R.string.confirm);
+			builder.setMessage(getString(R.string.local_folder_warning));
+			builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+	            public void onClick(DialogInterface dialog, int which) {
+	            	// we made it do the save
+	        		AddRepository.this.save();
+	        		return;
+	            }
+
+	        });
+			builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+
+	            public void onClick(DialogInterface dialog, int which) {
+	            	return;
+	            }
+
+	        });
+
+			builder.show();	
+			return;
+		}
+		else {
+			ready = true;
+		}
 		
-		// and add this connection to the allConnections array
-		app.getAllConnections().add(thisConnection);
+		// made it to the end, save the connection
+		if (ready) {
+			this.save();
+		}
+		
 	}
+	
+	
 	
 }

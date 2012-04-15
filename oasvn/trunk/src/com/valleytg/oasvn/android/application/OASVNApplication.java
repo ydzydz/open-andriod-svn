@@ -327,9 +327,19 @@ public class OASVNApplication extends Application {
     		try {
     			updateClient.doCheckout(myURL, myFile, myRevision, myRevision, true, true);
     		}
-    		catch(SVNException e) {
-    			String msg = e.getMessage();
+    		catch(SVNException se) {
+    			String msg = se.getMessage();
     			return msg;
+    		}
+    		catch(VerifyError ve) {
+    			String msg = ve.getMessage();
+    			ve.printStackTrace();
+    			return "Verify " + msg;
+    		}
+    		catch(Exception e) {
+    			String msg = e.getMessage();
+    			e.printStackTrace();
+    			return "Exception " + msg;
     		}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -443,7 +453,41 @@ public class OASVNApplication extends Application {
 		}
 		dbCursor.close();
     }
+    
+    /**
+     * Handles saving the connection to the in-memory arraylist and to the local
+     * database.  Manages whether or not a connection is an update to an existing
+     * connection or a new connection.
+     * @param connection - connection to be saved or updated.
+     */
+    public void saveConnection(Connection connection) {
+		
+		// check all existing connection
+		int flag = -1;
+		if(this.getAllConnections().size() > 0) {
+			for(int i=0; i < this.getAllConnections().size(); i++) {
+				if(connection.getLocalDBId() == this.getAllConnections().get(i).getLocalDBId()) {
+					flag = i;
+				}
+			}
+		}
+		
+		// do the update or insert to the arraylist
+		if(flag >= 0) {
+			// entry exists, replace it
+			this.getAllConnections().set(flag, connection);
+		}
+		else {
+			// new
+			this.getAllConnections().add(connection);
+		}
 
+		// save to the local database
+		connection.saveToLocalDB(this);
+		
+	}
+    
+   
 	public void setmExternalStorageAvailable(boolean mExternalStorageAvailable) {
 		this.mExternalStorageAvailable = mExternalStorageAvailable;
 	}

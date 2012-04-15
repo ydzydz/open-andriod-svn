@@ -172,8 +172,6 @@ public class ConnectionDetails extends Activity {
 				// open the add repository activity
 				if(running	== false) {
 
-					
-					
 					// double check the users intention
 					AlertDialog.Builder builder = new AlertDialog.Builder(ConnectionDetails.this);
 					
@@ -188,7 +186,13 @@ public class ConnectionDetails extends Activity {
 			            			app.initializePath();
 			            			File tree = app.assignPath();
 			            			app.deleteRecursive(tree);
+			            			
+			            			// set the connection revision back to 0
+		    				        app.getCurrentConnection().setHead(0);
+		    				        app.saveConnection(app.getCurrentConnection());
 		    				        
+		    				        // update the header
+		    				        populateTopInfo();
 			            		} 
 			            		catch(Exception e) {
 			            			e.printStackTrace();
@@ -198,8 +202,8 @@ public class ConnectionDetails extends Activity {
 			            }
 
 			        });
-		        builder.setNegativeButton(R.string.no, null);
-		        builder.show();	
+					builder.setNegativeButton(R.string.no, null);
+					builder.show();	
 					
 				}
 				else {

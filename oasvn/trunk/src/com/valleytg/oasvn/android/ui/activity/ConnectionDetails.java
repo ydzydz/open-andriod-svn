@@ -35,9 +35,11 @@ import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -75,6 +77,7 @@ public class ConnectionDetails extends Activity {
 	Button btnEdit;
 	Button btnDelete;
 	Button btnRepoDelete;
+	Button btnFileManager;
 	
 	/**
 	 * Thread control
@@ -110,6 +113,7 @@ public class ConnectionDetails extends Activity {
         btnDelete = (Button) findViewById(R.id.conndetail_delete_local);
         btnEdit = (Button) findViewById(R.id.conndetail_edit);
         btnRepoDelete = (Button) findViewById(R.id.conndetail_delete_connection);
+        btnFileManager = (Button) findViewById(R.id.conndetail_open_fm);
         
         // populate the top
         populateTopInfo();
@@ -160,6 +164,21 @@ public class ConnectionDetails extends Activity {
 				// open the add repository activity
 				Intent intent = new Intent(ConnectionDetails.this, AddRepository.class);
 				startActivity(intent);
+				
+			}
+		});
+        
+        this.btnFileManager.setOnClickListener(new View.OnClickListener() {
+			
+			public void onClick(View v) {
+				// Warn the user that not all file browser support landing in the correct directory
+				Toast.makeText(ConnectionDetails.this, getString(R.string.file_manager_warning), 6000).show();
+				
+	            Intent intent = new Intent();  
+	            intent.addCategory(Intent.CATEGORY_OPENABLE);
+	            intent.setAction(Intent.ACTION_GET_CONTENT);  
+	            intent.setDataAndType(Uri.parse(app.assignPath().toString()), "*/*");
+	            startActivity(intent);  
 				
 			}
 		});

@@ -131,13 +131,24 @@
 		        android:textSize="24sp"
 		        android:layout_below="@id/conndetail_full_checkout"
 		        android:text="@string/commit" />
-			<Button 
-			    android:id="@+id/conndetail_edit"
+			<LinearLayout android:orientation="horizontal"
 			    android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:textSize="24sp"
-		        android:layout_below="@id/conndetail_full_commit"
-		        android:text="@string/edit" />
+			    android:layout_height="wrap_content">
+			    <Button 
+				    android:id="@+id/conndetail_edit"
+				    android:layout_width="fill_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_weight="1"
+			        android:textSize="24sp"
+			        android:text="@string/edit" />
+			    <Button 
+				    android:id="@+id/conndetail_open_fm"
+				    android:layout_width="fill_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_weight="1"
+			        android:textSize="22sp"
+			        android:text="@string/file_manager" />
+			</LinearLayout>
 			<LinearLayout android:orientation="horizontal"
 			    android:layout_width="fill_parent"
 			    android:layout_height="wrap_content">
@@ -155,8 +166,7 @@
 			        android:layout_weight="1"
 			        android:textSize="22sp"
 			        android:text="@string/delete_connection" />
-			  </LinearLayout>
-			
+			</LinearLayout>
 			<TextView 
 			    android:id="@+id/conndetail_status"
 			    android:layout_width="fill_parent" 

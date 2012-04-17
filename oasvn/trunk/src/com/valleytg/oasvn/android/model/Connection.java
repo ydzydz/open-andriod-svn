@@ -84,6 +84,10 @@ public class Connection extends OASVNModelLocalDB {
 	 * @param folder
 	 */
 	public Connection(String name, String url, PROTOCOL_TYPE type, String username, String password, String folder) {
+		
+		// call the super, setting the table name
+		super("connection");
+		
 		this.setName(name);
 		this.setUrl(url);
 		this.setUsername(username);

@@ -23,31 +23,6 @@
 
 package com.valleytg.oasvn.android.database;
 
-/**
- * @author brian.gormanly
- * <p>Copyright 2011 Valley Technologies Group, Brian Gormanly and 
- * Commercial Site Services all rights reserved.</p>
- * 
- * <p>This is software is not to be distributed, copied or used in any way.</p>
- * 
- * <p>VALLEY TECHNOLOGIES GROUP AND COMMERCIAL SITE SERVICES WILL BE NOT
- * LIABLE TO NMR FOR ANY SPECIAL, INDIRECT, INCIDENTAL, CONSEQUENTIAL OR
- * STATUTORY DAMAGES RELATED TO ANY CAUSE OF ACTION ARISING OUT OF THIS
- * AGREEMENT, EVEN IF NRI IS INFORMED OF THE POSSIBILITY THEREOF IN ADVANCE.</p>
- * 
- * <p>LICENSEE agrees not to create, or attempt to create, or permit or help 
- * others to create, the source code from the SOFTWARE furnished pursuant 
- * to this Agreement.</p>
- * 
- * <p>The SOFTWARE and documentation are provided with RESTRICTED RIGHTS. Use, 
- * duplication, or disclosure by the Government is subject to restrictions 
- * as set forth in the Rights in Technical Data and Computer SOFTWARE 
- * Regulations. Contractor/manufacturer is Valley Technologies Group, 
- * 110 Oak Ridge Rd, Hopewell Junction, NY, 12533 (646) 801-6004. Owner 
- * is Commercial Site Services.</p>
- * 
- */
-
 import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.application.OASVNApplication;
 
@@ -69,7 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 Context mContext;
 	
 	public static final String DB_NAME = "OASVN";
-	public static final int VERSION = 1;
+	public static final int VERSION = 2;
 	
 	public String pNumber;
 	
@@ -89,8 +64,18 @@ Context mContext;
 		// upgrades will go here
 		
 		try {
-			//sql execs go here
-			//db.execSQL(sql1);
+			String[] sql = mContext.getString(R.string.db_update_1_1).split("\n");
+			db.beginTransaction();
+			try {
+				// Create tables & test data
+				execMultipleSQL(db, sql);
+				db.setTransactionSuccessful();
+				Log.d("Database upgrade", "Database upgrade successful!");
+			} catch (SQLException e) {
+	            Log.e("Error creating tables and debug data", e.toString());
+	        } finally {
+	        	db.endTransaction();
+	        }
 			
 		}
 		catch(SQLException e) {

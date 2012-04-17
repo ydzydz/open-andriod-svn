@@ -23,6 +23,8 @@
 
 package com.valleytg.oasvn.android.model;
 
+import java.util.ArrayList;
+
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
@@ -55,6 +57,7 @@ public class Connection extends OASVNModelLocalDB {
 	    public String toString() { return label; }  
 	}
 	
+	// members saved in the database
 	private String name = "";
 	private String textURL = "";
 	private SVNURL repositoryURL;
@@ -64,6 +67,9 @@ public class Connection extends OASVNModelLocalDB {
 	private String password = "";
 	private String folder = "";
 	private Integer head = 0;
+	
+	// members not saved in the databse
+	private ArrayList<LogItem> logs = new ArrayList<LogItem>();
 	
 	/**
 	 * Default Constructor, connection is not ready to be used until url, username and password are provided
@@ -195,6 +201,93 @@ public class Connection extends OASVNModelLocalDB {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	// log management
+	
+	/**
+	 * Retrieve all of the logs that are saved in the local database and are 
+	 * associated with this connection.  Saves them in the logs ArrayList.
+	 * 
+	 * @param app - Application context, required to access the database
+	 */
+	public void retrieveAllLogs(OASVNApplication app) {
+		String sql = "select * from logging where connectionId = " + this.getLocalDBId() + ";";
+		Cursor dbCursor = app.database.rawQuery(sql, null);
+		dbCursor.moveToFirst();
+		
+		if(!dbCursor.isAfterLast()) {
+			
+			// clear out any user currently stored in mem
+			this.logs.removeAll(this.logs);
+			
+			// iterate through local and populate
+			while(!dbCursor.isAfterLast()) {
+				LogItem thisLog = new LogItem();
+				thisLog.setData(dbCursor);
+				dbCursor.moveToNext();
+				
+				this.logs.add(thisLog);
+			}
+		}
+		dbCursor.close();
+	}
+	
+	/**
+	 * Creates a LogItem, saves it to the local db associated with the connection and adds the LogItem
+	 * to the connections ArrayList of log items.
+	 * 
+	 * @param app
+	 * @param log_number
+	 * @param shortMessage
+	 * @param message
+	 */
+	public void createLogEntry(OASVNApplication app, String log_number, String shortMessage, String message) {
+		//create the new LogItem
+		LogItem thisLogItem = new LogItem(this.getLocalDBId(), log_number, shortMessage, message);
+		
+		// save the logItem to the local db
+		thisLogItem.saveToLocalDB(app);
+		
+		// add the logItem to the arraylist
+		this.logs.add(thisLogItem);
+	}
+	
+	/**
+	 * Creates a LogItem, saves it to the local db associated with the connection and adds the LogItem
+	 * to the connections ArrayList of log items.
+	 * 
+	 * @param app
+	 * @param shortMessage
+	 * @param message
+	 */
+	public void createLogEntry(OASVNApplication app, String shortMessage, String message) {
+		createLogEntry(app, "-", shortMessage, message);
+	}
+	
+	/**
+	 * Creates a LogItem, saves it to the local db associated with the connection and adds the LogItem
+	 * to the connections ArrayList of log items.
+	 * 
+	 * @param app
+	 * @param message
+	 */
+	public void createLogEntry(OASVNApplication app, String message) {
+		createLogEntry(app, "-", "-", message);
+	}
+	
+	/**
+	 * STUB: Will delete LogItem from the local database and remove it from the connections arraylist
+	 * of logs.
+	 * @param app
+	 * @param logId
+	 */
+	public void removeLogEntry(OASVNApplication app, Integer logId) {
+		// STUB
+	}
+	
+	
+	// gettors and settors
 	
 	public void dateUpdated() {
 		this.setDateModified(DateUtil.getGMTNow());

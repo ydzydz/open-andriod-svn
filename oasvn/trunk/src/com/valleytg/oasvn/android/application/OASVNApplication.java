@@ -329,15 +329,27 @@ public class OASVNApplication extends Application {
     		}
     		catch(SVNException se) {
     			String msg = se.getMessage();
+    			
+    			// log this failure
+    			this.getCurrentConnection().createLogEntry(this, "Error", se.getMessage(), se.getErrorMessage().getFullMessage());
+    			
     			return msg;
     		}
     		catch(VerifyError ve) {
     			String msg = ve.getMessage();
+    			
+    			// log this failure
+    			this.getCurrentConnection().createLogEntry(this, "Error", ve.getMessage(), ve.getLocalizedMessage());
+    			
     			ve.printStackTrace();
     			return "Verify " + msg;
     		}
     		catch(Exception e) {
     			String msg = e.getMessage();
+    			
+    			// log this failure
+    			this.getCurrentConnection().createLogEntry(this, "Error", e.getCause().toString(), e.getMessage());
+    			
     			e.printStackTrace();
     			return "Exception " + msg;
     		}
@@ -369,10 +381,19 @@ public class OASVNApplication extends Application {
 		}
 		catch(SVNException e) {
 			String msg = e.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, "Error", e.getMessage(), e.getErrorMessage().getFullMessage());
+			
 			return msg;
 		}
 		
-		return Long.toString(getInfo().getNewRevision());
+		Long revision = getInfo().getNewRevision();
+		
+		// log that the commit was successful
+		this.getCurrentConnection().createLogEntry(this, revision.toString(), "Commit Successful", this.commitComments);
+		
+		return Long.toString(revision);
 		
     }
     
@@ -389,6 +410,10 @@ public class OASVNApplication extends Application {
         		//this.initAuthManager();
         		
         		Integer rev = (int) clientManager.getStatusClient().doStatus(this.assignPath(), false).getRevision().getNumber();
+        		
+        		// log that the revision number was retrieved 
+        		this.getCurrentConnection().createLogEntry(this, rev.toString(), "Revision", "Local revision number updated, Rev. No. :" + rev);
+        		
         		return rev;
         	}
         	else {

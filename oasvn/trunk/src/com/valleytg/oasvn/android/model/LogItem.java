@@ -52,7 +52,7 @@ public class LogItem extends OASVNModelLocalDB {
 	public LogItem(Integer connectionId, String logNumber, String shortMessage, String message) {
 		
 		// call the super, setting the table name
-		super("connection");
+		super("logging");
 		
 		this.setConnectionId(connectionId);
 		this.setLogNumber(logNumber);

@@ -75,6 +75,7 @@ public class ConnectionDetails extends Activity {
 	Button btnCheckoutHead;
 	Button btnCommit;
 	Button btnEdit;
+	Button btnLog;
 	Button btnDelete;
 	Button btnRepoDelete;
 	Button btnFileManager;
@@ -114,6 +115,7 @@ public class ConnectionDetails extends Activity {
         btnEdit = (Button) findViewById(R.id.conndetail_edit);
         btnRepoDelete = (Button) findViewById(R.id.conndetail_delete_connection);
         btnFileManager = (Button) findViewById(R.id.conndetail_open_fm);
+        btnLog = (Button) findViewById(R.id.conndetail_logs);
         
         // populate the top
         populateTopInfo();
@@ -156,7 +158,17 @@ public class ConnectionDetails extends Activity {
 			}
 		});
         
-        
+        this.btnLog.setOnClickListener(new View.OnClickListener() {
+			
+			public void onClick(View v) {
+				
+				// open the add repository activity
+				Intent intent = new Intent(ConnectionDetails.this, LogView.class);
+				startActivity(intent);
+				
+			}
+		});
+
         this.btnEdit.setOnClickListener(new View.OnClickListener() {
 			
 			public void onClick(View v) {

@@ -289,6 +289,14 @@ public class Connection extends OASVNModelLocalDB {
 	
 	// gettors and settors
 	
+	public ArrayList<LogItem> getLogs() {
+		return this.logs;
+	}
+	
+	public void setLogs(ArrayList<LogItem> logs) {
+		this.logs = logs;
+	}
+	
 	public void dateUpdated() {
 		this.setDateModified(DateUtil.getGMTNow());
 	}

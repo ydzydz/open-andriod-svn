@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.tmatesoft.svn.core.SVNCommitInfo;
+import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
@@ -38,6 +39,7 @@ import org.tmatesoft.svn.core.wc.admin.SVNLookClient;
 
 import com.valleytg.oasvn.android.database.DatabaseHelper;
 import com.valleytg.oasvn.android.model.Connection;
+import com.valleytg.oasvn.android.model.LogItem;
 import com.valleytg.oasvn.android.util.Settings;
 
 import android.app.Application;
@@ -78,22 +80,27 @@ public class OASVNApplication extends Application {
     /**
      * Current connection
      */
-    Connection currentConnection;
+    private Connection currentConnection;
+    
+    /**
+     * Current Log
+     */
+    private LogItem currentLog;
     
     /**
      * All connections
      */
-    ArrayList<Connection> allConnections;
+    private ArrayList<Connection> allConnections;
     
     /**
      * BasicAithenticationManager sets up the svn authentication with the server.
      */
-    BasicAuthenticationManager myAuthManager;
+    private BasicAuthenticationManager myAuthManager;
     
     /**
      * The SVNClientManager class is used to manage SVN*Client objects
      */
-    SVNClientManager clientManager;
+    private SVNClientManager clientManager;
     
     /**
      * The SVNLookClient class provides API for examining different aspects of a 
@@ -102,14 +109,14 @@ public class OASVNApplication extends Application {
      * methods of SVNLookClient to the corresponding commands of the svnlook 
      * utility (to make sense what its different methods are for):
      */
-    SVNLookClient lookClient;
+    private SVNLookClient lookClient;
     
     /**
      * This class provides methods which allow to check out, update, switch and 
      * relocate a Working Copy as well as export an unversioned directory or file 
      * from a repository.
      */
-    SVNUpdateClient updateClient;
+    private SVNUpdateClient updateClient;
     
     /**
      * The SVNCommitClient class provides methods to perform operations that relate 
@@ -118,7 +125,7 @@ public class OASVNApplication extends Application {
      * which operate on working copy items as well as ones that operate only on a 
      * repository.
      */
-    SVNCommitClient commitClient;
+    private SVNCommitClient commitClient;
     
     /**
      * 
@@ -322,10 +329,15 @@ public class OASVNApplication extends Application {
     		
     		SVNURL myURL = this.currentConnection.getRepositoryURL();
     		File myFile = this.assignPath();
+    		SVNRevision pegRevision = SVNRevision.UNDEFINED;
     		SVNRevision myRevision = SVNRevision.HEAD;
-    		
+    		SVNDepth depth = SVNDepth.INFINITY;
     		try {
-    			updateClient.doCheckout(myURL, myFile, myRevision, myRevision, true, true);
+    			// do the checkout
+    			Long rev = updateClient.doCheckout(myURL, myFile, pegRevision, myRevision, depth, true);
+    			
+    			// log this success
+    			this.getCurrentConnection().createLogEntry(this, "Checkout", "Successful checkout", "Revision: " + rev.toString());
     		}
     		catch(SVNException se) {
     			String msg = se.getMessage();
@@ -608,5 +620,13 @@ public class OASVNApplication extends Application {
 
 	public String getFullPathToMain() {
 		return fullPathToMain;
+	}
+
+	public void setCurrentLog(LogItem currentLog) {
+		this.currentLog = currentLog;
+	}
+
+	public LogItem getCurrentLog() {
+		return currentLog;
 	}
 }

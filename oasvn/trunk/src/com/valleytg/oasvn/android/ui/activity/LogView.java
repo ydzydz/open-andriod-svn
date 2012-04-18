@@ -7,6 +7,7 @@ import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.application.OASVNApplication;
 import com.valleytg.oasvn.android.model.Connection;
 import com.valleytg.oasvn.android.model.LogItem;
+import com.valleytg.oasvn.android.util.DateUtil;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -74,7 +75,7 @@ public class LogView extends ListActivity {
 			//startActivity(intent);
 		} 
 		catch (Exception e) {
-			Toast.makeText(this, getString(R.string.create_connection), 1500).show();
+			//Toast.makeText(this, getString(R.string.create_connection), 1500).show();
 			e.printStackTrace();
 		}
 	}
@@ -120,7 +121,8 @@ public class LogView extends ListActivity {
 	        		// connections ready to go
 	        		logs = new String[app.getCurrentConnection().getLogs().size()];
 	        		for(LogItem log : app.getCurrentConnection().getLogs()) {
-	            		logs[app.getCurrentConnection().getLogs().indexOf(log)] = log.getLogNumber() + " | " + log.getShortMessage() + "\n" + log.getMessage();
+	            		logs[app.getCurrentConnection().getLogs().indexOf(log)] = log.getLogNumber() + " | " + DateUtil.getSimpleDateTime(log.getDateCreated(), this) 
+	            		+ "\nType: " + log.getShortMessage() + "\nMessage: " + log.getMessage();
 	            	}
 	        		
 	        		

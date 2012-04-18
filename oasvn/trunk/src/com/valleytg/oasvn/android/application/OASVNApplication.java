@@ -377,7 +377,8 @@ public class OASVNApplication extends Application {
      * Does a full commit to the repository
      * @return Response from the server (error code or success)
      */
-    public String fullCommit() {
+    @SuppressWarnings("deprecation")
+	public String fullCommit() {
     	
 		
 		// make sure the path is ready
@@ -388,8 +389,19 @@ public class OASVNApplication extends Application {
 		SVNRevision myRevision = SVNRevision.HEAD;
 
 		try {
-			setInfo(commitClient.doCommit( new File[] {myFile} , false, this.commitComments , false , true));
+			setInfo(commitClient.doCommit(new File[] {myFile} , false, this.commitComments , false , true));
 			System.out.println("Revision " + getInfo().getNewRevision());
+			
+			// check to see if the commit revision is -1 (means nothing was committed - no change)
+			if(getInfo().getNewRevision() == -1) {
+				this.getCurrentConnection().createLogEntry(this, "Commit", "No Change: " 
+						+ Long.toString(getInfo().getNewRevision()), "No changes were available to commit to the repository");
+			}
+			else {
+				// log that the commit was successful
+				this.getCurrentConnection().createLogEntry(this, "Commit", "Commit Successful Revision: " 
+						+ Long.toString(getInfo().getNewRevision()), "Commit comments: " + this.commitComments + "\nAuthor: " + getInfo().getAuthor());
+			}
 		}
 		catch(SVNException e) {
 			String msg = e.getMessage();
@@ -401,9 +413,6 @@ public class OASVNApplication extends Application {
 		}
 		
 		Long revision = getInfo().getNewRevision();
-		
-		// log that the commit was successful
-		this.getCurrentConnection().createLogEntry(this, revision.toString(), "Commit Successful", this.commitComments);
 		
 		return Long.toString(revision);
 		
@@ -424,7 +433,7 @@ public class OASVNApplication extends Application {
         		Integer rev = (int) clientManager.getStatusClient().doStatus(this.assignPath(), false).getRevision().getNumber();
         		
         		// log that the revision number was retrieved 
-        		this.getCurrentConnection().createLogEntry(this, rev.toString(), "Revision", "Local revision number updated, Rev. No. :" + rev);
+        		this.getCurrentConnection().createLogEntry(this, "Revision", "Rev. No. :" + rev, "Local revision number updated, Rev. No. :" + rev);
         		
         		return rev;
         	}

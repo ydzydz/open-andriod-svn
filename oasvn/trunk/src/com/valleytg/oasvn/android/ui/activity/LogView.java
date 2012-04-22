@@ -29,35 +29,49 @@ public class LogView extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.log);
         
-        // get the application
-        this.app = (OASVNApplication)getApplication();
-        
-        // initialize the buttons
-        btnBack = (Button) findViewById(R.id.log_back);
-        
-        // set the list adapter
-        setListAdapter(new ArrayAdapter<String>(this, R.layout.log_item));
-        
-        // populate the list
-        populateList();
-        
-        // button listeners     
-        this.btnBack.setOnClickListener(new View.OnClickListener() {
-			
-			public void onClick(View v) {
-				LogView.this.finish();
-			}
-		});
+        try {
+	        // get the application
+	        this.app = (OASVNApplication)getApplication();
+	        
+	        // initialize the buttons
+	        btnBack = (Button) findViewById(R.id.log_back);
+	        
+	        // set the list adapter
+	        setListAdapter(new ArrayAdapter<String>(this, R.layout.log_item));
+	        
+	        // populate the list
+	        populateList();
+	        
+	        // button listeners     
+	        this.btnBack.setOnClickListener(new View.OnClickListener() {
+				
+				public void onClick(View v) {
+					LogView.this.finish();
+				}
+			});
+        }
+        catch (Exception e) {
+        	// problem loading activity
+        	this.finish();
+        	e.printStackTrace();
+        }
 	}
 	
 	
 	@Override
 	protected void onRestart() {
-		// TODO Auto-generated method stub
-		super.onRestart();
 		
-		// populate the list
-        populateList();
+		try{
+			super.onRestart();
+			
+			// populate the list
+	        populateList();
+		}
+		catch (Exception e) {
+        	// problem loading activity
+        	this.finish();
+        	e.printStackTrace();
+        }
 	}
 
 	@Override
@@ -83,16 +97,22 @@ public class LogView extends ListActivity {
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
-		super.onResume();
-		
-		// populate the list
-        populateList();
+		try {
+			super.onResume();
+			
+			// populate the list
+	        populateList();
+		}
+		catch (Exception e) {
+        	// problem loading activity
+        	this.finish();
+        	e.printStackTrace();
+        }
 	}
 
 
 	private void populateList() {
-    	// intialize array of choices
+    	// Initialize array of choices
         String[] logs;
         logs = null;
  
@@ -113,7 +133,7 @@ public class LogView extends ListActivity {
 						public int compare(LogItem lhs, LogItem rhs) {
 							LogItem p1 = (LogItem) lhs;
 	    	                LogItem p2 = (LogItem) rhs;
-	    	               return p1.getDateCreated().compareTo(p2.getDateCreated());
+	    	               return p2.getDateCreated().compareTo(p1.getDateCreated());
 						}
 	    	 
 	    	        });
@@ -122,7 +142,7 @@ public class LogView extends ListActivity {
 	        		logs = new String[app.getCurrentConnection().getLogs().size()];
 	        		for(LogItem log : app.getCurrentConnection().getLogs()) {
 	            		logs[app.getCurrentConnection().getLogs().indexOf(log)] = log.getLogNumber() + " | " + DateUtil.getSimpleDateTime(log.getDateCreated(), this) 
-	            		+ "\nType: " + log.getShortMessage() + "\nMessage: " + log.getMessage();
+	            		+ "\nType: " + log.getShortMessage();
 	            	}
 	        		
 	        		

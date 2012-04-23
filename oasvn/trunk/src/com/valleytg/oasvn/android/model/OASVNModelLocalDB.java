@@ -101,9 +101,9 @@ public abstract class OASVNModelLocalDB extends OASVNModel {
 			values.put("active", "0");
 		}
 		
-		values.put("date_modified", this.getDateModified().toString());
+		values.put("date_modified", DateUtil.dateFormat.format(this.getDateModified()));
 		if(this.getDateCreated() != null) {
-			values.put("date_created", this.getDateCreated().toString());
+			values.put("date_created", DateUtil.dateFormat.format(this.getDateCreated()));
 		}
 		
 		// call the database insert

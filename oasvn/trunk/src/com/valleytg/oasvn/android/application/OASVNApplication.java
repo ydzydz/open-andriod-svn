@@ -343,7 +343,7 @@ public class OASVNApplication extends Application {
     			String msg = se.getMessage();
     			
     			// log this failure
-    			this.getCurrentConnection().createLogEntry(this, "Error", se.getMessage(), se.getStackTrace().toString());
+    			this.getCurrentConnection().createLogEntry(this, "Error", se.getMessage().substring(0, 19), se.getMessage().toString());
     			
     			return msg;
     		}
@@ -351,7 +351,7 @@ public class OASVNApplication extends Application {
     			String msg = ve.getMessage();
     			
     			// log this failure
-    			this.getCurrentConnection().createLogEntry(this, "Error", ve.getMessage(), ve.getStackTrace().toString());
+    			this.getCurrentConnection().createLogEntry(this, "Error", ve.getMessage().substring(0, 19), ve.getMessage().toString());
     			
     			ve.printStackTrace();
     			return "Verify " + msg;
@@ -360,7 +360,7 @@ public class OASVNApplication extends Application {
     			String msg = e.getMessage();
     			
     			// log this failure
-    			this.getCurrentConnection().createLogEntry(this, "Error", e.getCause().toString(), e.getStackTrace().toString());
+    			this.getCurrentConnection().createLogEntry(this, "Error", e.getCause().toString().substring(0, 19), e.getMessage().toString());
     			
     			e.printStackTrace();
     			return "Exception " + msg;
@@ -407,7 +407,7 @@ public class OASVNApplication extends Application {
 			String msg = e.getMessage();
 			
 			// log this failure
-			this.getCurrentConnection().createLogEntry(this, "Error", e.getMessage(), e.getStackTrace().toString());
+			this.getCurrentConnection().createLogEntry(this, "Error", e.getMessage().substring(0, 19), e.getMessage().toString());
 			
 			return msg;
 		}

@@ -169,7 +169,7 @@
 			        android:layout_height="wrap_content"
 			        android:layout_weight="1"
 			        android:textSize="22sp"
-			        android:text="@string/delete" />
+			        android:text="@string/delete_folder" />
 			    <Button 
 				    android:id="@+id/conndetail_delete_connection"
 				    android:layout_width="fill_parent"

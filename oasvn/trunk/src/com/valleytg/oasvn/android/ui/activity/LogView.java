@@ -1,5 +1,29 @@
+/**
+ * @author brian.gormanly
+ * OASVN (Open Android SVN)
+ * Copyright (C) 2012 Brian Gormanly
+ * Valley Technologies Group
+ * http://www.valleytg.com
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version. 
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ */
+
 package com.valleytg.oasvn.android.ui.activity;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -9,7 +33,9 @@ import com.valleytg.oasvn.android.model.Connection;
 import com.valleytg.oasvn.android.model.LogItem;
 import com.valleytg.oasvn.android.util.DateUtil;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -22,6 +48,7 @@ import android.widget.Toast;
 public class LogView extends ListActivity {
 	
 	OASVNApplication app;
+	Button btnDelete;
 	Button btnBack;
 
 	@Override
@@ -34,6 +61,7 @@ public class LogView extends ListActivity {
 	        this.app = (OASVNApplication)getApplication();
 	        
 	        // initialize the buttons
+	        btnDelete = (Button) findViewById(R.id.log_delete);
 	        btnBack = (Button) findViewById(R.id.log_back);
 	        
 	        // set the list adapter
@@ -42,13 +70,48 @@ public class LogView extends ListActivity {
 	        // populate the list
 	        populateList();
 	        
-	        // button listeners     
+	        // button listeners 
+	        this.btnDelete.setOnClickListener(new View.OnClickListener() {
+				
+				public void onClick(View v) {
+	
+					// double check the users intention
+					AlertDialog.Builder builder = new AlertDialog.Builder(LogView.this);
+					
+					builder.setIcon(android.R.drawable.ic_dialog_alert);
+					builder.setTitle(R.string.confirm);
+					builder.setMessage(getString(R.string.delete_all_logs_warning));
+					builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+			            public void onClick(DialogInterface dialog, int which) {
+			            	synchronized (this) {
+			            		try{
+			            			// do the removal
+			            			app.getCurrentConnection().removeLogEntrys(app);
+			            			
+		    				        // update the activity
+		    				        populateList();
+		    				        
+			            		} 
+			            		catch(Exception e) {
+			            			e.printStackTrace();
+			            		}
+			            	}	
+			            }
+			        });
+					builder.setNegativeButton(R.string.no, null);
+					builder.show();	
+
+				}
+			});
+
 	        this.btnBack.setOnClickListener(new View.OnClickListener() {
 				
 				public void onClick(View v) {
 					LogView.this.finish();
 				}
 			});
+
         }
         catch (Exception e) {
         	// problem loading activity
@@ -85,8 +148,8 @@ public class LogView extends ListActivity {
 			app.setCurrentLog(thisLog);
 			
 			// go to the log details screen
-			//Intent intent = new Intent(LogView.this, LogDetails.class);
-			//startActivity(intent);
+			Intent intent = new Intent(LogView.this, LogDetails.class);
+			startActivity(intent);
 		} 
 		catch (Exception e) {
 			//Toast.makeText(this, getString(R.string.create_connection), 1500).show();

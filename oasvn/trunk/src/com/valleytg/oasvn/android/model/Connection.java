@@ -277,13 +277,45 @@ public class Connection extends OASVNModelLocalDB {
 	}
 	
 	/**
-	 * STUB: Will delete LogItem from the local database and remove it from the connections arraylist
-	 * of logs.
+	 * STUB: Will delete all LogItems for this connection from the local database and remove them 
+	 * from the connections arraylist of logs.
 	 * @param app
-	 * @param logId
+	 */
+	public void removeLogEntrys(OASVNApplication app) {
+		for(LogItem thislog : this.getLogs()) {
+			thislog.deleteFromDatabase(app);
+		}
+		
+		// once the database removals are done empty the logs arraylist
+		this.getLogs().clear();
+	}
+	
+	/**
+	 * STUB: Will delete one LogItem for this connection from the local database and remove it 
+	 * from the connections arraylist of logs.
+	 * @param app
+	 * @param logId - Id of the log to be removed
 	 */
 	public void removeLogEntry(OASVNApplication app, Integer logId) {
-		// STUB
+		// flag will contain the index of the log if found
+		Integer flag = -1;
+		for(LogItem thisLog : this.getLogs()) {
+			if(thisLog.getLocalDBId() == logId) {
+				thisLog.deleteFromDatabase(app);
+				flag = this.getLogs().indexOf(thisLog);
+			}
+		}
+		
+		// If there was a match remove it from teh arraylist as well
+		if(flag >= 0) {
+			// check to see if this is the last log entry
+			if(this.getLogs().size() == 1) {
+				this.getLogs().removeAll(this.getLogs());
+			}
+			else {
+				this.getLogs().remove(flag);
+			}
+		}
 	}
 	
 	

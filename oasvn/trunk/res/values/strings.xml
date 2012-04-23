@@ -33,7 +33,7 @@
     <string name="checkout">Checkout</string>
     <string name="commit">Commit</string>
     <string name="file_manager">Open Folder</string>
-    <string name="delete">Delete Folder</string>
+    <string name="delete_folder">Delete Folder</string>
     <string name="delete_connection">Delete Repo</string>
     <string name="view_logs">Show Log</string>
     <string name="performing_checkout">Performing Checkout!!!</string>
@@ -55,5 +55,15 @@
     
     <!-- LogView -->
     <string name="no_logs">No logs are stored for this connection.</string>
+    <string name="delete_all_logs">Clear Connection Logs</string>
+    <string name="delete_all_logs_warning">Are you sure you want to clear all log entries for this connection?</string>
+    
+    <!-- LogDetails -->
+    <string name="logdetail_header">Entry Details</string>
+	<string name="type">Type:</string>
+	<string name="date">Date:</string>
+	<string name="message">Message:</string>
+	<string name="author">Author:</string>
+	<string name="delete_entry">Delete Log Entry</string>
 
 </resources>

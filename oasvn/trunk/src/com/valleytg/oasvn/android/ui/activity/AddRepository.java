@@ -90,7 +90,7 @@ public class AddRepository extends Activity {
         }
         else {
 	        // initialize the connection
-	        thisConnection = new Connection();
+	        thisConnection = new Connection(app.getCurrentConnection().getTextURL());
         }
         
         // button listeners     

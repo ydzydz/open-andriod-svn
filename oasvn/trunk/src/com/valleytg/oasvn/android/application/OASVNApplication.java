@@ -473,8 +473,10 @@ public class OASVNApplication extends Application {
 			
 			// iterate through local and populate
 			while(!dbCursor.isAfterLast()) {
-				Connection thisConnection = new Connection();
-				thisConnection.setData(dbCursor);
+				Connection thisConnection;
+
+				thisConnection = new Connection(dbCursor);
+
 				dbCursor.moveToNext();
 				
 				this.allConnections.add(thisConnection);

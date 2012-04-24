@@ -141,6 +141,13 @@
 			        android:layout_weight="1"
 			        android:textSize="22sp"
 			        android:text="@string/view_logs" />
+			    <Button 
+				    android:id="@+id/conndetail_revisions"
+			        android:layout_height="wrap_content"
+			        android:layout_width="fill_parent"
+			        android:layout_weight="1"
+			        android:textSize="22sp"
+			        android:text="@string/view_revisions" />
 			</LinearLayout>
 			<LinearLayout android:orientation="horizontal"
 			    android:layout_width="fill_parent"

@@ -25,18 +25,11 @@ package com.valleytg.oasvn.android.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
+import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
-import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
-import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
-import org.tmatesoft.svn.core.io.SVNRepository;
-import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
-import org.tmatesoft.svn.core.wc.SVNRevision;
-import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -77,21 +70,18 @@ public class Connection extends OASVNModelLocalDB {
 	private String folder = "";
 	private Integer head = 0;
 	
+	// members not saved in the databse
 	private ArrayList<LogItem> logs = new ArrayList<LogItem>();
-	
-	// members not saved in the database
-	SVNRepository repository;
-	private ArrayList<SVNRevision> revisions = new ArrayList<SVNRevision>();
+	private Collection<SVNDirEntry> directories = null;
 	
 	/**
-	 * Datbase (cursor) Constructor
-	 * can only be called when data is being passed in a cursor.
+	 * Default Constructor, connection is not ready to be used until url, username and password are provided
+	 * and the AuthManager is initialized.
 	 */
-	public Connection(Cursor dbCursor) {
+	public Connection() {
 		// call the super, setting the table name
 		super("connection");
 		
-		this.setData(dbCursor);
 	}
 	
 	/**
@@ -113,23 +103,6 @@ public class Connection extends OASVNModelLocalDB {
 		this.setPassword(password);
 		this.setFolder(folder);
 		this.initializeAuthManager();
-		
-		this.init();
-
-	}
-	
-	private void init() {
-		SVNRepositoryFactoryImpl.setup();
-		
-		try {
-			this.repository = SVNRepositoryFactory.create( SVNURL.parseURIEncoded(this.getTextURL()) );
-		} catch (SVNException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		ISVNAuthenticationManager authManager = SVNWCUtil.createDefaultAuthenticationManager( this.getUsername(), this.getPassword() );
-		repository.setAuthenticationManager( authManager );
 	}
 	
 	/**
@@ -205,8 +178,6 @@ public class Connection extends OASVNModelLocalDB {
 		}
 		
 		super.setData(results);
-		
-		this.init();
 	}
 	
 	/**
@@ -351,24 +322,6 @@ public class Connection extends OASVNModelLocalDB {
 	}
 	
 	
-	// Revisions
-	
-	@SuppressWarnings("unchecked")
-	public void retrieveAllRevisions() {
-		SVNRevision startRevision = SVNRevision.BASE;
-		SVNRevision endRevision = SVNRevision.HEAD; //HEAD (i.e. the latest) revision
-		
-		Collection logEntries = null;
-		try {
-			repository.
-			logEntries = repository.log( new String[] { "EJB.java" }, null, startRevision.getNumber(), endRevision.getNumber(), true, true );
-		} catch (SVNException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	
 	// gettors and settors
 	
 	public ArrayList<LogItem> getLogs() {
@@ -489,11 +442,11 @@ public class Connection extends OASVNModelLocalDB {
 		return head;
 	}
 
-	public void setRevisions(ArrayList<SVNRevision> revisions) {
-		this.revisions = revisions;
+	public void setDirectories(Collection<SVNDirEntry> directories) {
+		this.directories = directories;
 	}
 
-	public ArrayList<SVNRevision> getRevisions() {
-		return revisions;
+	public Collection<SVNDirEntry> getDirectories() {
+		return directories;
 	}
 }

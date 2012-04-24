@@ -543,7 +543,7 @@ public class OASVNApplication extends Application {
 			while(!dbCursor.isAfterLast()) {
 				Connection thisConnection;
 
-				thisConnection = new Connection(dbCursor);
+				thisConnection = new Connection();
 
 				dbCursor.moveToNext();
 				

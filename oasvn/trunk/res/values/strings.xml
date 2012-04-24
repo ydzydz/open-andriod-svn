@@ -36,6 +36,7 @@
     <string name="delete_folder">Delete Folder</string>
     <string name="delete_connection">Delete Repo</string>
     <string name="view_logs">Show Log</string>
+    <string name="view_revisions">Show Revisions</string>
     <string name="performing_checkout">Performing Checkout!!!</string>
     <string name="performing_commit">Performing Commit!!!</string>
     <string name="idle">Idle...</string>
@@ -65,5 +66,8 @@
 	<string name="message">Message:</string>
 	<string name="author">Author:</string>
 	<string name="delete_entry">Delete Log Entry</string>
+	
+	<!-- Revisions -->
+	<string name="no_revisions">No revisions are available for this connection.</string>
 
 </resources>

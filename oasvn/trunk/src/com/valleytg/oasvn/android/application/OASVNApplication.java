@@ -93,6 +93,11 @@ public class OASVNApplication extends Application {
     private LogItem currentLog;
     
     /**
+     * Current Revision
+     */
+    private SVNLogEntry currentRevision;
+    
+    /**
      * All connections
      */
     private ArrayList<Connection> allConnections;
@@ -701,5 +706,13 @@ public class OASVNApplication extends Application {
 
 	public LogItem getCurrentLog() {
 		return currentLog;
+	}
+
+	public void setCurrentRevision(SVNLogEntry currentRevision) {
+		this.currentRevision = currentRevision;
+	}
+
+	public SVNLogEntry getCurrentRevision() {
+		return currentRevision;
 	}
 }

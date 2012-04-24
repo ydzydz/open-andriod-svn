@@ -85,14 +85,14 @@ public class Revisions extends ListActivity {
 		super.onListItemClick(l, v, position, id);
 		
 		try {
-			final LogItem thisLog = app.getCurrentConnection().getLogs().get(position);
-			
+			SVNLogEntry thisEntry = app.getCurrentConnection().getRevisions().get(position);
+
 			// set the current log
-			app.setCurrentLog(thisLog);
+			app.setCurrentRevision(thisEntry);
 			
 			// go to the log details screen
-			//Intent intent = new Intent(Revisions.this, RevisionDetails.class);
-			//startActivity(intent);
+			Intent intent = new Intent(Revisions.this, RevisionDetails.class);
+			startActivity(intent);
 		} 
 		catch (Exception e) {
 			//Toast.makeText(this, getString(R.string.create_connection), 1500).show();
@@ -128,12 +128,12 @@ public class Revisions extends ListActivity {
         	// check to see that there is a current connection
         	if(this.app.getCurrentConnection() != null) {
         		
-        		Collection<SVNLogEntry> revisions = app.getAllRevisions();
+        		app.getCurrentConnection().retrieveAllRevisions(app);
         		
         		// add the revisions to the connection
         		//app.getCurrentConnection().setDirectories(revisions);
         		
-        		if(revisions.size() > 0) {
+        		if(app.getCurrentConnection().getRevisions().size() > 0) {
         			// sort the list by staff first name
         			/*
 	        		Collections.sort(revisions, new Comparator<SVNDirEntry>(){
@@ -147,9 +147,9 @@ public class Revisions extends ListActivity {
 	    	        */
 
 	        		// revisions ready to go
-	        		entries = new String[revisions.size()];
+	        		entries = new String[app.getCurrentConnection().getRevisions().size()];
 	        		int i = 0;
-	        		for(SVNLogEntry entry : revisions) {
+	        		for(SVNLogEntry entry : app.getCurrentConnection().getRevisions()) {
 	        			entries[i] = entry.getRevision() + " | " + entry.getMessage() + " | " + DateUtil.getSimpleDateTime(entry.getDate(), this) 
 	            		+ "\nAuthor: " + entry.getAuthor();
 	        			i++;

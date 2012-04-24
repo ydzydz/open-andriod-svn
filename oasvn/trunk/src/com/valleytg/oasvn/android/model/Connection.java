@@ -25,9 +25,12 @@ package com.valleytg.oasvn.android.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 
@@ -70,9 +73,11 @@ public class Connection extends OASVNModelLocalDB {
 	private String folder = "";
 	private Integer head = 0;
 	
-	// members not saved in the databse
 	private ArrayList<LogItem> logs = new ArrayList<LogItem>();
+	
+	// members not saved in the databse
 	private Collection<SVNDirEntry> directories = null;
+	private List<SVNLogEntry> revisions;
 	
 	/**
 	 * Default Constructor, connection is not ready to be used until url, username and password are provided
@@ -203,6 +208,27 @@ public class Connection extends OASVNModelLocalDB {
 		catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	
+	// revision management
+	
+	/**
+	 * Retrieve all of the revisions that are associated with the connection.
+	 * Saves them in the logs ArrayList.
+	 * 
+	 * @param app - Application context, required to access the database
+	 */
+	public void retrieveAllRevisions(OASVNApplication app) {
+		
+		List<SVNLogEntry> list;
+		if (app.getAllRevisions() instanceof List)
+		  list = (List<SVNLogEntry>)app.getAllRevisions();
+		else
+		  list = new ArrayList<SVNLogEntry>(app.getAllRevisions());
+		//Collections.sort(list);
+		
+		this.revisions = list;
 	}
 	
 	
@@ -448,5 +474,13 @@ public class Connection extends OASVNModelLocalDB {
 
 	public Collection<SVNDirEntry> getDirectories() {
 		return directories;
+	}
+
+	public void setRevisions(List<SVNLogEntry> revisions) {
+		this.revisions = revisions;
+	}
+
+	public List<SVNLogEntry> getRevisions() {
+		return revisions;
 	}
 }

@@ -69,5 +69,8 @@
 	
 	<!-- Revisions -->
 	<string name="no_revisions">No revisions are available for this connection.</string>
+	
+	<!-- Revision Details -->
+	<string name="revisiondetail_header">Revision Details</string>
 
 </resources>

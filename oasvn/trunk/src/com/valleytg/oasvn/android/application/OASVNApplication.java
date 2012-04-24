@@ -26,14 +26,12 @@ package com.valleytg.oasvn.android.application;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
-import org.tmatesoft.svn.core.SVNProperties;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.io.SVNRepository;
@@ -322,8 +320,7 @@ public class OASVNApplication extends Application {
     	}
     }
     
-    
-    // SVNKit wrapper
+// SVNKit wrapper
     
     /**
      * Retrieves all of the directories for the current repository, from the root
@@ -381,7 +378,6 @@ public class OASVNApplication extends Application {
     	return entriesList;
     	
     }
-    
     
     /**
      * Does full checkout of the Head revision
@@ -541,10 +537,8 @@ public class OASVNApplication extends Application {
 			
 			// iterate through local and populate
 			while(!dbCursor.isAfterLast()) {
-				Connection thisConnection;
-
-				thisConnection = new Connection();
-
+				Connection thisConnection = new Connection();
+				thisConnection.setData(dbCursor);
 				dbCursor.moveToNext();
 				
 				this.allConnections.add(thisConnection);

@@ -84,8 +84,8 @@ public class Versions extends ListActivity {
 			app.setCurrentLog(thisLog);
 			
 			// go to the log details screen
-			Intent intent = new Intent(Versions.this, VersionDetails.class);
-			startActivity(intent);
+			//Intent intent = new Intent(Versions.this, VersionDetails.class);
+			//startActivity(intent);
 		} 
 		catch (Exception e) {
 			//Toast.makeText(this, getString(R.string.create_connection), 1500).show();

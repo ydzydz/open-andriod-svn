@@ -25,12 +25,19 @@ package com.valleytg.oasvn.android.application;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDepth;
+import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNProperties;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
+import org.tmatesoft.svn.core.io.SVNRepository;
+import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNCommitClient;
 import org.tmatesoft.svn.core.wc.SVNRevision;
@@ -314,6 +321,67 @@ public class OASVNApplication extends Application {
     		e.printStackTrace();
     	}
     }
+    
+    
+    // SVNKit wrapper
+    
+    /**
+     * Retrieves all of the directories for the current repository, from the root
+     * @return ArrayList<SVNDirEntry> - Contains all directories as objects
+     */
+    public Collection<SVNLogEntry> getAllRevisions() {
+    	// initialize the auth manager
+		this.initAuthManager();
+		
+    	SVNURL url = this.currentConnection.getRepositoryURL();
+
+    	Collection<SVNLogEntry> logEntries = null;
+    	
+    	long startRevision = 0;
+    	long endRevision = -1; //HEAD (i.e. the latest) revision
+    	
+		try {
+			SVNRepository repos = SVNRepositoryFactory.create(url);
+			repos.setAuthenticationManager(getMyAuthManager());
+
+	    	logEntries = repos.log( new String[] { "" }, null, startRevision, endRevision, true, true );
+	    	
+	    	
+		} catch (SVNException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+    	return logEntries;
+    	
+    }
+    
+    /**
+     * Retrieves all of the directories for the current repository, from the root
+     * @return ArrayList<SVNDirEntry> - Contains all directories as objects
+     */
+    public Collection<SVNDirEntry> getAllDirectories() {
+    	// initialize the auth manager
+		this.initAuthManager();
+		
+    	SVNURL url = this.currentConnection.getRepositoryURL();
+
+    	Collection<SVNDirEntry> entriesList = null;
+		try {
+			SVNRepository repos = SVNRepositoryFactory.create(url);
+			repos.setAuthenticationManager(getMyAuthManager());
+	    	long headRevision = repos.getLatestRevision();
+			entriesList = repos.getDir("", headRevision, null, (Collection) null);
+
+		} catch (SVNException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+    	return entriesList;
+    	
+    }
+    
     
     /**
      * Does full checkout of the Head revision

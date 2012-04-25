@@ -16,6 +16,7 @@
         android:id="@+id/revisiondetail_scroll_container"
 		android:layout_width="fill_parent"
 		android:layout_below="@id/revisiondetail_top_header"
+		android:layout_above="@+id/revisiondetail_back"
 		android:layout_height="wrap_content">
 	    <TableLayout android:layout_width="fill_parent"
 			android:id="@+id/revisiondetail_scroll"
@@ -92,12 +93,6 @@
                 
 	    </TableLayout>
 	</ScrollView> 
-	<Button
-        android:id="@+id/revisiondetail_delete"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/revisiondetail_back"
-        android:text="@string/delete_entry" />
 	<Button
         android:id="@id/revisiondetail_back"
         android:layout_width="fill_parent"

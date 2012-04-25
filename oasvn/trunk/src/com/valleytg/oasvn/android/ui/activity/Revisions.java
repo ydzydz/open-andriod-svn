@@ -36,6 +36,7 @@ import org.tmatesoft.svn.core.SVNProperties;
 import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.application.OASVNApplication;
 import com.valleytg.oasvn.android.model.LogItem;
+import com.valleytg.oasvn.android.ui.activity.CommitActivity.CommitThread;
 import com.valleytg.oasvn.android.util.DateUtil;
 
 import android.app.AlertDialog;
@@ -58,6 +59,7 @@ public class Revisions extends ListActivity {
 	 * Controls
 	 */
 	OASVNApplication app;
+	Button btnRefresh;
 	Button btnBack;
 	
 	/**
@@ -75,6 +77,7 @@ public class Revisions extends ListActivity {
 	        this.app = (OASVNApplication)getApplication();
 	        
 	        // initialize the buttons
+	        btnRefresh = (Button) findViewById(R.id.revisions_refresh);
 	        btnBack = (Button) findViewById(R.id.revisions_back);
 	        
 	        // set the list adapter
@@ -82,6 +85,18 @@ public class Revisions extends ListActivity {
 	        
 	        // populate the list
 	        populateList();
+	        
+	        // handle refresh button press
+	        this.btnRefresh.setOnClickListener(new View.OnClickListener() {
+				
+				public void onClick(View v) {
+					// null the connections revisions
+					app.getCurrentConnection().setRevisions(null);
+					
+					// refresh
+					Revisions.this.populateList();
+				}
+			});
 	        
 	        // handle back button press
 	        this.btnBack.setOnClickListener(new View.OnClickListener() {
@@ -161,47 +176,43 @@ public class Revisions extends ListActivity {
         // try to retrieve the local staff / users
         try {
         	
-        	// check to see that there is a current connection
-        	if(this.app.getCurrentConnection() != null) {
-        		
-        		
-        		
-        		// add the revisions to the connection
-        		//app.getCurrentConnection().setDirectories(revisions);
-        		
-        		if(app.getCurrentConnection().getRevisions().size() > 0) {
-        			// sort the list by staff first name
-        			/*
-	        		Collections.sort(revisions, new Comparator<SVNDirEntry>(){
-						public int compare(SVNDirEntry lhs, SVNDirEntry rhs) {
-							SVNDirEntry p1 = (SVNDirEntry) lhs;
-							SVNDirEntry p2 = (SVNDirEntry) rhs;
-	    	               return p2.getDate().compareTo(p1.getDate());
-						}
-	    	 
-	    	        });
-	    	        */
+    		// check to see if there are any revisions
+    		if(app.getCurrentConnection().getRevisions() == null || app.getCurrentConnection().getRevisions().size() == 0) {
+    			// set the running flag
+    			if(!Revisions.this.running) {
+					Revisions.this.running = true;
+					
+					RetrieveRevisionsThread revisionsThread = new RetrieveRevisionsThread();
+					revisionsThread.execute();
+    			}
+    			
+    			// notify the user that we are working
+        		entries = new String[1];
+        		entries[0]= getString(R.string.in_progress);
+    		}
+    			
+    		// if there are revisions, display them.
+    		if(app.getCurrentConnection().getRevisions() != null && app.getCurrentConnection().getRevisions().size() > 0) {
 
-	        		// revisions ready to go
-	        		entries = new String[app.getCurrentConnection().getRevisions().size()];
-	        		int i = 0;
-	        		for(SVNLogEntry entry : app.getCurrentConnection().getRevisions()) {
-	        			entries[i] = entry.getRevision() + " | " + entry.getMessage() + " | " + DateUtil.getSimpleDateTime(entry.getDate(), this) 
-	            		+ "\nAuthor: " + entry.getAuthor();
-	        			i++;
-	            	}
+        		// revisions ready to go
+        		entries = new String[app.getCurrentConnection().getRevisions().size()];
+        		int i = 0;
+        		for(SVNLogEntry entry : app.getCurrentConnection().getRevisions()) {
+        			entries[i] = entry.getRevision() + " | " + entry.getMessage() + " | " + DateUtil.getSimpleDateTime(entry.getDate(), this) 
+            		+ "\nAuthor: " + entry.getAuthor();
+        			i++;
+            	}
 
-	        		
-	        	}
-	        	else {
-	        		// no users in the local db
-	        		entries = new String[1];
-	        		entries[0]= getString(R.string.no_revisions);
-	        		Toast toast=Toast.makeText(this, getString(R.string.no_revisions), 1500);
-	        		toast.show();
-	        	}
+        		
         	}
-        	
+        	else {
+        		// no users in the local db
+        		entries = new String[1];
+        		entries[0]= getString(R.string.no_revisions);
+        		Toast toast=Toast.makeText(this, getString(R.string.no_revisions), 1500);
+        		toast.show();
+        	}
+
         	
         }
         catch(Exception e) {

@@ -88,6 +88,7 @@
 	<!-- Revisions -->
 	<string name="no_revisions">No revisions are available for this connection.</string>
 	<string name="revisions_retrieved">Revisions retrieved successfully</string>
+	<string name="refresh">Refresh</string>
 	
 	<!-- Revision Details -->
 	<string name="revisiondetail_header">Revision Details</string>

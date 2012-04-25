@@ -42,6 +42,7 @@ import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.admin.SVNLookClient;
 
+import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.database.DatabaseHelper;
 import com.valleytg.oasvn.android.model.Connection;
 import com.valleytg.oasvn.android.model.LogItem;
@@ -310,12 +311,12 @@ public class OASVNApplication extends Application {
 		    	// folder does not yet exist, create it.
 		         folder.mkdir();
 		         this.setRootPath(folder);
-		         Log.i("FILE", "directory is created"); 
+		         Log.i(getString(R.string.FILE), getString(R.string.directory_created)); 
 		    }
 		    else {
 		    	// folder already exists
 		    	this.setRootPath(folder);
-		    	Log.i("FILE", "directory already exists"); 
+		    	Log.i(getString(R.string.FILE), getString(R.string.directory_exists)); 
 		    }
 		    
     	}
@@ -406,13 +407,13 @@ public class OASVNApplication extends Application {
     			Long rev = updateClient.doCheckout(myURL, myFile, pegRevision, myRevision, depth, true);
     			
     			// log this success
-    			this.getCurrentConnection().createLogEntry(this, "Checkout", "Successful checkout", "Revision: " + rev.toString());
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.checkout), "", getString(R.string.revision) + " " + rev.toString());
     		}
     		catch(SVNException se) {
     			String msg = se.getMessage();
     			
     			// log this failure
-    			this.getCurrentConnection().createLogEntry(this, "Error", se.getMessage().substring(0, 19), se.getMessage().toString());
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
     			
     			return msg;
     		}
@@ -420,19 +421,19 @@ public class OASVNApplication extends Application {
     			String msg = ve.getMessage();
     			
     			// log this failure
-    			this.getCurrentConnection().createLogEntry(this, "Error", ve.getMessage().substring(0, 19), ve.getMessage().toString());
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
     			
     			ve.printStackTrace();
-    			return "Verify " + msg;
+    			return getString(R.string.verify) + " " + msg;
     		}
     		catch(Exception e) {
     			String msg = e.getMessage();
     			
     			// log this failure
-    			this.getCurrentConnection().createLogEntry(this, "Error", e.getCause().toString().substring(0, 19), e.getMessage().toString());
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
     			
     			e.printStackTrace();
-    			return "Exception " + msg;
+    			return getString(R.string.exception) + " " + msg;
     		}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -463,20 +464,21 @@ public class OASVNApplication extends Application {
 			
 			// check to see if the commit revision is -1 (means nothing was committed - no change)
 			if(getInfo().getNewRevision() == -1) {
-				this.getCurrentConnection().createLogEntry(this, "Commit", "No Change: " 
-						+ Long.toString(getInfo().getNewRevision()), "No changes were available to commit to the repository");
+				this.getCurrentConnection().createLogEntry(this, getString(R.string.commit), getString(R.string.no_change) + getString(R.string.colon) + " "
+						+ Long.toString(getInfo().getNewRevision()), getString(R.string.no_changes_available));
 			}
 			else {
 				// log that the commit was successful
-				this.getCurrentConnection().createLogEntry(this, "Commit", "Commit Successful Revision: " 
-						+ Long.toString(getInfo().getNewRevision()), "Commit comments: " + this.commitComments + "\nAuthor: " + getInfo().getAuthor());
+				this.getCurrentConnection().createLogEntry(this, getString(R.string.commit), getString(R.string.commit_success) + getString(R.string.colon) + " " 
+						+ Long.toString(getInfo().getNewRevision()), getString(R.string.commit_comments) + getString(R.string.colon) + " " 
+						+ this.commitComments + "\n" + getString(R.string.author) + getString(R.string.colon) + " " + getInfo().getAuthor());
 			}
 		}
 		catch(SVNException e) {
 			String msg = e.getMessage();
 			
 			// log this failure
-			this.getCurrentConnection().createLogEntry(this, "Error", e.getMessage().substring(0, 19), e.getMessage().toString());
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getMessage().substring(0, 19), e.getMessage().toString());
 			
 			return msg;
 		}
@@ -502,7 +504,8 @@ public class OASVNApplication extends Application {
         		Integer rev = (int) clientManager.getStatusClient().doStatus(this.assignPath(), false).getRevision().getNumber();
         		
         		// log that the revision number was retrieved 
-        		this.getCurrentConnection().createLogEntry(this, "Revision", "Rev. No. :" + rev, "Local revision number updated, Rev. No. :" + rev);
+        		this.getCurrentConnection().createLogEntry(this, getString(R.string.revision), getString(R.string.rev_no) + getString(R.string.colon) 
+        				+ " " + rev, getString(R.string.local_rev_updated) + getString(R.string.colon) + " " + rev);
         		
         		return rev;
         	}

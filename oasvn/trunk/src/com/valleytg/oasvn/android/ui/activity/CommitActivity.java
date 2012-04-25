@@ -153,7 +153,7 @@ public class CommitActivity extends Activity {
 		
 		protected void onPostExecute(final String result) {
 			
-			android.util.Log.d("alarm", "Commit Complete!");
+			android.util.Log.d(getString(R.string.alarm), getString(R.string.commit_success));
 			
 			dialog.dismiss();
 	        

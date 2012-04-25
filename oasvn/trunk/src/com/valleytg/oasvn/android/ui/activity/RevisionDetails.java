@@ -1,3 +1,26 @@
+/**
+ * @author brian.gormanly
+ * OASVN (Open Android SVN)
+ * Copyright (C) 2012 Brian Gormanly
+ * Valley Technologies Group
+ * http://www.valleytg.com
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version. 
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ */
+
 package com.valleytg.oasvn.android.ui.activity;
 
 import com.valleytg.oasvn.android.R;
@@ -44,8 +67,8 @@ public class RevisionDetails extends Activity {
 			this.revisiondetail_num = (TextView)findViewById(R.id.revisiondetail_num);
 			this.revisiondetail_date_text = (TextView)findViewById(R.id.revisiondetail_date_text);
 			this.revisiondetail_date = (TextView)findViewById(R.id.revisiondetail_date);
-			this.revisiondetail_author_text = (TextView)findViewById(R.id.revisiondetail_date_text);
-			this.revisiondetail_author = (TextView)findViewById(R.id.revisiondetail_date);
+			this.revisiondetail_author_text = (TextView)findViewById(R.id.revisiondetail_author_text);
+			this.revisiondetail_author = (TextView)findViewById(R.id.revisiondetail_author);
 			this.revisiondetail_message_text = (TextView)findViewById(R.id.revisiondetail_message_text);
 			this.revisiondetail_message = (TextView)findViewById(R.id.revisiondetail_message);
 			this.btnBack = (Button) findViewById(R.id.revisiondetail_back);

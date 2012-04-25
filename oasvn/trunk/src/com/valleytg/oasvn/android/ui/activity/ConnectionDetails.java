@@ -384,7 +384,7 @@ public class ConnectionDetails extends Activity {
 					url = this.app.getCurrentConnection().getTextURL().toString();
 				}
 				catch(Exception e) {
-					url = "unknown";
+					url = getString(R.string.unknown);
 				}
 				
 				String protocol = "";
@@ -392,7 +392,7 @@ public class ConnectionDetails extends Activity {
 					protocol = this.app.getCurrentConnection().getType().toString();
 				}
 				catch(Exception e) {
-					protocol = "unknown";
+					protocol = getString(R.string.unknown);
 				}
 				
 				String username = "";
@@ -400,7 +400,7 @@ public class ConnectionDetails extends Activity {
 					username = this.app.getCurrentConnection().getUsername().toString();
 				}
 				catch(Exception e) {
-					username = "unknown";
+					username = getString(R.string.unknown);
 				}
 				
 				String folder = "";
@@ -408,7 +408,7 @@ public class ConnectionDetails extends Activity {
 					folder = app.getFullPathToMain().toString() + this.app.getCurrentConnection().getFolder().toString();
 				}
 				catch(Exception e) {
-					folder = "unknown";
+					folder = getString(R.string.unknown);
 				}
 				
 				String head = "";
@@ -416,7 +416,7 @@ public class ConnectionDetails extends Activity {
 					head = this.app.getCurrentConnection().getHead().toString();
 				}
 				catch(Exception e) {
-					head = "unknown";
+					head = getString(R.string.unknown);
 				}
 				
 				// assign text to individual text areas
@@ -519,7 +519,7 @@ public class ConnectionDetails extends Activity {
 			// unset the running flag
 			ConnectionDetails.this.resetIdle();
 
-			android.util.Log.d("alarm", "Checkout Successful!");
+			android.util.Log.d(getString(R.string.alarm), getString(R.string.checkout_successful));
 
 	        dialog.dismiss();
 	        

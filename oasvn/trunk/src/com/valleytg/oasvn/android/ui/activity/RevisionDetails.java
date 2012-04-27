@@ -23,6 +23,11 @@
 
 package com.valleytg.oasvn.android.ui.activity;
 
+import java.util.Iterator;
+import java.util.Set;
+
+import org.tmatesoft.svn.core.SVNLogEntryPath;
+
 import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.application.OASVNApplication;
 import com.valleytg.oasvn.android.util.DateUtil;
@@ -49,6 +54,8 @@ public class RevisionDetails extends Activity {
 	TextView revisiondetail_date;
 	TextView revisiondetail_author_text;
 	TextView revisiondetail_author;
+	TextView revisiondetail_files_text;
+	TextView revisiondetail_files;
 	TextView revisiondetail_message_text;
 	TextView revisiondetail_message;
 	Button btnBack;
@@ -69,14 +76,31 @@ public class RevisionDetails extends Activity {
 			this.revisiondetail_date = (TextView)findViewById(R.id.revisiondetail_date);
 			this.revisiondetail_author_text = (TextView)findViewById(R.id.revisiondetail_author_text);
 			this.revisiondetail_author = (TextView)findViewById(R.id.revisiondetail_author);
+			this.revisiondetail_files_text = (TextView)findViewById(R.id.revisiondetail_files_text);
+			this.revisiondetail_files = (TextView)findViewById(R.id.revisiondetail_files);
 			this.revisiondetail_message_text = (TextView)findViewById(R.id.revisiondetail_message_text);
 			this.revisiondetail_message = (TextView)findViewById(R.id.revisiondetail_message);
 			this.btnBack = (Button) findViewById(R.id.revisiondetail_back);
+			
+			// get the file path details
+			String paths = "";
+			if ( app.getCurrentRevision().getChangedPaths().size() > 0 ) {
+				Set changedPathsSet = app.getCurrentRevision().getChangedPaths().keySet();
+				
+				for ( Iterator changedPaths = changedPathsSet.iterator( ); changedPaths.hasNext( ); ) {
+					SVNLogEntryPath entryPath = ( SVNLogEntryPath ) app.getCurrentRevision().getChangedPaths().get(changedPaths.next());
+					paths += entryPath.getType( ) + " " + entryPath.getPath( ) + ( ( entryPath.getCopyPath( ) != null ) ? " (from " 
+							+ entryPath.getCopyPath( ) + " revision " + entryPath.getCopyRevision( ) + ")" : "" ) + "\n";
+				}
+				
+			
+			}
 			
 			// set the values
 			this.revisiondetail_num.setText(Long.toString(app.getCurrentRevision().getRevision()));
 			this.revisiondetail_date.setText(DateUtil.getSimpleDateTime(app.getCurrentRevision().getDate(), this));
 			this.revisiondetail_author.setText(app.getCurrentRevision().getAuthor());
+			this.revisiondetail_files.setText(paths);
 			this.revisiondetail_message.setText(app.getCurrentRevision().getMessage());
 			
 			// button listeners     

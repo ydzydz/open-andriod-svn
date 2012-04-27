@@ -40,6 +40,7 @@ import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNCommitClient;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNUpdateClient;
+import org.tmatesoft.svn.core.wc.SVNWCClient;
 import org.tmatesoft.svn.core.wc.admin.SVNLookClient;
 
 import com.valleytg.oasvn.android.R;
@@ -243,6 +244,31 @@ public class OASVNApplication extends Application {
     }
     
 
+    /*
+    public File[] assignAllFilesInPath() {
+    	// check to see that there is a path
+    	try {
+	    	if(this.currentConnection != null && this.currentConnection.getFolder().length() > 0) {
+	    		// get the sd card directory
+				File file = new File(this.getRootPath(), this.currentConnection.getFolder());
+				File[] edited = file.listFiles();
+				for(File thisFile : edited) {
+					if(thisFile.toString().contains(".svn")) {
+						edited.
+					}
+ 				}
+				
+			
+				return file.listFiles();
+	    	}
+    	}
+    	catch(Exception e) {
+    		e.printStackTrace();
+    		return null;
+    	}
+    	return null;
+    }
+    */
     
     public File assignPath() {
     	// check to see that there is a path
@@ -260,6 +286,7 @@ public class OASVNApplication extends Application {
     	}
     	return null;
     }
+    
     
     public void deleteRecursive(File tree) {
     	if (tree.isDirectory())
@@ -457,6 +484,26 @@ public class OASVNApplication extends Application {
 		SVNURL myURL = this.currentConnection.getRepositoryURL();
 		File myFile = this.assignPath();
 		SVNRevision myRevision = SVNRevision.HEAD;
+		
+		// add any new files to the svn
+		SVNWCClient wcClient = new SVNWCClient(this.myAuthManager, null); 
+		try {
+			wcClient.doAdd(myFile, true, false, false, SVNDepth.INFINITY, false, 
+			false, false);
+		} catch (SVNException se) {
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
+			se.printStackTrace();
+		} 
+		catch(Exception e) {
+			String msg = e.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getMessage().substring(0, 19), e.getMessage().toString());
+			
+			return msg;
+		}
+		
 
 		try {
 			setInfo(commitClient.doCommit(new File[] {myFile} , false, this.commitComments , false , true));

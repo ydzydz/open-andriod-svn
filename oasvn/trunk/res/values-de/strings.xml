@@ -1,0 +1,96 @@
+<resources>
+
+    <!-- General, logging and errors -->
+    <string name="app_name">"OASVN Pro"</string>
+    <string name="loading">"Wird geladen..."</string>
+    <string name="colon">":"</string>
+    <string name="error">"Fehler"</string>
+    <string name="verify">"Verifizieren"</string>
+    <string name="exception">"Ausnahme:"</string>
+    <string name="revision">"Revision"</string>
+    <string name="FILE">"File:"</string>
+    <string name="files">"Dateien"</string>
+    <string name="directory_created">"Directory erstellt"</string>
+    <string name="directory_exists">"Verzeichnis bereits vorhanden"</string>
+    <string name="no_change">"Keine Änderung"</string>
+    <string name="no_changes_available">"Keine Änderungen zur Verfügung standen, um das Repository"</string>
+    <string name="commit_success">"Commit Erfolgreiche Revision"</string>
+    <string name="checkout_successful">"Prüfung über erfolgreiche"</string>
+    <string name="commit_comments">"Commit Kommentare"</string>
+    <string name="rev_no">"Rev. Nr."</string>
+    <string name="local_rev_updated">"Lokale Revisionsnummer aktualisiert, Stand Nr."</string>
+    <string name="alarm">"Wecker"</string>
+    <string name="revision_success">"Überarbeitet Informationen erfolgreich abgerufen"</string>
+    <string name="unknown">"Unbekannt"</string>
+    
+    <!-- Main Menu -->
+    <string name="new_connection">"Repository hinzufügen"</string>
+    <string name="exit">"Beenden"</string>
+    <string name="no_connections">"Derzeit gibt es keine Verbindungen gespeichert."</string>
+    <string name="create_connection">"Bitte verwenden Sie die Add Repository Schaltfläche unten, um ein Repository erstellen"</string>
+    
+    <!-- Add Repository -->
+    <string name="name">"Name"</string>
+    <string name="url">"Repository-URL"</string>
+    <string name="username">"Benutzername"</string>
+    <string name="password">"Passwort"</string>
+    <string name="protocol">"Protokoll"</string>
+    <string name="folder">"Lokaler Ordner"</string>
+    <string name="save">"Speichern"</string>
+    <string name="cancel">"Abbrechen"</string>
+	<string name="url_invalid">"Sie haben eine ungültige URL eingegeben haben. Die URL muss mindestens 7 Zeichen lang sein und beginnen Sie mit einer der folgenden: http://, https://, svn :/ /, svn + ssl :/ /"</string>
+	<string name="folder_invalid">"Der Ordner von Ihnen eingegebene Name ist ungültig oder leer."</string>
+	<string name="folder_exists">"Der Ordner von Ihnen eingegebene Name wird bereits verwendet."</string>
+	<string name="name_invalid">"Ein eindeutiger Name wird for.the Repository benötigt."</string>
+	<string name="local_folder_warning">"Ein lokaler Ordner existiert bereits mit dem Ordnernamen. Sind Sie sicher, dass Sie einen vorhandenen Ordner verwenden?"</string>
+    
+    <!-- Connection Details -->
+    <string name="connection">"Verbindung"</string>
+    <string name="no_connection_selected">"Keine Verbindung gewählt ..."</string>
+    <string name="head">"Revision"</string>
+    <string name="checkout">"Kasse"</string>
+    <string name="commit">"Verbindlichkeit"</string>
+    <string name="file_manager">"Ordner öffnen"</string>
+    <string name="delete_folder">"Ordner löschen"</string>
+    <string name="delete_connection">"Löschen Repo"</string>
+    <string name="view_logs">"Zeige Log"</string>
+    <string name="view_revisions">"Zeige Revisions"</string>
+    <string name="performing_checkout">"Darstellende Kasse!"</string>
+    <string name="performing_commit">"Darstellende Commit!"</string>
+    <string name="idle">"Inaktiv"</string>
+    <string name="complete">"Aktion abgeschlossen!!"</string>
+    <string name="in_progress">"Der Betrieb läuft, bitte warten ..."</string>
+    <string name="confirm">"Bist Du sicher?"</string>
+    <string name="delete_message">"Sie löschen den gesamten lokalen Ordner!"</string>
+    <string name="delete_repo_message">"Sie sind im Begriff, diese Repository-Verbindung zu löschen. Sind Sie sicher?"</string>
+    <string name="delete_folder_too">"Wollen Sie den lokalen Ordner ebenfalls löschen?"</string>
+    <string name="yes">"Ja"</string>
+    <string name="no">"Kein"</string>
+    <string name="edit">"Änderungen"</string>
+    <string name="file_manager_warning">"Nicht alle Datei-Manager der Landung in den richtigen Ordner zu unterstützen, müssen Sie möglicherweise zu dem Ordner navigieren. OI File Manager unterstützt Landung in den richtigen Ordner"</string>
+    
+    <!-- Commit -->
+    <string name="comments">"Kommentare"</string>
+    
+    <!-- LogView -->
+    <string name="no_logs">"Es werden keine Protokolle für diese Verbindung gespeichert."</string>
+    <string name="delete_all_logs">"Klare Verbindungsprotokolle"</string>
+    <string name="delete_all_logs_warning">"Sind Sie sicher, Sie möchten alle Log-Einträge für diese Verbindung löschen?"</string>
+    
+    <!-- LogDetails -->
+    <string name="logdetail_header">"Einreichdetails"</string>
+	<string name="type">"TYPE aktiviert"</string>
+	<string name="date">"Datum:"</string>
+	<string name="message">"Nachricht:"</string>
+	<string name="author">"Autor:"</string>
+	<string name="delete_entry">"Log-Eintrag löschen"</string>
+	
+	<!-- Revisions -->
+	<string name="no_revisions">"Keine Änderungen sind für diese Verbindung zur Verfügung."</string>
+	<string name="revisions_retrieved">"Revisions erfolgreich abgerufen"</string>
+	<string name="refresh">"Aktualisieren"</string>
+	
+	<!-- Revision Details -->
+	<string name="revisiondetail_header">"Revision Einzelheiten"</string>
+
+</resources>

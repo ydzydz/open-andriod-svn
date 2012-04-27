@@ -10,6 +10,7 @@
     <string name="exception">Exception</string>
     <string name="revision">Revision</string>
     <string name="FILE">FILE</string>
+    <string name="files">Files</string>
     <string name="directory_created">Directory is created</string>
     <string name="directory_exists">Directory already exists</string>
     <string name="no_change">No change</string>

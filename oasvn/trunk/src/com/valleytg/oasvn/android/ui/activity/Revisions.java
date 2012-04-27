@@ -198,8 +198,12 @@ public class Revisions extends ListActivity {
         		entries = new String[app.getCurrentConnection().getRevisions().size()];
         		int i = 0;
         		for(SVNLogEntry entry : app.getCurrentConnection().getRevisions()) {
-        			entries[i] = entry.getRevision() + " | " + entry.getMessage() + " | " + DateUtil.getSimpleDateTime(entry.getDate(), this) 
-            		+ "\nAuthor: " + entry.getAuthor();
+        			int messageLength = entry.getMessage().length();
+        			if(messageLength < 21 ) {
+        				messageLength = 20;
+        			}
+        			entries[i] = entry.getRevision() + " | "  + DateUtil.getSimpleDateTime(entry.getDate(), this) + "\n"
+            		+ "\n" + getString(R.string.author) + getString(R.string.colon) + " " + entry.getAuthor() + "\n";
         			i++;
             	}
 
@@ -208,9 +212,7 @@ public class Revisions extends ListActivity {
         	else {
         		// no users in the local db
         		entries = new String[1];
-        		entries[0]= getString(R.string.no_revisions);
-        		Toast toast=Toast.makeText(this, getString(R.string.no_revisions), 1500);
-        		toast.show();
+        		entries[0]= getString(R.string.in_progress);
         	}
 
         	

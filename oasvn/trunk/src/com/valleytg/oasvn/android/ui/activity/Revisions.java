@@ -275,7 +275,7 @@ public class Revisions extends ListActivity {
     			String msg = e.getMessage();
     			
     			// log this failure
-    			app.getCurrentConnection().createLogEntry(app, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
+    			//app.getCurrentConnection().createLogEntry(app, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
     			
     			e.printStackTrace();
     			return getString(R.string.exception) + " " + msg;

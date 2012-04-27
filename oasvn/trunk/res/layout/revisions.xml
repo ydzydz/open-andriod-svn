@@ -4,7 +4,6 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    
     <Button
         android:id="@+id/revisions_back"
         android:layout_width="fill_parent"

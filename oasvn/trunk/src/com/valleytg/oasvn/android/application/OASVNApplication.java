@@ -343,7 +343,7 @@ public class OASVNApplication extends Application {
 		    else {
 		    	// folder already exists
 		    	this.setRootPath(folder);
-		    	Log.i(getString(R.string.FILE), getString(R.string.directory_exists)); 
+		    	//Log.i(getString(R.string.FILE), getString(R.string.directory_exists)); 
 		    }
 		    
     	}
@@ -377,8 +377,24 @@ public class OASVNApplication extends Application {
 	    	logEntries = repos.log( new String[] { "" }, null, startRevision, endRevision, true, true );
 	    	
 	    	
-		} catch (SVNException e) {
+		} 
+		catch (SVNException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch(VerifyError ve) {
+			String msg = ve.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
+			
+			ve.printStackTrace();
+		}
+		catch(Exception e) {
+			String msg = e.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
 			e.printStackTrace();
 		}
 		
@@ -403,8 +419,24 @@ public class OASVNApplication extends Application {
 	    	long headRevision = repos.getLatestRevision();
 			entriesList = repos.getDir("", headRevision, null, (Collection) null);
 
-		} catch (SVNException e) {
+		} 
+		catch (SVNException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch(VerifyError ve) {
+			String msg = ve.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
+			
+			ve.printStackTrace();
+		}
+		catch(Exception e) {
+			String msg = e.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
 			e.printStackTrace();
 		}
 		

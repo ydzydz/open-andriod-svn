@@ -4,22 +4,23 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <ListView
-        android:id="@+id/android:list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_above="@+id/log_back" />
     <Button
-        android:id="@+id/log_delete"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/log_back"
-        android:text="@string/delete_all_logs" />
-    <Button
-        android:id="@id/log_back"
+        android:id="@+id/log_back"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:text="@string/exit" />
-
+    <Button
+        android:id="@+id/log_delete"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/log_back"
+        android:text="@string/delete_all_logs" />
+    <ListView
+        android:id="@+id/android:list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@id/log_delete" />
+    
+    
 </RelativeLayout>

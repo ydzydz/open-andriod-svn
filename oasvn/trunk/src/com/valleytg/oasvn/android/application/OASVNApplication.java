@@ -140,6 +140,14 @@ public class OASVNApplication extends Application {
     private SVNCommitClient commitClient;
     
     /**
+     * The SVNWCClient class combines a number of version control operations mainly 
+     * intended for local work with Working Copy items. This class includes those 
+     * operations that are destined only for local work on a Working Copy as well 
+     * as those that are moreover able to access a repository.
+     */
+    private SVNWCClient wcClient;
+    
+    /**
      * 
      */
     private SVNCommitInfo info;
@@ -241,42 +249,22 @@ public class OASVNApplication extends Application {
     	
     	// look client
     	lookClient = clientManager.getLookClient();
+    	
+    	// Working copy client
+    	wcClient = new SVNWCClient(this.myAuthManager, null); 
     }
     
-
-    /*
-    public File[] assignAllFilesInPath() {
-    	// check to see that there is a path
-    	try {
-	    	if(this.currentConnection != null && this.currentConnection.getFolder().length() > 0) {
-	    		// get the sd card directory
-				File file = new File(this.getRootPath(), this.currentConnection.getFolder());
-				File[] edited = file.listFiles();
-				for(File thisFile : edited) {
-					if(thisFile.toString().contains(".svn")) {
-						edited.
-					}
- 				}
-				
-			
-				return file.listFiles();
-	    	}
-    	}
-    	catch(Exception e) {
-    		e.printStackTrace();
-    		return null;
-    	}
-    	return null;
-    }
-    */
-    
+    /**
+     * Gets the current connection path 
+     * @return the path as a File.
+     */
     public File assignPath() {
     	// check to see that there is a path
     	try {
 	    	if(this.currentConnection != null && this.currentConnection.getFolder().length() > 0) {
 	    		// get the sd card directory
 				File file = new File(this.getRootPath(), this.currentConnection.getFolder());
-				String a = "a";
+				
 				return file;
 	    	}
     	}
@@ -353,7 +341,7 @@ public class OASVNApplication extends Application {
     	}
     }
     
-// SVNKit wrapper
+    // SVNKit wrapper
     
     /**
      * Retrieves all of the directories for the current repository, from the root
@@ -585,8 +573,6 @@ public class OASVNApplication extends Application {
 		File myFile = this.assignPath();
 		SVNRevision myRevision = SVNRevision.HEAD;
 		
-		// add any new files to the svn
-		SVNWCClient wcClient = new SVNWCClient(this.myAuthManager, null); 
 		try {
 			wcClient.doAdd(myFile, true, false, false, SVNDepth.INFINITY, false, 
 			false, false);
@@ -634,6 +620,46 @@ public class OASVNApplication extends Application {
 		
 		return Long.toString(revision);
 		
+    }
+    
+    /**
+     * Clean up the current connection
+     * Recursively cleans up the working copy, removing locks and resuming unfinished operations.
+     * If you ever get a "working copy locked" error, use this method to remove stale locks and 
+     * get your working copy into a usable state again.
+     * @return operation result text to be logged or displayed to the user
+     */
+    public String cleanUp() {
+    	try {
+    		// do the cleanup on the current connection
+    		wcClient.doCleanup(this.assignPath());
+    	} 
+    	catch (SVNException se) {
+    		String msg = se.getMessage();
+    		
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
+			
+			// catlog the failure
+			se.printStackTrace();
+			
+			// display the failure
+			return msg;
+		} 
+		catch(Exception e) {
+			String msg = e.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getMessage().substring(0, 19), e.getMessage().toString());
+			
+			// catlog the failure
+			e.printStackTrace();
+			
+			// display the failure
+			return msg;
+		}
+		
+		return getString(R.string.success);
     }
     
     /**

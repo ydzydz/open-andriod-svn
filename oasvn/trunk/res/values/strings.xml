@@ -23,6 +23,7 @@
     <string name="alarm">Alarm</string>
     <string name="revision_success">Revision information successfully retrieved</string>
     <string name="unknown">Unknown</string>
+    <string name="success">Success</string>
     
     <!-- Main Menu -->
     <string name="new_connection">Add Repository</string>

@@ -21,7 +21,7 @@
  * 
  */
 
-package com.valleytg.oasvn.android.util;
+package com.valleytg.oasvnlite.android.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

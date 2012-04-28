@@ -1,7 +1,7 @@
 <resources>
 
     <!-- General, logging and errors -->
-    <string name="app_name">"OASVN Pro"</string>
+    <string name="app_name">"OASVN"</string>
     <string name="loading">"Wird geladen..."</string>
     <string name="colon">":"</string>
     <string name="error">"Fehler"</string>
@@ -93,5 +93,10 @@
 	
 	<!-- Revision Details -->
 	<string name="revisiondetail_header">"Revision Einzelheiten"</string>
+	
+	<!-- Demo -->
+	<string name="three_views">Free-Version erlaubt 3 Revision Detailansichten.</string>
+	<string name="views_used">Demo Detailansichten überschritten. Pro-Version erlaubt die uneingeschränkte Nutzung.</string>
+	<string name="pro_only">Commit ist nur mit der Pro-Version verfügbar.</string>
 
 </resources>

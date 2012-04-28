@@ -21,11 +21,10 @@
  * 
  */
 
-package com.valleytg.oasvn.android.model;
+package com.valleytg.oasvnlite.android.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.tmatesoft.svn.core.SVNDirEntry;
@@ -34,12 +33,11 @@ import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 
-import com.valleytg.oasvn.android.R;
-import com.valleytg.oasvn.android.application.OASVNApplication;
-import com.valleytg.oasvn.android.util.DateUtil;
+import com.valleytg.oasvnlite.android.R;
+import com.valleytg.oasvnlite.android.application.OASVNApplication;
+import com.valleytg.oasvnlite.android.util.DateUtil;
 
 public class Connection extends OASVNModelLocalDB {
 

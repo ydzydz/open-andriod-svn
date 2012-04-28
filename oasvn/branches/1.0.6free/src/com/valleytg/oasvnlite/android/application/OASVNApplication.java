@@ -21,7 +21,7 @@
  * 
  */
 
-package com.valleytg.oasvn.android.application;
+package com.valleytg.oasvnlite.android.application;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,11 +43,11 @@ import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCClient;
 import org.tmatesoft.svn.core.wc.admin.SVNLookClient;
 
-import com.valleytg.oasvn.android.R;
-import com.valleytg.oasvn.android.database.DatabaseHelper;
-import com.valleytg.oasvn.android.model.Connection;
-import com.valleytg.oasvn.android.model.LogItem;
-import com.valleytg.oasvn.android.util.Settings;
+import com.valleytg.oasvnlite.android.R;
+import com.valleytg.oasvnlite.android.model.Connection;
+import com.valleytg.oasvnlite.android.model.LogItem;
+import com.valleytg.oasvnlite.android.util.Settings;
+import com.valleytg.oasvnlite.database.DatabaseHelper;
 
 import android.app.Application;
 import android.database.Cursor;
@@ -149,6 +149,10 @@ public class OASVNApplication extends Application {
      */
     private String commitComments = "";
     
+    /**
+	 * Demo details counter
+	 */
+	public Integer demoCounter = 0;
     
     /**
      * Constructor
@@ -198,7 +202,7 @@ public class OASVNApplication extends Application {
 		// see if settings existed
 		if(Settings.getInstance().getRootFolder().length() == 0) {
 			// there are no settings in the database create default
-			Settings.getInstance().setRootFolder("OASVN/");
+			Settings.getInstance().setRootFolder("OASVNlite/");
 			Settings.getInstance().saveToLocalDB(this);
 		}
 	}
@@ -323,7 +327,7 @@ public class OASVNApplication extends Application {
     		
     		// check to see if there is a default folder from the settings
     		if(Settings.getInstance().getRootFolder().length() == 0) {
-    			mainFolder = "OASVN/";
+    			mainFolder = "OASVNlite/";
     		}
     		else {
     			mainFolder = Settings.getInstance().getRootFolder();

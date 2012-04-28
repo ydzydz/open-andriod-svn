@@ -48,6 +48,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -85,6 +86,9 @@ public class Revisions extends ListActivity {
 	        
 	        // populate the list
 	        populateList();
+	        
+	        // Make sure the device does not go to sleep while in this acitvity
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	        
 	        // handle refresh button press
 	        this.btnRefresh.setOnClickListener(new View.OnClickListener() {
@@ -169,13 +173,13 @@ public class Revisions extends ListActivity {
 
 
 	private void populateList() {
-    	// Initialize array of choices
+		// Initialize array of choices
         String[] entries;
         entries = null;
- 
-        // try to retrieve the local staff / users
-        try {
-        	
+        
+		try {
+	    	
+	 
     		// check to see if there are any revisions
     		if(app.getCurrentConnection().getRevisions() == null || app.getCurrentConnection().getRevisions().size() == 0) {
     			// set the running flag
@@ -203,7 +207,7 @@ public class Revisions extends ListActivity {
         				messageLength = 20;
         			}
         			entries[i] = entry.getRevision() + " | "  + DateUtil.getSimpleDateTime(entry.getDate(), this) + "\n"
-            		+ "\n" + getString(R.string.author) + getString(R.string.colon) + " " + entry.getAuthor() + "\n";
+            		+ getString(R.string.author) + " " + entry.getAuthor();
         			i++;
             	}
 
@@ -216,6 +220,12 @@ public class Revisions extends ListActivity {
         	}
 
         	
+        
+        
+	        setListAdapter(new ArrayAdapter<String>(this, R.layout.revision_item, entries));
+	
+			ListView lv = getListView();
+			lv.setTextFilterEnabled(true);
         }
         catch(Exception e) {
         	// no user/staff data in application yet. call for a refresh
@@ -223,11 +233,6 @@ public class Revisions extends ListActivity {
         	entries[0] = getString(R.string.no_revisions);
         	e.printStackTrace();
         }
-        
-        setListAdapter(new ArrayAdapter<String>(this, R.layout.revision_item, entries));
-
-		ListView lv = getListView();
-		lv.setTextFilterEnabled(true);
 
     }
 	
@@ -259,8 +264,10 @@ public class Revisions extends ListActivity {
 			try {
 		
 				// get all the revisions
-				app.getCurrentConnection().retrieveAllRevisions(app);
-				returned = getString(R.string.revisions_retrieved);
+				returned = app.getCurrentConnection().retrieveAllRevisions(app);
+				if(returned.length() == 0) {
+					returned = getString(R.string.revisions_retrieved);
+				}
 			}
     		catch(VerifyError ve) {
     			String msg = ve.getMessage();

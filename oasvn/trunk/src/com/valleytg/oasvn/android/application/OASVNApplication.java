@@ -378,6 +378,74 @@ public class OASVNApplication extends Application {
 	    	
 	    	
 		} 
+		catch(SVNException se) {
+			String msg = se.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
+			
+			se.printStackTrace();
+		}
+		catch(VerifyError ve) {
+			String msg = ve.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
+			
+			ve.printStackTrace();
+		}
+		catch(Exception e) {
+			String msg = e.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
+			
+			e.printStackTrace();
+		}
+		
+    	return logEntries;
+    	
+    }
+    
+    /**
+     * Retrieves the last (num) the revisions for the current repository, from the root
+     * NOTE: not helping. will need another approach.
+     * @param num = The number of revisions you want to recover.  Will retrieve the last
+     * (num) revisions
+     * @return ArrayList<SVNDirEntry> - Contains all directories as objects
+     */
+    public Collection<SVNLogEntry> getXRevisions(Long num) {
+    	// initialize the auth manager
+		this.initAuthManager();
+		
+    	SVNURL url = this.currentConnection.getRepositoryURL();
+
+    	Collection<SVNLogEntry> logEntries = null;
+    	
+    	
+    	
+		try {
+			SVNRepository repos = SVNRepositoryFactory.create(url);
+			
+			// set the authentication manager
+			repos.setAuthenticationManager(getMyAuthManager());
+			
+			// get the most recent revision
+			long endRevision = repos.getLatestRevision();
+		
+			long startRevision;
+			// determine the start revision number
+			if (endRevision - num >= 0) {
+				startRevision = endRevision - num;
+			}
+			else {
+				startRevision = 0;
+			}
+
+	    	logEntries = repos.log( new String[] { "" }, null, startRevision, endRevision, true, true );
+	    	
+	    	
+		} 
 		catch (SVNException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -592,8 +660,30 @@ public class OASVNApplication extends Application {
         		return 0;
         	}
 			
-		} catch (SVNException e) {
-			// TODO Auto-generated catch block
+    	}
+    	catch(SVNException se) {
+			String msg = se.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
+			
+			return 0;
+		}
+		catch(VerifyError ve) {
+			String msg = ve.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
+			
+			ve.printStackTrace();
+			return 0;
+		}
+		catch(Exception e) {
+			String msg = e.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
+			
 			e.printStackTrace();
 			return 0;
 		}

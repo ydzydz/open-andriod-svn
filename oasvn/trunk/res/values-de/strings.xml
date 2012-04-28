@@ -89,6 +89,7 @@
 	<string name="no_revisions">"Keine Änderungen sind für diese Verbindung zur Verfügung."</string>
 	<string name="revisions_retrieved">"Revisions erfolgreich abgerufen"</string>
 	<string name="refresh">"Aktualisieren"</string>
+	<string name="problem">Es wurde ein Problem Abrufen von Informationen. Überprüfen Sie die Protokolle für weitere Details.</string>
 	
 	<!-- Revision Details -->
 	<string name="revisiondetail_header">"Revision Einzelheiten"</string>

@@ -55,7 +55,7 @@
     <string name="delete_folder">Delete Folder</string>
     <string name="delete_connection">Delete Repo</string>
     <string name="view_logs">Show Log</string>
-    <string name="view_revisions">Show Revisions</string>
+    <string name="view_revisions">Revisions</string>
     <string name="performing_checkout">Performing Checkout!!!</string>
     <string name="performing_commit">Performing Commit!!!</string>
     <string name="idle">Idle...</string>
@@ -90,6 +90,7 @@
 	<string name="no_revisions">No revisions are available for this connection.</string>
 	<string name="revisions_retrieved">Revisions retrieved successfully</string>
 	<string name="refresh">Refresh</string>
+	<string name="problem">There was a problem retrieving information.  Check the logs for more details.</string>
 	
 	<!-- Revision Details -->
 	<string name="revisiondetail_header">Revision Details</string>

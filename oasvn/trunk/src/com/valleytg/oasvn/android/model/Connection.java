@@ -37,6 +37,7 @@ import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.application.OASVNApplication;
 import com.valleytg.oasvn.android.util.DateUtil;
 
@@ -219,16 +220,31 @@ public class Connection extends OASVNModelLocalDB {
 	 * 
 	 * @param app - Application context, required to access the database
 	 */
-	public void retrieveAllRevisions(OASVNApplication app) {
-		
-		List<SVNLogEntry> list;
-		if (app.getAllRevisions() instanceof List)
-		  list = (List<SVNLogEntry>)app.getAllRevisions();
-		else
-		  list = new ArrayList<SVNLogEntry>(app.getAllRevisions());
-		//Collections.sort(list);
-		
-		this.revisions = list;
+	public String retrieveAllRevisions(OASVNApplication app) {
+		try {
+			List<SVNLogEntry> list;
+			if (app.getAllRevisions() instanceof List)
+			  list = (List<SVNLogEntry>)app.getAllRevisions();
+			else
+			  list = new ArrayList<SVNLogEntry>(app.getAllRevisions());
+			//Collections.sort(list);
+			
+			this.revisions = list;
+			
+			return "";
+		}
+		catch(VerifyError ve) {
+			String msg = app.getString(R.string.problem);
+			ve.printStackTrace();
+			
+			return msg;
+		}
+		catch(Exception e) {
+			String msg = app.getString(R.string.problem);
+			e.printStackTrace();
+			
+			return msg;
+		}
 	}
 	
 	

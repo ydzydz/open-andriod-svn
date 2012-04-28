@@ -219,6 +219,10 @@ public class LogView extends ListActivity {
 	        	}
         	}
         	
+        	setListAdapter(new ArrayAdapter<String>(this, R.layout.log_item, logs));
+
+    		ListView lv = getListView();
+    		lv.setTextFilterEnabled(true);
         	
         }
         catch(Exception e) {
@@ -227,10 +231,7 @@ public class LogView extends ListActivity {
         	logs[0] = getString(R.string.no_logs);
         }
         
-        setListAdapter(new ArrayAdapter<String>(this, R.layout.log_item, logs));
-
-		ListView lv = getListView();
-		lv.setTextFilterEnabled(true);
+        
 
     }
 	

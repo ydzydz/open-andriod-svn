@@ -52,6 +52,7 @@
     <string name="head">Revision</string>
     <string name="checkout">Checkout</string>
     <string name="commit">Commit</string>
+    <string name="update">Update</string>
     <string name="file_manager">Open Folder</string>
     <string name="delete_folder">Delete Folder</string>
     <string name="delete_connection">Delete Repo</string>

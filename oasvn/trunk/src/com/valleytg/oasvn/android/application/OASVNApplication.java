@@ -622,6 +622,58 @@ public class OASVNApplication extends Application {
 		
     }
     
+    public String update() {
+    	
+    	Long rev = 0L;
+    	try {
+    		
+    		SVNURL myURL = this.currentConnection.getRepositoryURL();
+    		File myFile = this.assignPath();
+    		SVNRevision pegRevision = SVNRevision.UNDEFINED;
+    		SVNRevision myRevision = SVNRevision.HEAD;
+    		SVNDepth depth = SVNDepth.INFINITY;
+    		try {
+    			// do the checkout
+    			rev = updateClient.doUpdate(myFile, myRevision, SVNDepth.INFINITY, false, true);
+    			
+    			// log this success
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.update), " ", getString(R.string.revision) + " " + rev.toString());
+    		}
+    		catch(SVNException se) {
+    			String msg = se.getMessage();
+    			
+    			// log this failure
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
+    			
+    			return msg;
+    		}
+    		catch(VerifyError ve) {
+    			String msg = ve.getMessage();
+    			
+    			// log this failure
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
+    			
+    			ve.printStackTrace();
+    			return getString(R.string.verify) + " " + msg;
+    		}
+    		catch(Exception e) {
+    			String msg = e.getMessage();
+    			
+    			// log this failure
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
+    			
+    			e.printStackTrace();
+    			return getString(R.string.exception) + " " + msg;
+    		}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return e.getMessage();
+		}
+    	
+    	return Long.toString(rev);
+    }
+    
     /**
      * Clean up the current connection
      * Recursively cleans up the working copy, removing locks and resuming unfinished operations.

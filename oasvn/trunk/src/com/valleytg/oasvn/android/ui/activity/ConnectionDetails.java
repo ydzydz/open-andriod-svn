@@ -40,6 +40,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -80,6 +83,11 @@ public class ConnectionDetails extends Activity {
 	Button btnDelete;
 	Button btnRepoDelete;
 	Button btnFileManager;
+	
+	/**
+	 * Keep track of the menu so it can be updated
+	 */
+	Menu menu;
 	
 	/**
 	 * Thread control
@@ -462,6 +470,76 @@ public class ConnectionDetails extends Activity {
 
 	}
 	
+	/**
+	 * Menu
+	 */
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.menu, menu);
+	    
+	    // hold on to the menu
+	    this.menu = menu;
+	    
+	    updateMenu();
+	    return true;
+	}
+	
+	private void updateMenu() {
+		try {
+			if(this.menu != null) {
+				this.menu.clear();
+			    
+			    this.menu.add(0, R.id.update, 0, R.string.update);
+			    this.menu.add(0, R.id.cleanup, 1, R.string.cleanup);
+			    
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+		    case R.id.update:
+		        // open navigation
+		    	// show the ticket detail screen
+				try {
+					// open the add repository activity
+					if(running == false) {
+						// set the running flag
+						ConnectionDetails.this.running = true;
+						
+						// set the status
+						ConnectionDetails.this.status.setText(R.string.performing_update);
+						
+						UpdateThread updateThread = new UpdateThread();
+						updateThread.execute();
+					}
+					else {
+						Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
+					}
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+		    	
+		        return true;
+		        
+		    case R.id.cleanup:
+		    	// stub
+		    	
+
+		    default:
+		        return super.onOptionsItemSelected(item);
+	    }
+	}
+	
+	
 	class CheckoutThread extends AsyncTask<Void, Void, String> {
 
 		ProgressDialog dialog;
@@ -539,4 +617,85 @@ public class ConnectionDetails extends Activity {
 			ConnectionDetails.this.running = false;
 	    }
 	}
+	
+	
+	class UpdateThread extends AsyncTask<Void, Void, String> {
+
+		ProgressDialog dialog;
+
+		@Override
+	    protected void onPreExecute() {
+	        dialog = new ProgressDialog(ConnectionDetails.this);
+	        dialog.setMessage(getString(R.string.in_progress));
+	        dialog.setIndeterminate(true);
+	        dialog.setCancelable(false);
+	        dialog.show();
+	    }
+		
+		@Override
+		protected String doInBackground(Void... unused) {
+			try {
+				Looper.myLooper();
+				Looper.prepare();
+			}
+			catch(Exception e) {
+				// Looper only needs to be created if the thread is new, if reusing the thread we end up here
+			}
+			
+			String returned;
+			
+			try {
+				runOnUiThread(new Runnable() {
+				     public void run() {
+				    	// set the status
+				    	 ConnectionDetails.this.status.setText(R.string.performing_update);
+
+				     }
+				});
+				
+				
+				// do the update
+				returned = app.update();
+				
+				// get the current version
+				app.getCurrentConnection().setHead((int)app.getRevisionNumber());
+				
+				// save the current connection
+				app.getCurrentConnection().saveToLocalDB(app);
+
+				
+			}
+	        catch(Exception e) {
+	        	e.printStackTrace();
+	        	return e.getMessage();
+	        }
+			return returned;
+		}
+		
+		protected void onPostExecute(final String result) {
+			// unset the running flag
+			ConnectionDetails.this.resetIdle();
+
+			android.util.Log.d(getString(R.string.alarm), getString(R.string.update_successful));
+
+	        dialog.dismiss();
+	        
+	        runOnUiThread(new Runnable() {
+			     public void run() {
+			    	// indicate to the user that the action completed
+					Toast.makeText(getApplicationContext(), result, 5000).show();
+			     }
+	        });
+	        
+	        // populate the top
+	        populateTopInfo();
+	        
+	        ConnectionDetails.this.status.setText(R.string.idle);
+	        
+			// unset the running flag
+			ConnectionDetails.this.running = false;
+	    }
+	}
+	
+	
 }

@@ -17,6 +17,7 @@
     <string name="no_changes_available">No changes were available to commit to the repository</string>
     <string name="commit_success">Commit Successful Revision</string>
     <string name="checkout_successful">Checkout successful</string>
+    <string name="update_successful">Update successful</string>
     <string name="commit_comments">Commit comments</string>
     <string name="rev_no">Rev. No.</string>
     <string name="local_rev_updated">Local revision number updated, Rev. No.</string>
@@ -53,6 +54,7 @@
     <string name="checkout">Checkout</string>
     <string name="commit">Commit</string>
     <string name="update">Update</string>
+    <string name="cleanup">Clean Up</string>
     <string name="file_manager">Open Folder</string>
     <string name="delete_folder">Delete Folder</string>
     <string name="delete_connection">Delete Repo</string>
@@ -60,6 +62,7 @@
     <string name="view_revisions">Revisions</string>
     <string name="performing_checkout">Performing Checkout!!!</string>
     <string name="performing_commit">Performing Commit!!!</string>
+    <string name="performing_update">Performing Update!!!</string>
     <string name="idle">Idle...</string>
     <string name="complete">Action Completed!!!!</string>
     <string name="in_progress">Operation in progress, please wait...</string>

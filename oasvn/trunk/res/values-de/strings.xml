@@ -16,6 +16,7 @@
     <string name="no_changes_available">"Keine Änderungen zur Verfügung standen, um das Repository"</string>
     <string name="commit_success">"Commit Erfolgreiche Revision"</string>
     <string name="checkout_successful">"Prüfung über erfolgreiche"</string>
+    <string name="update_successful">Update erfolgreich</string>
     <string name="commit_comments">"Commit Kommentare"</string>
     <string name="rev_no">"Rev. Nr."</string>
     <string name="local_rev_updated">"Lokale Revisionsnummer aktualisiert, Stand Nr."</string>
@@ -51,6 +52,7 @@
     <string name="checkout">"Kasse"</string>
     <string name="commit">"Verbindlichkeit"</string>
     <string name="update">Aktualisieren</string>
+    <string name="cleanup">Aufräumen</string>
     <string name="file_manager">"Ordner öffnen"</string>
     <string name="delete_folder">"Ordner löschen"</string>
     <string name="delete_connection">"Löschen Repo"</string>
@@ -58,6 +60,7 @@
     <string name="view_revisions">"Zeige Revisions"</string>
     <string name="performing_checkout">"Darstellende Kasse!"</string>
     <string name="performing_commit">"Darstellende Commit!"</string>
+    <string name="performing_update">Darstellende Aktualisieren!!!</string>
     <string name="idle">"Inaktiv"</string>
     <string name="complete">"Aktion abgeschlossen!!"</string>
     <string name="in_progress">"Der Betrieb läuft, bitte warten ..."</string>

@@ -94,6 +94,11 @@ public class ConnectionDetails extends Activity {
 	 */
 	Boolean running = false;
 	
+	/**
+	 * Checkout / Update Button state
+	 */
+	Boolean checkoutButtonState = true;
+	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,26 +137,6 @@ public class ConnectionDetails extends Activity {
         
         // Make sure the device does not go to sleep while in this acitvity
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        
-        this.btnCheckoutHead.setOnClickListener(new View.OnClickListener() {
-			
-			public void onClick(View v) {
-				// open the add repository activity
-				if(running == false) {
-					// set the running flag
-					ConnectionDetails.this.running = true;
-					
-					// set the status
-					ConnectionDetails.this.status.setText(R.string.performing_checkout);
-					
-					CheckoutThread checkoutThread = new CheckoutThread();
-					checkoutThread.execute();
-				}
-				else {
-					Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
-				}
-			}
-		});
         
         this.btnCommit.setOnClickListener(new View.OnClickListener() {
 			
@@ -379,6 +364,25 @@ public class ConnectionDetails extends Activity {
 		this.status.setText(R.string.idle);
 	}
 
+	/**
+	 * Determines whether the lead button is in a checkout or update state
+	 * @return true for update, false for checkout
+	 */
+	private Boolean determineCheckoutState() {
+		Boolean state = true;
+		
+		// check to see if the repository is currently checked out.
+		try {
+			state = app.verifyWorkingCopy(app.assignPath());
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			state = false;
+		}
+		
+		return state;
+	}
+	
 	private void populateTopInfo() {
 		
 		// create the header area info
@@ -442,6 +446,48 @@ public class ConnectionDetails extends Activity {
 				
 				this.topArea5Title.setText(this.getString(R.string.head) + this.getString(R.string.colon));
 				this.topArea5.setText(head);
+				
+				// set the checkout button text
+		        if (determineCheckoutState()) {
+		        	// update
+		        	btnCheckoutHead.setText(R.string.update);
+		        }
+		        else {
+		        	// checkout
+		        	btnCheckoutHead.setText(R.string.checkout);	
+		        }
+		        
+		        // assign the checkout / update button action
+		        this.btnCheckoutHead.setOnClickListener(new View.OnClickListener() {
+					
+					public void onClick(View v) {
+						// open the add repository activity
+						if(running == false) {
+
+							// set the running flag
+							ConnectionDetails.this.running = true;
+							
+							// set the checkout button text
+					        if (determineCheckoutState()) {
+					        	// update
+								ConnectionDetails.this.status.setText(R.string.performing_update);
+								
+								UpdateThread updateThread = new UpdateThread();
+								updateThread.execute();
+					        }
+					        else {
+					        	// checkout
+								ConnectionDetails.this.status.setText(R.string.performing_checkout);
+								
+								CheckoutThread checkoutThread = new CheckoutThread();
+								checkoutThread.execute();
+					        }
+						}
+						else {
+							Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
+						}
+					}
+				});
 	
 			}
 			else {
@@ -491,7 +537,12 @@ public class ConnectionDetails extends Activity {
 			if(this.menu != null) {
 				this.menu.clear();
 			    
-			    this.menu.add(0, R.id.update, 0, R.string.update);
+				// conditionally add checkout to the menu
+				if(determineCheckoutState()) {
+					this.menu.add(0, R.id.checkout, 0, R.string.checkout);
+				}
+			    
+				// add the cleanup option
 			    this.menu.add(0, R.id.cleanup, 1, R.string.cleanup);
 			    
 			}
@@ -505,7 +556,7 @@ public class ConnectionDetails extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle item selection
 	    switch (item.getItemId()) {
-		    case R.id.update:
+		    case R.id.checkout:
 		        // open navigation
 		    	// show the ticket detail screen
 				try {
@@ -514,11 +565,10 @@ public class ConnectionDetails extends Activity {
 						// set the running flag
 						ConnectionDetails.this.running = true;
 						
-						// set the status
-						ConnectionDetails.this.status.setText(R.string.performing_update);
+						ConnectionDetails.this.status.setText(R.string.performing_checkout);
 						
-						UpdateThread updateThread = new UpdateThread();
-						updateThread.execute();
+						CheckoutThread checkoutThread = new CheckoutThread();
+						checkoutThread.execute();
 					}
 					else {
 						Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();

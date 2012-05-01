@@ -41,6 +41,7 @@ import org.tmatesoft.svn.core.wc.SVNCommitClient;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCClient;
+import org.tmatesoft.svn.core.wc.SVNWCUtil;
 import org.tmatesoft.svn.core.wc.admin.SVNLookClient;
 
 import com.valleytg.oasvn.android.R;
@@ -148,6 +149,13 @@ public class OASVNApplication extends Application {
     private SVNWCClient wcClient;
     
     /**
+     * The SVNWCUtil is a utility class providing some common methods used by 
+     * Working Copy API classes for such purposes as creating default run-time 
+     * configuration and authentication drivers and some others.
+     */
+    private SVNWCUtil wcUtil;
+    
+    /**
      * 
      */
     private SVNCommitInfo info;
@@ -252,6 +260,9 @@ public class OASVNApplication extends Application {
     	
     	// Working copy client
     	wcClient = new SVNWCClient(this.myAuthManager, null); 
+    	
+    	// working copy util
+    	wcUtil = new SVNWCUtil();
     }
     
     /**
@@ -342,6 +353,45 @@ public class OASVNApplication extends Application {
     }
     
     // SVNKit wrapper
+    
+    /**
+     * Check to see if the folder exists as a local working copy, and is under version
+     * control
+     * @param directory to verify
+     * @return true if the folder is a version controlled working copy
+     */
+    public Boolean verifyWorkingCopy(File file) {
+    	Boolean state = true;
+    	
+    	try {
+    		state = wcUtil.isWorkingCopyRoot(file);
+    		state = wcUtil.isVersionedDirectory(file);
+    	}
+		catch(VerifyError ve) {
+			String msg = ve.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
+			
+			ve.printStackTrace();
+			
+			// set the state to false
+			state = false;
+		}
+		catch(Exception e) {
+			String msg = e.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
+			
+			e.printStackTrace();
+			
+			// set the state to false
+			state = false;
+		}
+    	
+    	return state;
+    }
     
     /**
      * Retrieves all of the directories for the current repository, from the root
@@ -964,5 +1014,13 @@ public class OASVNApplication extends Application {
 
 	public SVNLogEntry getCurrentRevision() {
 		return currentRevision;
+	}
+
+	public void setWcUtil(SVNWCUtil wcUtil) {
+		this.wcUtil = wcUtil;
+	}
+
+	public SVNWCUtil getWcUtil() {
+		return wcUtil;
 	}
 }

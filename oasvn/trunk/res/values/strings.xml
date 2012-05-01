@@ -18,6 +18,7 @@
     <string name="commit_success">Commit Successful Revision</string>
     <string name="checkout_successful">Checkout successful</string>
     <string name="update_successful">Update successful</string>
+    <string name="cleanup_successful">CleanUp successful</string>
     <string name="commit_comments">Commit comments</string>
     <string name="rev_no">Rev. No.</string>
     <string name="local_rev_updated">Local revision number updated, Rev. No.</string>
@@ -63,6 +64,7 @@
     <string name="performing_checkout">Performing Checkout!!!</string>
     <string name="performing_commit">Performing Commit!!!</string>
     <string name="performing_update">Performing Update!!!</string>
+    <string name="performing_cleanup">Performing CleanUp!!!</string>
     <string name="idle">Idle...</string>
     <string name="complete">Action Completed!!!!</string>
     <string name="in_progress">Operation in progress, please wait...</string>

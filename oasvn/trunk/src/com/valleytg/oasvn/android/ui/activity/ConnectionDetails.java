@@ -581,7 +581,25 @@ public class ConnectionDetails extends Activity {
 		        return true;
 		        
 		    case R.id.cleanup:
-		    	// stub
+		    	// do cleanup
+		    	try {
+					// open the add repository activity
+					if(running == false) {
+						// set the running flag
+						ConnectionDetails.this.running = true;
+						
+						ConnectionDetails.this.status.setText(R.string.performing_cleanup);
+						
+						CleanUpThread cleanUpThread = new CleanUpThread();
+						cleanUpThread.execute();
+					}
+					else {
+						Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
+					}
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
 		    	
 
 		    default:
@@ -727,6 +745,79 @@ public class ConnectionDetails extends Activity {
 			ConnectionDetails.this.resetIdle();
 
 			android.util.Log.d(getString(R.string.alarm), getString(R.string.update_successful));
+
+	        dialog.dismiss();
+	        
+	        runOnUiThread(new Runnable() {
+			     public void run() {
+			    	// indicate to the user that the action completed
+					Toast.makeText(getApplicationContext(), result, 5000).show();
+			     }
+	        });
+	        
+	        // populate the top
+	        populateTopInfo();
+	        
+	        ConnectionDetails.this.status.setText(R.string.idle);
+	        
+			// unset the running flag
+			ConnectionDetails.this.running = false;
+	    }
+	}
+	
+	
+	class CleanUpThread extends AsyncTask<Void, Void, String> {
+
+		ProgressDialog dialog;
+
+		@Override
+	    protected void onPreExecute() {
+	        dialog = new ProgressDialog(ConnectionDetails.this);
+	        dialog.setMessage(getString(R.string.in_progress));
+	        dialog.setIndeterminate(true);
+	        dialog.setCancelable(false);
+	        dialog.show();
+	    }
+		
+		@Override
+		protected String doInBackground(Void... unused) {
+			try {
+				Looper.myLooper();
+				Looper.prepare();
+			}
+			catch(Exception e) {
+				// Looper only needs to be created if the thread is new, if reusing the thread we end up here
+			}
+			
+			String returned;
+			
+			try {
+				runOnUiThread(new Runnable() {
+				     public void run() {
+				    	// set the status
+				    	 ConnectionDetails.this.status.setText(R.string.performing_cleanup);
+
+				     }
+				});
+				
+				
+				// do the cleanup
+				returned = app.cleanUp();
+
+				
+			}
+	        catch(Exception e) {
+	        	e.printStackTrace();
+	        	return e.getMessage();
+	        }
+			return returned;
+		}
+		
+		protected void onPostExecute(final String result) {
+			// unset the running flag
+			ConnectionDetails.this.resetIdle();
+
+			android.util.Log.d(getString(R.string.alarm), getString(R.string.cleanup_successful));
 
 	        dialog.dismiss();
 	        

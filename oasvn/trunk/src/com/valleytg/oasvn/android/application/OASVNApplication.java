@@ -735,6 +735,9 @@ public class OASVNApplication extends Application {
     	try {
     		// do the cleanup on the current connection
     		wcClient.doCleanup(this.assignPath());
+    		
+    		// log this success
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.cleanup), "",  getString(R.string.success));
     	} 
     	catch (SVNException se) {
     		String msg = se.getMessage();

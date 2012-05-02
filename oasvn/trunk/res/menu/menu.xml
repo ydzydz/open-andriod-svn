@@ -2,4 +2,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/checkout" android:title="@string/update" />
     <item android:id="@+id/cleanup" android:title="@string/cleanup" />
+    <item android:id="@+id/revert" android:title="@string/revert" />
 </menu>

@@ -768,6 +768,48 @@ public class OASVNApplication extends Application {
     }
     
     /**
+     * Revert the working copy to the head revision of the repository.  This will delete
+     * any local changes that have not been committed!
+     * @return status or error as string
+     */
+    public String revertToHead() {
+    	try {
+    		// do the revert on the current connection
+    		wcClient.doRevert((new File[] {this.assignPath()}), SVNDepth.INFINITY, null);
+    		
+    		// log this success
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.revert), "",  getString(R.string.success));
+    	} 
+    	catch (SVNException se) {
+    		String msg = se.getMessage();
+    		
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
+			
+			// catlog the failure
+			se.printStackTrace();
+			
+			// display the failure
+			return msg;
+		} 
+		catch(Exception e) {
+			String msg = e.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getMessage().substring(0, 19), e.getMessage().toString());
+			
+			// catlog the failure
+			e.printStackTrace();
+			
+			// display the failure
+			return msg;
+		}
+		
+		return getString(R.string.success);
+    }
+    
+    
+    /**
      * Gets the revision number.
      * @return integer value of the current checked out revision
      */

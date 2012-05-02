@@ -72,6 +72,7 @@
     <string name="complete">Action Completed!!!!</string>
     <string name="in_progress">Operation in progress, please wait...</string>
     <string name="confirm">Are you sure?</string>
+    <string name="revert_confirmation">Are you sure? Local working copy changes will be lost!</string>
     <string name="delete_message">You will delete the entire local folder!</string>
     <string name="delete_repo_message">You are about to delete this repository connection. Are you sure?</string>
     <string name="delete_folder_too">Do you want to remove the local folder as well?</string>

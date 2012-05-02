@@ -620,13 +620,40 @@ public class ConnectionDetails extends Activity {
 		    	try {
 					// open the add repository activity
 					if(running == false) {
-						// set the running flag
-						ConnectionDetails.this.running = true;
 						
-						ConnectionDetails.this.status.setText(R.string.performing_revert);
+						// double check the users intention
+						AlertDialog.Builder builder = new AlertDialog.Builder(ConnectionDetails.this);
 						
-						RevertThread revertThread = new RevertThread();
-						revertThread.execute();
+						builder.setIcon(android.R.drawable.ic_dialog_alert);
+						builder.setTitle(R.string.confirm);
+						builder.setMessage(getString(R.string.revert_confirmation));
+						builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+				            public void onClick(DialogInterface dialog, int which) {
+				            	synchronized (this) {
+				            		try{
+				            			// set the running flag
+										ConnectionDetails.this.running = true;
+
+										ConnectionDetails.this.status.setText(R.string.performing_revert);
+										
+										RevertThread revertThread = new RevertThread();
+										revertThread.execute();
+			    				        
+			    				        // update the header
+			    				        populateTopInfo();
+			    				        
+				            		} 
+				            		catch(Exception e) {
+				            			e.printStackTrace();
+				            		}
+				            	}
+								
+				            }
+
+				        });
+						builder.setNegativeButton(R.string.no, null);
+						builder.show();	
 					}
 					else {
 						Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();

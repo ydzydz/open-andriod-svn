@@ -65,11 +65,12 @@
     <string name="performing_commit">"Darstellende Commit!!!"</string>
     <string name="performing_update">Darstellende Aktualisieren!!!</string>
     <string name="performing_cleanup">Darstellende CleanUp!!!</string>
-    <string name="performing_revert">Darstellende zurückkehren!!!</string>
+    <string name="performing_revert">"Darstellende zurückkehren!!!"</string>
     <string name="idle">"Inaktiv"</string>
     <string name="complete">"Aktion abgeschlossen!!"</string>
     <string name="in_progress">"Der Betrieb läuft, bitte warten ..."</string>
     <string name="confirm">"Bist Du sicher?"</string>
+    <string name="revert_confirmation">"Sind Sie sicher? Lokalen Arbeitskopie Änderungen gehen verloren!"</string>
     <string name="delete_message">"Sie löschen den gesamten lokalen Ordner!"</string>
     <string name="delete_repo_message">"Sie sind im Begriff, diese Repository-Verbindung zu löschen. Sind Sie sicher?"</string>
     <string name="delete_folder_too">"Wollen Sie den lokalen Ordner ebenfalls löschen?"</string>

@@ -59,8 +59,8 @@
     <string name="cleanup">Clean Up</string>
     <string name="revert">Revert</string>
     <string name="file_manager">Open Folder</string>
-    <string name="delete_folder">Delete Folder</string>
-    <string name="delete_connection">Delete Repo</string>
+    <string name="delete_folder">Delete Working Copy (local folder)</string>
+    <string name="delete_connection">Delete Connection</string>
     <string name="view_logs">Show Log</string>
     <string name="view_revisions">Revisions</string>
     <string name="performing_checkout">Performing Checkout!!!</string>

@@ -57,8 +57,8 @@
     <string name="cleanup">"Aufräumen"</string>
     <string name="revert">"zurückkehren"</string>
     <string name="file_manager">"Ordner öffnen"</string>
-    <string name="delete_folder">"Ordner löschen"</string>
-    <string name="delete_connection">"Löschen Repo"</string>
+    <string name="delete_folder">"Löschen Arbeitskopie (lokaler Ordner)"</string>
+    <string name="delete_connection">"Verbindung löschen"</string>
     <string name="view_logs">"Zeige Log"</string>
     <string name="view_revisions">"Zeige Revisions"</string>
     <string name="performing_checkout">"Darstellende Checkout!!!"</string>

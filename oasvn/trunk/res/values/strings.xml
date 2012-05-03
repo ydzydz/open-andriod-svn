@@ -105,5 +105,10 @@
 	
 	<!-- Revision Details -->
 	<string name="revisiondetail_header">Revision Details</string>
+	
+	<!-- Demo -->
+	<string name="three_views">Free version allows 3 revision detail views.</string>
+	<string name="views_used">Demo detail views exceeded.  Pro version allows for unlimited use.</string>
+	<string name="pro_only">Commit is only available with the Pro version.</string>
 
 </resources>

@@ -198,6 +198,17 @@ public class Revisions extends ListActivity {
     		// if there are revisions, display them.
     		if(app.getCurrentConnection().getRevisions() != null && app.getCurrentConnection().getRevisions().size() > 0) {
 
+    			// reverse the sort order, most recent first.
+    			Collections.sort(app.getCurrentConnection().getRevisions(), new Comparator<SVNLogEntry>(){
+    				
+					public int compare(SVNLogEntry lhs, SVNLogEntry rhs) {
+						SVNLogEntry p1 = (SVNLogEntry) lhs;
+						SVNLogEntry p2 = (SVNLogEntry) rhs;
+    	               return Long.valueOf(p2.getRevision()).compareTo(Long.valueOf(p1.getRevision()));
+					}
+    	 
+    	        });
+    			
         		// revisions ready to go
         		entries = new String[app.getCurrentConnection().getRevisions().size()];
         		int i = 0;

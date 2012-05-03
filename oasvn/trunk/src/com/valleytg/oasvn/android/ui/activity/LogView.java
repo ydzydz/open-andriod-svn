@@ -201,7 +201,7 @@ public class LogView extends ListActivity {
 	    	 
 	    	        });
 	        		
-	        		// connections ready to go
+	        		// logs ready to go
 	        		logs = new String[app.getCurrentConnection().getLogs().size()];
 	        		for(LogItem log : app.getCurrentConnection().getLogs()) {
 	            		logs[app.getCurrentConnection().getLogs().indexOf(log)] = log.getLogNumber() + " | " + DateUtil.getSimpleDateTime(log.getDateCreated(), this) 

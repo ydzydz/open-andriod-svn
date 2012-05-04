@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/checkout" android:title="@string/update" />
+    <item android:id="@+id/cleanup" android:title="@string/cleanup" />
+    <item android:id="@+id/revert" android:title="@string/revert" />
+    <item android:id="@+id/delete_working_copy" android:title="@string/delete_folder" />
+    <item android:id="@+id/delete_connection" android:title="@string/delete_connection" />
+</menu>

@@ -21,7 +21,7 @@
  * 
  */
 
-package com.valleytg.oasvn.android.ui.activity;
+package com.valleytg.oasvnlite.android.ui.activity;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -35,7 +35,7 @@ import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
-import com.valleytg.oasvn.android.R;
+import com.valleytg.oasvnlite.android.R;
 
 import android.app.Activity;
 import android.os.AsyncTask;

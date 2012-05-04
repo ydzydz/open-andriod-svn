@@ -21,11 +21,11 @@
  * 
  */
 
-package com.valleytg.oasvn.android.model;
+package com.valleytg.oasvnlite.android.model;
 
 import java.util.Date;
 
-import com.valleytg.oasvn.android.util.DateUtil;
+import com.valleytg.oasvnlite.android.util.DateUtil;
 
 public abstract class OASVNModel {
 	

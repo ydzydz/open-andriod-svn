@@ -21,11 +21,11 @@
  * 
  */
 
-package com.valleytg.oasvn.android.ui.activity;
+package com.valleytg.oasvnlite.android.ui.activity;
 
-import com.valleytg.oasvn.android.R;
-import com.valleytg.oasvn.android.application.OASVNApplication;
-import com.valleytg.oasvn.android.util.DateUtil;
+import com.valleytg.oasvnlite.android.R;
+import com.valleytg.oasvnlite.android.application.OASVNApplication;
+import com.valleytg.oasvnlite.android.util.DateUtil;
 
 import android.app.Activity;
 import android.os.Bundle;

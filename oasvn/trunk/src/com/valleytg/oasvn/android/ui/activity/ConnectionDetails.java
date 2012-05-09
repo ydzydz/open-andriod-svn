@@ -444,250 +444,237 @@ public class ConnectionDetails extends Activity {
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle item selection
-	    switch (item.getItemId()) {
-		    case R.id.checkout:
-		        // open navigation
-		    	// show the ticket detail screen
-				try {
-					// open the add repository activity
-					if(running == false) {
-						// set the running flag
-						ConnectionDetails.this.running = true;
-						
-						ConnectionDetails.this.status.setText(R.string.performing_checkout);
-						
-						CheckoutThread checkoutThread = new CheckoutThread();
-						checkoutThread.execute();
-					}
-					else {
-						Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
-					}
+	    if (item.getItemId() == R.id.checkout) {
+			// open navigation
+			// show the ticket detail screen
+			try {
+				// open the add repository activity
+				if(running == false) {
+					// set the running flag
+					ConnectionDetails.this.running = true;
+					
+					ConnectionDetails.this.status.setText(R.string.performing_checkout);
+					
+					CheckoutThread checkoutThread = new CheckoutThread();
+					checkoutThread.execute();
 				}
-				catch(Exception e) {
-					e.printStackTrace();
+				else {
+					Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
 				}
-		    	
-		        return true;
-		        
-		    case R.id.cleanup:
-		    	// do cleanup
-		    	try {
-					// open the add repository activity
-					if(running == false) {
-						// set the running flag
-						ConnectionDetails.this.running = true;
-						
-						ConnectionDetails.this.status.setText(R.string.performing_cleanup);
-						
-						CleanUpThread cleanUpThread = new CleanUpThread();
-						cleanUpThread.execute();
-					}
-					else {
-						Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
-					}
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+			return true;
+		} else if (item.getItemId() == R.id.cleanup) {
+			// do cleanup
+			try {
+				// open the add repository activity
+				if(running == false) {
+					// set the running flag
+					ConnectionDetails.this.running = true;
+					
+					ConnectionDetails.this.status.setText(R.string.performing_cleanup);
+					
+					CleanUpThread cleanUpThread = new CleanUpThread();
+					cleanUpThread.execute();
 				}
-				catch(Exception e) {
-					e.printStackTrace();
+				else {
+					Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
 				}
-		    	
-				return true;
-				
-		    case R.id.revert:
-		    	// do revert
-		    	try {
-					// open the add repository activity
-					if(running == false) {
-						
-						// double check the users intention
-						AlertDialog.Builder builder = new AlertDialog.Builder(ConnectionDetails.this);
-						
-						builder.setIcon(android.R.drawable.ic_dialog_alert);
-						builder.setTitle(R.string.confirm);
-						builder.setMessage(getString(R.string.revert_confirmation));
-						builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+			return true;
+		} else if (item.getItemId() == R.id.revert) {
+			// do revert
+			try {
+				// open the add repository activity
+				if(running == false) {
+					
+					// double check the users intention
+					AlertDialog.Builder builder = new AlertDialog.Builder(ConnectionDetails.this);
+					
+					builder.setIcon(android.R.drawable.ic_dialog_alert);
+					builder.setTitle(R.string.confirm);
+					builder.setMessage(getString(R.string.revert_confirmation));
+					builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 
-				            public void onClick(DialogInterface dialog, int which) {
-				            	synchronized (this) {
-				            		try{
-				            			// set the running flag
-										ConnectionDetails.this.running = true;
+			            public void onClick(DialogInterface dialog, int which) {
+			            	synchronized (this) {
+			            		try{
+			            			// set the running flag
+									ConnectionDetails.this.running = true;
 
-										ConnectionDetails.this.status.setText(R.string.performing_revert);
-										
-										RevertThread revertThread = new RevertThread();
-										revertThread.execute();
-			    				        
-			    				        // update the header
-			    				        populateTopInfo();
-			    				        
-				            		} 
-				            		catch(Exception e) {
-				            			e.printStackTrace();
-				            		}
-				            	}
-								
-				            }
-
-				        });
-						builder.setNegativeButton(R.string.no, null);
-						builder.show();	
-					}
-					else {
-						Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
-					}
-				}
-				catch(Exception e) {
-					e.printStackTrace();
-				}
-		    	
-				return true;
-				
-		    case R.id.delete_working_copy:
-		        // open navigation
-		    	// show the ticket detail screen
-				try {
-					// open the add repository activity
-					if(running	== false) {
-
-						// double check the users intention
-						AlertDialog.Builder builder = new AlertDialog.Builder(ConnectionDetails.this);
-						
-						builder.setIcon(android.R.drawable.ic_dialog_alert);
-						builder.setTitle(R.string.confirm);
-						builder.setMessage(getString(R.string.delete_message));
-						builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-
-				            public void onClick(DialogInterface dialog, int which) {
-				            	synchronized (this) {
-				            		try{
-				            			app.initializePath();
-				            			File tree = app.assignPath();
-				            			app.deleteRecursive(tree);
-				            			
-				            			// set the connection revision back to 0
-			    				        app.getCurrentConnection().setHead(0);
-			    				        app.saveConnection(app.getCurrentConnection());
-			    				        
-			    				        // update the header
-			    				        populateTopInfo();
-			    				        
-				            		} 
-				            		catch(Exception e) {
-				            			e.printStackTrace();
-				            		}
-				            	}
-								
-				            }
-
-				        });
-						builder.setNegativeButton(R.string.no, null);
-						builder.show();	
-						
-					}
-					else {
-						Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
-					}
-				}
-				catch(Exception e) {
-					e.printStackTrace();
-				}
-		    	
-		        return true;
-		        
-		    case R.id.delete_connection:
-		    	// delete the connection from oasvn
-		    	try {
-		    		// open the add repository activity
-					if(running	== false) {
-
-						// double check the users intention
-						AlertDialog.Builder builder = new AlertDialog.Builder(ConnectionDetails.this);
-						
-						builder.setIcon(android.R.drawable.ic_dialog_alert);
-						builder.setTitle(R.string.confirm);
-						builder.setMessage(getString(R.string.delete_repo_message));
-						builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-
-				            public void onClick(DialogInterface dialog, int which) {
-				            	// if there is a local working copy then..
-				            	// check to see if the user wants to delete the local folder as well
-				            	// double check the users intention
-				            	if(determineCheckoutState()) {
-									AlertDialog.Builder builder2 = new AlertDialog.Builder(ConnectionDetails.this);
+									ConnectionDetails.this.status.setText(R.string.performing_revert);
 									
-									builder2.setIcon(android.R.drawable.ic_dialog_alert);
-									builder2.setTitle(R.string.confirm);
-									builder2.setMessage(getString(R.string.delete_folder_too));
-									builder2.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-	
-							            public void onClick(DialogInterface dialog2, int which) {
-							            	// user choose to delete the local folder
-							            	synchronized (this) {
-							            		try{
-							            			app.initializePath();
-							            			File tree = app.assignPath();
-							            			app.deleteRecursive(tree);
-							            			
-							            			// close the activity
-							            			ConnectionDetails.this.finish();
-							            		} 
-							            		catch(Exception e) {
-							            			e.printStackTrace();
-							            		}
-							            	}
-							            }
-						            });
-									builder2.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-	
-							            public void onClick(DialogInterface dialog2, int which) {
-							            	// close the activity
-					            			ConnectionDetails.this.finish();
-							            }
-									});
-							        builder2.show();	
-				            	}
-				            	
-						        // remove the connection from the local database
-				            	synchronized (this) {
-				            		try{
-				            			// remove from the database
-				            			app.getCurrentConnection().deleteFromDatabase(app);
-				            			
-				            			// remove from the allConnections array
-				            			app.getAllConnections().remove(app.getCurrentConnection());
-				            			
-				            		} 
-				            		catch(Exception e) {
-				            			e.printStackTrace();
-				            		}
-				            	}
-				            	
-				            	// close the activity only if there was no working copy
-				            	if(!determineCheckoutState()) {
-				            		ConnectionDetails.this.finish();
-				            	}
-				            }
+									RevertThread revertThread = new RevertThread();
+									revertThread.execute();
+							        
+							        // update the header
+							        populateTopInfo();
+							        
+			            		} 
+			            		catch(Exception e) {
+			            			e.printStackTrace();
+			            		}
+			            	}
+							
+			            }
 
-				        });
-			        builder.setNegativeButton(R.string.no, null);
-			        builder.show();	
-						
-					}
-					else {
-						Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
-					}
+			        });
+					builder.setNegativeButton(R.string.no, null);
+					builder.show();	
 				}
-				catch(Exception e) {
-					e.printStackTrace();
+				else {
+					Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
 				}
-		    	
-				return true;
-				
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+			return true;
+		} else if (item.getItemId() == R.id.delete_working_copy) {
+			// open navigation
+			// show the ticket detail screen
+			try {
+				// open the add repository activity
+				if(running	== false) {
 
-		    default:
-		        return super.onOptionsItemSelected(item);
-	    }
+					// double check the users intention
+					AlertDialog.Builder builder = new AlertDialog.Builder(ConnectionDetails.this);
+					
+					builder.setIcon(android.R.drawable.ic_dialog_alert);
+					builder.setTitle(R.string.confirm);
+					builder.setMessage(getString(R.string.delete_message));
+					builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+			            public void onClick(DialogInterface dialog, int which) {
+			            	synchronized (this) {
+			            		try{
+			            			app.initializePath();
+			            			File tree = app.assignPath();
+			            			app.deleteRecursive(tree);
+			            			
+			            			// set the connection revision back to 0
+							        app.getCurrentConnection().setHead(0);
+							        app.saveConnection(app.getCurrentConnection());
+							        
+							        // update the header
+							        populateTopInfo();
+							        
+			            		} 
+			            		catch(Exception e) {
+			            			e.printStackTrace();
+			            		}
+			            	}
+							
+			            }
+
+			        });
+					builder.setNegativeButton(R.string.no, null);
+					builder.show();	
+					
+				}
+				else {
+					Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
+				}
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+			return true;
+		} else if (item.getItemId() == R.id.delete_connection) {
+			// delete the connection from oasvn
+			try {
+				// open the add repository activity
+				if(running	== false) {
+
+					// double check the users intention
+					AlertDialog.Builder builder = new AlertDialog.Builder(ConnectionDetails.this);
+					
+					builder.setIcon(android.R.drawable.ic_dialog_alert);
+					builder.setTitle(R.string.confirm);
+					builder.setMessage(getString(R.string.delete_repo_message));
+					builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+			            public void onClick(DialogInterface dialog, int which) {
+			            	// if there is a local working copy then..
+			            	// check to see if the user wants to delete the local folder as well
+			            	// double check the users intention
+			            	if(determineCheckoutState()) {
+								AlertDialog.Builder builder2 = new AlertDialog.Builder(ConnectionDetails.this);
+								
+								builder2.setIcon(android.R.drawable.ic_dialog_alert);
+								builder2.setTitle(R.string.confirm);
+								builder2.setMessage(getString(R.string.delete_folder_too));
+								builder2.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+						            public void onClick(DialogInterface dialog2, int which) {
+						            	// user choose to delete the local folder
+						            	synchronized (this) {
+						            		try{
+						            			app.initializePath();
+						            			File tree = app.assignPath();
+						            			app.deleteRecursive(tree);
+						            			
+						            			// close the activity
+						            			ConnectionDetails.this.finish();
+						            		} 
+						            		catch(Exception e) {
+						            			e.printStackTrace();
+						            		}
+						            	}
+						            }
+					            });
+								builder2.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+
+						            public void onClick(DialogInterface dialog2, int which) {
+						            	// close the activity
+				            			ConnectionDetails.this.finish();
+						            }
+								});
+						        builder2.show();	
+			            	}
+			            	
+					        // remove the connection from the local database
+			            	synchronized (this) {
+			            		try{
+			            			// remove from the database
+			            			app.getCurrentConnection().deleteFromDatabase(app);
+			            			
+			            			// remove from the allConnections array
+			            			app.getAllConnections().remove(app.getCurrentConnection());
+			            			
+			            		} 
+			            		catch(Exception e) {
+			            			e.printStackTrace();
+			            		}
+			            	}
+			            	
+			            	// close the activity only if there was no working copy
+			            	if(!determineCheckoutState()) {
+			            		ConnectionDetails.this.finish();
+			            	}
+			            }
+
+			        });
+			    builder.setNegativeButton(R.string.no, null);
+			    builder.show();	
+					
+				}
+				else {
+					Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
+				}
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+			return true;
+		} else {
+			return super.onOptionsItemSelected(item);
+		}
 	}
 	
 	

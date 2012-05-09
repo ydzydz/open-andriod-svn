@@ -247,6 +247,39 @@ public class Connection extends OASVNModelLocalDB {
 		}
 	}
 	
+	/**
+	 * Retrieve all of the revisions that are associated with the connection.
+	 * Saves them in the logs ArrayList.
+	 * 
+	 * @param app - Application context, required to access the database
+	 */
+	public String retrieveXRevisions(OASVNApplication app, long numRevisions) {
+		try {
+			List<SVNLogEntry> list;
+			if (app.getXRevisions(numRevisions) instanceof List)
+			  list = (List<SVNLogEntry>)app.getXRevisions(numRevisions);
+			else
+			  list = new ArrayList<SVNLogEntry>(app.getXRevisions(numRevisions));
+			//Collections.sort(list);
+			
+			this.revisions = list;
+			
+			return "";
+		}
+		catch(VerifyError ve) {
+			String msg = app.getString(R.string.problem);
+			ve.printStackTrace();
+			
+			return msg;
+		}
+		catch(Exception e) {
+			String msg = app.getString(R.string.problem);
+			e.printStackTrace();
+			
+			return msg;
+		}
+	}
+	
 	
 	// log management
 	

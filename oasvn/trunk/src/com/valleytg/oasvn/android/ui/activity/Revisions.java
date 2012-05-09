@@ -275,7 +275,10 @@ public class Revisions extends ListActivity {
 			try {
 		
 				// get all the revisions
-				returned = app.getCurrentConnection().retrieveAllRevisions(app);
+				//returned = app.getCurrentConnection().retrieveAllRevisions(app);
+				
+				// get 20 revisions
+				returned = app.getCurrentConnection().retrieveXRevisions(app, 50L);
 				if(returned.length() == 0) {
 					returned = getString(R.string.revisions_retrieved);
 				}

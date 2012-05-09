@@ -672,6 +672,11 @@ public class OASVNApplication extends Application {
 		
     }
     
+    /**
+     * Update the current connection
+     * Will perform svn update on the repository
+     * @return revision number or error message
+     */
     public String update() {
     	
     	Long rev = 0L;

@@ -196,9 +196,9 @@ public class Revisions extends ListActivity {
 				// add the number input to the dialog 
 				final EditText input = new EditText(this);
 				
-				// limit the number of revisions to 9999
+				// limit the number of revisions to 999
 				InputFilter[] FilterArray = new InputFilter[1];
-				FilterArray[0] = new InputFilter.LengthFilter(4);
+				FilterArray[0] = new InputFilter.LengthFilter(3);
 				input.setFilters(FilterArray);
 				
 				// populate the default value

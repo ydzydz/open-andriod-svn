@@ -16,6 +16,7 @@
     <string name="no_changes_available">"Keine Änderungen für ein Commit in das Repository verfügbar"</string>
     <string name="commit_success">"Commit erfolgreich"</string>
     <string name="checkout_successful">"Checkout erfolgreich"</string>
+    <string name="export_successful">Export erfolgreich</string>
     <string name="update_successful">"Update erfolgreich"</string>
     <string name="cleanup_successful">"CleanUp erfolgreich"</string>
     <string name="commit_comments">"Commit-Kommentare"</string>
@@ -63,6 +64,7 @@
     <string name="view_logs">"Zeige Log"</string>
     <string name="view_revisions">"Zeige Revisionen"</string>
     <string name="performing_checkout">"Führe Checkout aus!"</string>
+    <string name="performing_export">Führe Export aus!</string>
     <string name="performing_commit">"Führe Commit aus!"</string>
     <string name="performing_update">"Führe Update aus!"</string>
     <string name="performing_cleanup">"Führe Update aus!"</string>

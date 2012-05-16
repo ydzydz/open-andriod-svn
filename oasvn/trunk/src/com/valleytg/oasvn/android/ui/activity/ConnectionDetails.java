@@ -412,29 +412,30 @@ public class ConnectionDetails extends Activity {
 				
 				// checkout
 				this.menu.add(0, R.id.checkout, 0, R.string.checkout);
+				
 			    
 				// conditionally add checkout to the menu
 				if(determineCheckoutState()) {
 					// working copy exists, add any menu options dependant on having a working copy here
 					
 					// add the cleanup option
-				    this.menu.add(0, R.id.cleanup, 1, R.string.cleanup);
+				    this.menu.add(0, R.id.cleanup, 2, R.string.cleanup);
 				    
 				    // add the revert action
-				    this.menu.add(0, R.id.revert, 1, R.string.revert);
+				    this.menu.add(0, R.id.revert, 3, R.string.revert);
 				    
 				    // delete entire local working copy
-					this.menu.add(0, R.id.delete_working_copy, 0, R.string.delete_folder);
+					this.menu.add(0, R.id.delete_working_copy, 4, R.string.delete_folder);
 				}
 				else {
 					// any options that can exist without a working copy go here.
-					
+					this.menu.add(0, R.id.export, 1, R.string.export);
 				}
 				
 				// options that should always be at the bottom of the menu
 
 				// delete the connection (and possibly the entire working copy as well)
-				this.menu.add(0, R.id.delete_connection, 0, R.string.delete_connection);
+				this.menu.add(0, R.id.delete_connection, 5, R.string.delete_connection);
 			}
 		}
 		catch(Exception e) {
@@ -466,7 +467,30 @@ public class ConnectionDetails extends Activity {
 				e.printStackTrace();
 			}
 			return true;
-		} else if (item.getItemId() == R.id.cleanup) {
+		}
+	    else if (item.getItemId() == R.id.export) {
+
+			try {
+				// open the add repository activity
+				if(running == false) {
+					// set the running flag
+					ConnectionDetails.this.running = true;
+					
+					ConnectionDetails.this.status.setText(R.string.performing_export);
+					
+					ExportThread exportThread = new ExportThread();
+					exportThread.execute();
+				}
+				else {
+					Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
+				}
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+			return true;
+		}
+	    else if (item.getItemId() == R.id.cleanup) {
 			// do cleanup
 			try {
 				// open the add repository activity
@@ -740,6 +764,85 @@ public class ConnectionDetails extends Activity {
 			ConnectionDetails.this.resetIdle();
 
 			android.util.Log.d(getString(R.string.alarm), getString(R.string.checkout_successful));
+
+	        dialog.dismiss();
+	        
+	        runOnUiThread(new Runnable() {
+			     public void run() {
+			    	// indicate to the user that the action completed
+					Toast.makeText(getApplicationContext(), result, 5000).show();
+			     }
+	        });
+	        
+	        // populate the top
+	        populateTopInfo();
+	        
+	        ConnectionDetails.this.status.setText(R.string.idle);
+	        
+			// unset the running flag
+			ConnectionDetails.this.running = false;
+	    }
+	}
+	
+	
+	class ExportThread extends AsyncTask<Void, Void, String> {
+
+		ProgressDialog dialog;
+
+		@Override
+	    protected void onPreExecute() {
+	        dialog = new ProgressDialog(ConnectionDetails.this);
+	        dialog.setMessage(getString(R.string.in_progress));
+	        dialog.setIndeterminate(true);
+	        dialog.setCancelable(false);
+	        dialog.show();
+	    }
+		
+		@Override
+		protected String doInBackground(Void... unused) {
+			try {
+				Looper.myLooper();
+				Looper.prepare();
+			}
+			catch(Exception e) {
+				// Looper only needs to be created if the thread is new, if reusing the thread we end up here
+			}
+			
+			String returned;
+			
+			try {
+				runOnUiThread(new Runnable() {
+				     public void run() {
+				    	// set the status
+				    	 ConnectionDetails.this.status.setText(R.string.performing_export);
+
+				     }
+				});
+				
+				
+				// do the checkout
+				returned = app.fullHeadExport();
+				
+				// get the current version
+				app.getCurrentConnection().setHead((int)app.getRevisionNumber());
+				
+				// save the current connection
+				app.getCurrentConnection().saveToLocalDB(app);
+
+				
+			}
+	        catch(Exception e) {
+	        	e.printStackTrace();
+	        	return e.getMessage();
+	        }
+			return returned;
+		}
+		
+		protected void onPostExecute(final String result) {
+			// unset the running flag
+			ConnectionDetails.this.resetIdle();
+
+			android.util.Log.d(getString(R.string.alarm), getString(R.string.export_successful));
 
 	        dialog.dismiss();
 	        

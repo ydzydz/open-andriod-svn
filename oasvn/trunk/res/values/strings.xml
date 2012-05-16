@@ -17,6 +17,7 @@
     <string name="no_changes_available">No changes were available to commit to the repository</string>
     <string name="commit_success">Commit Successful Revision</string>
     <string name="checkout_successful">Checkout successful</string>
+    <string name="export_successful">Export successful</string>
     <string name="update_successful">Update successful</string>
     <string name="cleanup_successful">CleanUp successful</string>
     <string name="revert_successful">Revert successful</string>
@@ -65,6 +66,7 @@
     <string name="view_logs">Show Log</string>
     <string name="view_revisions">Revisions</string>
     <string name="performing_checkout">Performing Checkout!!!</string>
+    <string name="performing_export">Performing Export!!!</string>
     <string name="performing_commit">Performing Commit!!!</string>
     <string name="performing_update">Performing Update!!!</string>
     <string name="performing_cleanup">Performing CleanUp!!!</string>

@@ -552,9 +552,45 @@ public class OASVNApplication extends Application {
     
     /**
      * Does full checkout of the Head revision
-     * @return
+     * @return success or failure message
      */
     public String fullHeadCheckout() {
+
+    		SVNRevision myRevision = SVNRevision.HEAD;
+    		String rValue = doCheckout(myRevision);
+    		return rValue;
+    }
+    
+    /**
+     * Does a checkout of version supplied and create working copy
+     * @param revision as long
+     * @return success or failure message
+     */
+    public String doCheckout(long revision) {
+    	// create the return holder
+    	String rValue ="";
+    	
+    	// convert the Long parameter value to an SVNRevision
+    	try {
+    		SVNRevision thisRev = SVNRevision.create(revision);
+    		rValue = doCheckout(thisRev);
+    	}
+    	catch(Exception e) {
+    		if(rValue.length() == 0) {
+    			rValue = "Invalid Revision";
+    		}
+    		e.printStackTrace();
+    	}
+    	 
+    	return rValue;
+    }
+    
+    /**
+     * Does a checkout of version supplied and create working copy
+     * @param revision as SVNRevision
+     * @return success or failure message
+     */
+    public String doCheckout(SVNRevision revision) {
     	try {
     		// initialize the auth manager
     		this.initAuthManager();
@@ -565,7 +601,7 @@ public class OASVNApplication extends Application {
     		SVNURL myURL = this.currentConnection.getRepositoryURL();
     		File myFile = this.assignPath();
     		SVNRevision pegRevision = SVNRevision.UNDEFINED;
-    		SVNRevision myRevision = SVNRevision.HEAD;
+    		SVNRevision myRevision = revision;
     		SVNDepth depth = SVNDepth.INFINITY;
     		try {
     			// do the checkout
@@ -607,6 +643,103 @@ public class OASVNApplication extends Application {
 		}
 		return "success";
     }
+    
+    
+    /**
+     * Does full export of the Head revision
+     * @return success or failure message
+     */
+    public String fullHeadExport() {
+
+    		SVNRevision myRevision = SVNRevision.HEAD;
+    		String rValue = doExport(myRevision);
+    		return rValue;
+    }
+    
+    /**
+     * Does an export of version supplied does not create a working copy.
+     * @param revision as long
+     * @return success or failure message
+     */
+    public String doExport(long revision) {
+    	// create the return holder
+    	String rValue ="";
+    	
+    	// convert the Long parameter value to an SVNRevision
+    	try {
+    		SVNRevision thisRev = SVNRevision.create(revision);
+    		rValue = doExport(thisRev);
+    	}
+    	catch(Exception e) {
+    		if(rValue.length() == 0) {
+    			rValue = "Invalid Revision";
+    		}
+    		e.printStackTrace();
+    	}
+    	 
+    	return rValue;
+    }
+    
+    /**
+     * Does an export of the remote folder to the local.  This does not create a working copy and 
+     * will not work if a working copy is already in the local location.  
+     * @param revision of the remote repo to export
+     * @return success or failure message
+     */
+    public String doExport(SVNRevision revision) {
+    	try {
+    		// initialize the auth manager
+    		this.initAuthManager();
+    		
+    		// make sure the path is ready
+    		initializePath();
+    		
+    		SVNURL myURL = this.currentConnection.getRepositoryURL();
+    		File myFile = this.assignPath();
+    		SVNRevision pegRevision = SVNRevision.UNDEFINED;
+    		SVNRevision myRevision = revision;
+    		SVNDepth depth = SVNDepth.INFINITY;
+    		try {
+    			// do the export
+    			Long rev = updateClient.doExport(myURL, myFile, pegRevision, myRevision, null, true, depth);
+    			
+    			// log this success
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.export), "", getString(R.string.revision) + " " + rev.toString());
+    		}
+    		catch(SVNException se) {
+    			String msg = se.getMessage();
+    			
+    			// log this failure
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
+    			
+    			return msg;
+    		}
+    		catch(VerifyError ve) {
+    			String msg = ve.getMessage();
+    			
+    			// log this failure
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
+    			
+    			ve.printStackTrace();
+    			return getString(R.string.verify) + " " + msg;
+    		}
+    		catch(Exception e) {
+    			String msg = e.getMessage();
+    			
+    			// log this failure
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
+    			
+    			e.printStackTrace();
+    			return getString(R.string.exception) + " " + msg;
+    		}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return e.getMessage();
+		}
+		return "success";
+    }
+    
     
     /**
      * Does a full commit to the repository

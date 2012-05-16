@@ -54,6 +54,7 @@
     <string name="no_connection_selected">No connection selected...</string>
     <string name="head">Revision</string>
     <string name="checkout">Checkout</string>
+    <string name="export">Export</string>
     <string name="commit">Commit</string>
     <string name="update">Update</string>
     <string name="cleanup">Clean Up</string>

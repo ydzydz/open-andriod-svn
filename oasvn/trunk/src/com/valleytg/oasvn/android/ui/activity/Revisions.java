@@ -47,10 +47,13 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -67,6 +70,11 @@ public class Revisions extends ListActivity {
 	 * Thread control
 	 */
 	Boolean running = false;
+	
+	/**
+	 * Entries string
+	 */
+	private String[] entries = null;
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,7 +93,7 @@ public class Revisions extends ListActivity {
 	        setListAdapter(new ArrayAdapter<String>(this, R.layout.revision_item));
 	        
 	        // populate the list
-	        populateList();
+	        this.btnRefresh.performClick();
 	        
 	        // Make sure the device does not go to sleep while in this acitvity
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -126,7 +134,7 @@ public class Revisions extends ListActivity {
 			super.onRestart();
 			
 			// populate the list
-	        populateList();
+	        this.btnRefresh.performClick();
 		}
 		catch (Exception e) {
         	// problem loading activity
@@ -162,7 +170,7 @@ public class Revisions extends ListActivity {
 			super.onResume();
 			
 			// populate the list
-	        populateList();
+	        this.btnRefresh.performClick();
 		}
 		catch (Exception e) {
         	// problem loading activity
@@ -173,26 +181,78 @@ public class Revisions extends ListActivity {
 
 
 	private void populateList() {
-		// Initialize array of choices
-        String[] entries;
-        entries = null;
         
 		try {
-	    	
-	 
+			
     		// check to see if there are any revisions
     		if(app.getCurrentConnection().getRevisions() == null || app.getCurrentConnection().getRevisions().size() == 0) {
-    			// set the running flag
-    			if(!Revisions.this.running) {
-					Revisions.this.running = true;
-					
-					RetrieveRevisionsThread revisionsThread = new RetrieveRevisionsThread();
-					revisionsThread.execute();
-    			}
+    			// prompt the user for the number of revisions to return
+				AlertDialog.Builder builder = new AlertDialog.Builder(Revisions.this);
+				
+				builder.setIcon(android.R.drawable.ic_dialog_alert);
+				builder.setTitle(R.string.revisions);
+				builder.setMessage(getString(R.string.number_revisions));
+				
+				// add the number input to the dialog 
+				final EditText input = new EditText(this);
+				
+				// limit the number of revisions to 9999
+				InputFilter[] FilterArray = new InputFilter[1];
+				FilterArray[0] = new InputFilter.LengthFilter(4);
+				input.setFilters(FilterArray);
+				
+				// populate the default value
+				input.setText("50");
+				
+				// make the input type numeric
+				input.setRawInputType(InputType.TYPE_CLASS_NUMBER);	
+				
+				// show the prompt
+				builder.setView(input);
+				
+				builder.setPositiveButton(R.string.retrieve, new DialogInterface.OnClickListener() {
+
+		            public void onClick(DialogInterface dialog, int which) {
+		            	synchronized (this) {
+		            		try{
+		            			
+		            	        
+		            	        // get the value entered and make sure it is valid
+		            	        String value = input.getText().toString();
+		            	        Long lValue = 50L;
+		            	        
+		            	        // try to convert the value to a long
+		            	        try {
+		            	        	lValue = Long.parseLong(value);
+		            	        }
+		            	        catch(Exception e) {
+		            	        	lValue = 50L;
+		            	        	e.printStackTrace();
+		            	        }
+		            	        
+		            			// set the running flag
+		            			if(!Revisions.this.running) {
+		        					Revisions.this.running = true;
+		        					
+		        					RetrieveRevisionsThread revisionsThread = new RetrieveRevisionsThread();
+		        					revisionsThread.execute(lValue);
+		        					
+		        					// notify the user that we are working
+			                		entries = new String[1];
+			                		entries[0]= getString(R.string.in_progress);
+		        					
+		            			}
+		            		} 
+		            		catch(Exception e) {
+		            			e.printStackTrace();
+		            		}
+		            	}	
+		            }
+		        });
+				builder.setNegativeButton(R.string.cancel, null);
+				builder.show();	
     			
-    			// notify the user that we are working
-        		entries = new String[1];
-        		entries[0]= getString(R.string.in_progress);
+    			
     		}
     			
     		// if there are revisions, display them.
@@ -247,7 +307,16 @@ public class Revisions extends ListActivity {
 
     }
 	
-	class RetrieveRevisionsThread extends AsyncTask<Void, Void, String> {
+	public String[] getEntries() {
+		return this.entries;
+	}
+	
+	public void setEntries(String[] entries) {
+		this.entries = entries;
+	}
+	
+	
+	class RetrieveRevisionsThread extends AsyncTask<Long, Void, String> {
 
 		ProgressDialog dialog;
 
@@ -261,7 +330,7 @@ public class Revisions extends ListActivity {
 	    }
 		
 		@Override
-		protected String doInBackground(Void... unused) {
+		protected String doInBackground(Long... values) {
 			try {
 				Looper.myLooper();
 				Looper.prepare();
@@ -273,12 +342,15 @@ public class Revisions extends ListActivity {
 			String returned;
 			
 			try {
+				
+				// get the passed number of revisions
+				Long revisions = values[0];
 		
 				// get all the revisions
 				//returned = app.getCurrentConnection().retrieveAllRevisions(app);
 				
-				// get 20 revisions
-				returned = app.getCurrentConnection().retrieveXRevisions(app, 50L);
+				// get 50 revisions
+				returned = app.getCurrentConnection().retrieveXRevisions(app, revisions);
 				if(returned.length() == 0) {
 					returned = getString(R.string.revisions_retrieved);
 				}

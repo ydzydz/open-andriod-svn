@@ -102,6 +102,9 @@
 	<string name="revisions_retrieved">Revisions retrieved successfully</string>
 	<string name="refresh">Refresh</string>
 	<string name="problem">There was a problem retrieving information.  Check the logs for more details.</string>
+	<string name="revisions">Revisions</string>
+	<string name="number_revisions">How many revisions should be retrieved?</string>
+	<string name="retrieve">Retrieve</string>
 	
 	<!-- Revision Details -->
 	<string name="revisiondetail_header">Revision Details</string>

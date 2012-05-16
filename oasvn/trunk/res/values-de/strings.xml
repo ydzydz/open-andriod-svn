@@ -100,6 +100,9 @@
 	<string name="revisions_retrieved">"Revisionen erfolgreich abgerufen"</string>
 	<string name="refresh">"Aktualisieren"</string>
 	<string name="problem">"Es ist ein Problem beim Abrufen von Informationen aufgetreten. Überprüfen Sie für weitere Details die Protokolle."</string>
+	<string name="revisions">Revisions</string>
+	<string name="number_revisions">How many revisions should be retrieved?</string>
+	<string name="retrieve">Retrieve</string>
 	
 	<!-- Revision Details -->
 	<string name="revisiondetail_header">"Revisions-Einzelheiten"</string>

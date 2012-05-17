@@ -51,7 +51,7 @@
     <!-- Connection Details -->
     <string name="connection">"Verbindung"</string>
     <string name="no_connection_selected">"Keine Verbindung ausgewählt ..."</string>
-    <string name="choose_revision">Please enter the revision number.</string>
+    <string name="choose_revision">"Geben Sie bitte revision Nr."</string>
     <string name="head">"Head"</string>
     <string name="specified">Specified</string>
     <string name="checkout">"Checkout"</string>
@@ -107,7 +107,7 @@
 	<string name="refresh">"Aktualisieren"</string>
 	<string name="problem">"Es ist ein Problem beim Abrufen von Informationen aufgetreten. Überprüfen Sie für weitere Details die Protokolle."</string>
 	<string name="revisions">Revisions</string>
-	<string name="number_revisions">How many revisions should be retrieved?</string>
+	<string name="number_revisions">"Wie viele revisions abgerufen werden soll?"</string>
 	<string name="retrieve">Retrieve</string>
 	
 	<!-- Revision Details -->

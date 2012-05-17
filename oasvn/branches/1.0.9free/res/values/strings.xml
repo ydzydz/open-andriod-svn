@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- General, logging and errors -->
+    <string name="app_name">OASVN Pro</string>
+    <string name="loading">Loading...</string>
+    <string name="colon">:</string>
+    <string name="error">Error</string>
+    <string name="verify">Verify</string>
+    <string name="exception">Exception</string>
+    <string name="revision">Revision</string>
+    <string name="FILE">FILE</string>
+    <string name="files">Files</string>
+    <string name="directory_created">Directory is created</string>
+    <string name="directory_exists">Directory already exists</string>
+    <string name="no_change">No change</string>
+    <string name="no_changes_available">No changes were available to commit to the repository</string>
+    <string name="commit_success">Commit Successful Revision</string>
+    <string name="checkout_successful">Checkout successful</string>
+    <string name="export_successful">Export successful</string>
+    <string name="update_successful">Update successful</string>
+    <string name="cleanup_successful">CleanUp successful</string>
+    <string name="revert_successful">Revert successful</string>
+    <string name="commit_comments">Commit comments</string>
+    <string name="rev_no">Rev. No.</string>
+    <string name="local_rev_updated">Local revision number updated, Rev. No.</string>
+    <string name="alarm">Alarm</string>
+    <string name="revision_success">Revision information successfully retrieved</string>
+    <string name="unknown">Unknown</string>
+    <string name="success">Success</string>
+    
+    <!-- Main Menu -->
+    <string name="new_connection">Add Repository</string>
+    <string name="exit">Exit</string>
+    <string name="no_connections">There are currently no connections saved.</string>
+    <string name="create_connection">Please use the Add Repository button below to create a repository</string>
+    
+    <!-- Add Repository -->
+    <string name="name">Name</string>
+    <string name="url">Repository URL</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="protocol">Protocol</string>
+    <string name="folder">Local Folder</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+	<string name="url_invalid">You have entered an invalid URL. The URL must be at least 7 characters long and start with one of the following: http://, https://, svn://, svn+ssl://</string>
+	<string name="folder_invalid">The folder name you entered is either invalid or blank.</string>
+	<string name="folder_exists">The folder name you entered is already in use.</string>
+	<string name="name_invalid">A unique name is required for.the repository.</string>
+	<string name="local_folder_warning">A Local folder already exists with the folder name. Are you sure you want to use an existing folder?</string>
+    
+    <!-- Connection Details -->
+    <string name="connection">Connection</string>
+    <string name="no_connection_selected">No connection selected...</string>
+    <string name="choose_revision">Please enter the revision number.</string>
+    <string name="head">Head</string>
+    <string name="specified">Specified</string>
+    <string name="checkout">Checkout</string>
+    <string name="export">Export</string>
+    <string name="commit">Commit</string>
+    <string name="update">Update</string>
+    <string name="cleanup">Clean Up</string>
+    <string name="revert">Revert</string>
+    <string name="file_manager">Open Folder</string>
+    <string name="checkout_revision">Checkout Revision</string>
+    <string name="delete_folder">Delete Working Copy (local folder)</string>
+    <string name="delete_connection">Delete Connection</string>
+    <string name="view_logs">Show Log</string>
+    <string name="view_revisions">Revisions</string>
+    <string name="performing_checkout">Performing Checkout!!!</string>
+    <string name="performing_export">Performing Export!!!</string>
+    <string name="performing_commit">Performing Commit!!!</string>
+    <string name="performing_update">Performing Update!!!</string>
+    <string name="performing_cleanup">Performing CleanUp!!!</string>
+    <string name="performing_revert">Performing Revert!!!</string>
+    <string name="idle">Idle...</string>
+    <string name="complete">Action Completed!!!!</string>
+    <string name="in_progress">Operation in progress, please wait...</string>
+    <string name="confirm">Are you sure?</string>
+    <string name="revert_confirmation">Are you sure? Local working copy changes will be lost!</string>
+    <string name="delete_message">You will delete the entire local folder!</string>
+    <string name="delete_repo_message">You are about to delete this repository connection. Are you sure?</string>
+    <string name="delete_folder_too">Do you want to remove the local folder as well?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="edit">Edit</string>
+    <string name="file_manager_warning">Not all File Managers support landing in the correct folder, you might have to navigate to the folder.  OI File manager supports landing in the correct folder</string>
+    
+    <!-- Commit -->
+    <string name="comments">Comments</string>
+    
+    <!-- LogView -->
+    <string name="no_logs">No logs are stored for this connection.</string>
+    <string name="delete_all_logs">Clear Connection Logs</string>
+    <string name="delete_all_logs_warning">Are you sure you want to clear all log entries for this connection?</string>
+    
+    <!-- LogDetails -->
+    <string name="logdetail_header">Entry Details</string>
+	<string name="type">Type:</string>
+	<string name="date">Date:</string>
+	<string name="message">Message:</string>
+	<string name="author">Author:</string>
+	<string name="delete_entry">Delete Log Entry</string>
+	
+	<!-- Revisions -->
+	<string name="no_revisions">No revisions are available for this connection.</string>
+	<string name="revisions_retrieved">Revisions retrieved successfully</string>
+	<string name="refresh">Refresh</string>
+	<string name="problem">There was a problem retrieving information.  Check the logs for more details.</string>
+	<string name="revisions">Revisions</string>
+	<string name="number_revisions">How many revisions should be retrieved?</string>
+	<string name="retrieve">Retrieve</string>
+	
+	<!-- Revision Details -->
+	<string name="revisiondetail_header">Revision Details</string>
+	
+	<!-- Demo -->
+	<string name="three_views">Free version allows 3 revision detail views.</string>
+	<string name="views_used">Demo detail views exceeded.  Pro version allows for unlimited use.</string>
+	<string name="pro_only">Commit is only available with the Pro version.</string>
+
+</resources>

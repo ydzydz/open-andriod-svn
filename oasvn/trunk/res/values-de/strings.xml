@@ -51,7 +51,9 @@
     <!-- Connection Details -->
     <string name="connection">"Verbindung"</string>
     <string name="no_connection_selected">"Keine Verbindung ausgewählt ..."</string>
-    <string name="head">"Revision"</string>
+    <string name="choose_revision">Please enter the revision number.</string>
+    <string name="head">"Head"</string>
+    <string name="specified">Specified</string>
     <string name="checkout">"Checkout"</string>
     <string name="export">Export</string>
     <string name="commit">"Commit"</string>
@@ -59,6 +61,7 @@
     <string name="cleanup">"Clean Up"</string>
 	<string name="revert">"Revert"</string>
     <string name="file_manager">"Verzeichnis öffnen"</string>
+    <string name="checkout_revision">Checkout Revision</string>
     <string name="delete_folder">"Verzeichnis löschen"</string>
     <string name="delete_connection">"Repo löschen"</string>
     <string name="view_logs">"Zeige Log"</string>

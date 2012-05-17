@@ -25,9 +25,12 @@ package com.valleytg.oasvn.android.ui.activity;
 
 import java.io.File;
 
+import org.tmatesoft.svn.core.wc.SVNRevision;
+
 import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.application.OASVNApplication;
 import com.valleytg.oasvn.android.ui.activity.ConnectionDetails;
+import com.valleytg.oasvn.android.ui.activity.Revisions.RetrieveRevisionsThread;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -39,6 +42,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,6 +51,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -251,6 +257,7 @@ public class ConnectionDetails extends Activity {
 		return state;
 	}
 	
+	
 	private void populateTopInfo() {
 		
 		// create the header area info
@@ -312,7 +319,7 @@ public class ConnectionDetails extends Activity {
 				this.topArea4Title.setText(this.getString(R.string.folder) + this.getString(R.string.colon));
 				this.topArea4.setText(folder);
 				
-				this.topArea5Title.setText(this.getString(R.string.head) + this.getString(R.string.colon));
+				this.topArea5Title.setText(this.getString(R.string.revision) + this.getString(R.string.colon));
 				this.topArea5.setText(head);
 				
 				// set the checkout button text
@@ -348,7 +355,7 @@ public class ConnectionDetails extends Activity {
 								ConnectionDetails.this.status.setText(R.string.performing_checkout);
 								
 								CheckoutThread checkoutThread = new CheckoutThread();
-								checkoutThread.execute();
+								checkoutThread.execute(SVNRevision.HEAD);
 					        }
 						}
 						else {
@@ -411,7 +418,7 @@ public class ConnectionDetails extends Activity {
 				// options that should always be at the top of the menu
 				
 				// checkout
-				this.menu.add(0, R.id.checkout, 0, R.string.checkout);
+				this.menu.add(0, R.id.checkout, 0, R.string.checkout_revision);
 				
 			    
 				// conditionally add checkout to the menu
@@ -451,13 +458,10 @@ public class ConnectionDetails extends Activity {
 			try {
 				// open the add repository activity
 				if(running == false) {
-					// set the running flag
-					ConnectionDetails.this.running = true;
 					
 					ConnectionDetails.this.status.setText(R.string.performing_checkout);
 					
-					CheckoutThread checkoutThread = new CheckoutThread();
-					checkoutThread.execute();
+					promptForVersion(false);
 				}
 				else {
 					Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
@@ -473,13 +477,10 @@ public class ConnectionDetails extends Activity {
 			try {
 				// open the add repository activity
 				if(running == false) {
-					// set the running flag
-					ConnectionDetails.this.running = true;
 					
 					ConnectionDetails.this.status.setText(R.string.performing_export);
 					
-					ExportThread exportThread = new ExportThread();
-					exportThread.execute();
+					promptForVersion(true);
 				}
 				else {
 					Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
@@ -701,12 +702,112 @@ public class ConnectionDetails extends Activity {
 		}
 	}
 	
+	/**
+	 * Prompt the user with an Alert Dialog to ask the user which version
+	 * they want to checkout or export
+	 * @param isExport true for export, false for checkout
+	 */
+	private void promptForVersion(final Boolean isExport) {
+		// prompt the user for the number of revisions to return
+		AlertDialog.Builder builder = new AlertDialog.Builder(ConnectionDetails.this);
+		
+		builder.setIcon(android.R.drawable.ic_dialog_alert);
+		builder.setTitle(R.string.revision);
+		builder.setMessage(getString(R.string.choose_revision));
+		
+		// add the number input to the dialog 
+		final EditText input = new EditText(this);
+		
+		// populate the default value
+		input.setText("0");
+		
+		// make the input type numeric
+		input.setRawInputType(InputType.TYPE_CLASS_NUMBER);	
+		
+		// show the prompt
+		builder.setView(input);
+		
+		builder.setPositiveButton(R.string.specified, new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+            	synchronized (this) {
+            		try{
+            			
+            	        
+            	        // get the value entered and make sure it is valid
+            	        String value = input.getText().toString();
+            	        SVNRevision lValue = SVNRevision.HEAD;
+            	        
+            	        // try to convert the value to a long
+            	        try {
+            	        	lValue = SVNRevision.create(Long.parseLong(value));
+            	        }
+            	        catch(Exception e) {
+            	        	lValue = SVNRevision.HEAD;
+            	        	e.printStackTrace();
+            	        }
+            	        
+            			// set the running flag
+            			if(!ConnectionDetails.this.running) {
+            				ConnectionDetails.this.running = true;
+            				
+            				// check to see if we are doing a export or checkout
+            				if(isExport) {
+            					ExportThread exportThread = new ExportThread();
+            					exportThread.execute(lValue);
+            				}
+            				else {
+            					CheckoutThread checkoutThread = new CheckoutThread();
+            					checkoutThread.execute(lValue);
+            				}
+        					
+            			}
+            		} 
+            		catch(Exception e) {
+            			e.printStackTrace();
+            		}
+            	}	
+            }
+        });
+		builder.setNegativeButton(R.string.head, new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+            	synchronized (this) {
+            		try{
+
+            	        SVNRevision lValue = SVNRevision.HEAD;
+
+            			// set the running flag
+            			if(!ConnectionDetails.this.running) {
+            				ConnectionDetails.this.running = true;
+            				
+            				// check to see if we are doing a export or checkout
+            				if(isExport) {
+            					ExportThread exportThread = new ExportThread();
+            					exportThread.execute(lValue);
+            				}
+            				else {
+            					CheckoutThread checkoutThread = new CheckoutThread();
+            					checkoutThread.execute(lValue);
+            				}
+        					
+            			}
+            		} 
+            		catch(Exception e) {
+            			e.printStackTrace();
+            		}
+            	}	
+            }
+        });
+		builder.show();	
+	}
+	
 	
 	/**
 	 * Threads
 	 */
 
-	class CheckoutThread extends AsyncTask<Void, Void, String> {
+	class CheckoutThread extends AsyncTask<SVNRevision, Void, String> {
 
 		ProgressDialog dialog;
 
@@ -720,7 +821,7 @@ public class ConnectionDetails extends Activity {
 	    }
 		
 		@Override
-		protected String doInBackground(Void... unused) {
+		protected String doInBackground(SVNRevision... revisions) {
 			try {
 				Looper.myLooper();
 				Looper.prepare();
@@ -728,6 +829,9 @@ public class ConnectionDetails extends Activity {
 			catch(Exception e) {
 				// Looper only needs to be created if the thread is new, if reusing the thread we end up here
 			}
+			
+			// get the passed revision
+			SVNRevision revision = revisions[0];
 			
 			String returned;
 			
@@ -742,7 +846,7 @@ public class ConnectionDetails extends Activity {
 				
 				
 				// do the checkout
-				returned = app.fullHeadCheckout();
+				returned = app.doCheckout(revision);
 				
 				// get the current version
 				app.getCurrentConnection().setHead((int)app.getRevisionNumber());
@@ -785,7 +889,7 @@ public class ConnectionDetails extends Activity {
 	}
 	
 	
-	class ExportThread extends AsyncTask<Void, Void, String> {
+	class ExportThread extends AsyncTask<SVNRevision, Void, String> {
 
 		ProgressDialog dialog;
 
@@ -799,7 +903,7 @@ public class ConnectionDetails extends Activity {
 	    }
 		
 		@Override
-		protected String doInBackground(Void... unused) {
+		protected String doInBackground(SVNRevision... revisions) {
 			try {
 				Looper.myLooper();
 				Looper.prepare();
@@ -807,6 +911,9 @@ public class ConnectionDetails extends Activity {
 			catch(Exception e) {
 				// Looper only needs to be created if the thread is new, if reusing the thread we end up here
 			}
+			
+			// get the passed revision
+			SVNRevision revision = revisions[0];
 			
 			String returned;
 			
@@ -819,17 +926,15 @@ public class ConnectionDetails extends Activity {
 				     }
 				});
 				
-				
 				// do the checkout
-				returned = app.fullHeadExport();
+				returned = app.doExport(revision);
 				
 				// get the current version
-				app.getCurrentConnection().setHead((int)app.getRevisionNumber());
+				//app.getCurrentConnection().setHead((int)app.getRevisionNumber());
 				
 				// save the current connection
 				app.getCurrentConnection().saveToLocalDB(app);
 
-				
 			}
 	        catch(Exception e) {
 	        	e.printStackTrace();

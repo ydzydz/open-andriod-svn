@@ -53,7 +53,9 @@
     <!-- Connection Details -->
     <string name="connection">Connection</string>
     <string name="no_connection_selected">No connection selected...</string>
-    <string name="head">Revision</string>
+    <string name="choose_revision">Please enter the revision number.</string>
+    <string name="head">Head</string>
+    <string name="specified">Specified</string>
     <string name="checkout">Checkout</string>
     <string name="export">Export</string>
     <string name="commit">Commit</string>
@@ -61,6 +63,7 @@
     <string name="cleanup">Clean Up</string>
     <string name="revert">Revert</string>
     <string name="file_manager">Open Folder</string>
+    <string name="checkout_revision">Checkout Revision</string>
     <string name="delete_folder">Delete Working Copy (local folder)</string>
     <string name="delete_connection">Delete Connection</string>
     <string name="view_logs">Show Log</string>

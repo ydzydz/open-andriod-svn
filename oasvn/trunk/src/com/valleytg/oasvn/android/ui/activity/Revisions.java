@@ -134,7 +134,7 @@ public class Revisions extends ListActivity {
 			super.onRestart();
 			
 			// populate the list
-	        this.btnRefresh.performClick();
+	        //this.btnRefresh.performClick();
 		}
 		catch (Exception e) {
         	// problem loading activity
@@ -170,7 +170,7 @@ public class Revisions extends ListActivity {
 			super.onResume();
 			
 			// populate the list
-	        this.btnRefresh.performClick();
+			Revisions.this.populateList();
 		}
 		catch (Exception e) {
         	// problem loading activity

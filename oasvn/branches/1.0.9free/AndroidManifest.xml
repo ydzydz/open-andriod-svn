@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.valleytg.oasvn.android"
-    android:versionCode="10"
+    package="com.valleytg.oasvnlite.android"
+    android:versionCode="9"
     android:versionName="1.0.9" >
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="14"/>

@@ -21,11 +21,11 @@
  * 
  */
 
-package com.valleytg.oasvn.android.model;
+package com.valleytg.oasvnlite.android.model;
 
 import android.database.Cursor;
 
-import com.valleytg.oasvn.android.application.OASVNApplication;
+import com.valleytg.oasvnlite.android.application.OASVNApplication;
 
 public class LogItem extends OASVNModelLocalDB {
 	

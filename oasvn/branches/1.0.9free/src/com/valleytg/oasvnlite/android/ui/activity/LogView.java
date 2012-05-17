@@ -21,17 +21,17 @@
  * 
  */
 
-package com.valleytg.oasvn.android.ui.activity;
+package com.valleytg.oasvnlite.android.ui.activity;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.Comparator;
 
-import com.valleytg.oasvn.android.R;
-import com.valleytg.oasvn.android.application.OASVNApplication;
-import com.valleytg.oasvn.android.model.Connection;
-import com.valleytg.oasvn.android.model.LogItem;
-import com.valleytg.oasvn.android.util.DateUtil;
+import com.valleytg.oasvnlite.android.R;
+import com.valleytg.oasvnlite.android.application.OASVNApplication;
+import com.valleytg.oasvnlite.android.model.Connection;
+import com.valleytg.oasvnlite.android.model.LogItem;
+import com.valleytg.oasvnlite.android.util.DateUtil;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;

@@ -21,12 +21,12 @@
  * 
  */
 
-package com.valleytg.oasvn.android.util;
+package com.valleytg.oasvnlite.android.util;
 
 import android.database.Cursor;
 
-import com.valleytg.oasvn.android.application.OASVNApplication;
-import com.valleytg.oasvn.android.model.OASVNModelLocalDB;
+import com.valleytg.oasvnlite.android.application.OASVNApplication;
+import com.valleytg.oasvnlite.android.model.OASVNModelLocalDB;
 
 public class Settings extends OASVNModelLocalDB {
 	private String rootFolder = "";

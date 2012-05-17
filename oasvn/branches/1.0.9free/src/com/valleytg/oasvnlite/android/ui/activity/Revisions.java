@@ -21,7 +21,7 @@
  * 
  */
 
-package com.valleytg.oasvn.android.ui.activity;
+package com.valleytg.oasvnlite.android.ui.activity;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,11 +33,11 @@ import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNProperties;
 
-import com.valleytg.oasvn.android.R;
-import com.valleytg.oasvn.android.application.OASVNApplication;
-import com.valleytg.oasvn.android.model.LogItem;
-import com.valleytg.oasvn.android.ui.activity.CommitActivity.CommitThread;
-import com.valleytg.oasvn.android.util.DateUtil;
+import com.valleytg.oasvnlite.android.R;
+import com.valleytg.oasvnlite.android.application.OASVNApplication;
+import com.valleytg.oasvnlite.android.model.LogItem;
+import com.valleytg.oasvnlite.android.ui.activity.CommitActivity.CommitThread;
+import com.valleytg.oasvnlite.android.util.DateUtil;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -148,14 +148,31 @@ public class Revisions extends ListActivity {
 		super.onListItemClick(l, v, position, id);
 		
 		try {
-			SVNLogEntry thisEntry = app.getCurrentConnection().getRevisions().get(position);
-
-			// set the current log
-			app.setCurrentRevision(thisEntry);
 			
-			// go to the log details screen
-			Intent intent = new Intent(Revisions.this, RevisionDetails.class);
-			startActivity(intent);
+			if(app.demoCounter < 3) {
+				app.demoCounter++;
+				SVNLogEntry thisEntry = app.getCurrentConnection().getRevisions().get(position);
+	
+				// set the current log
+				app.setCurrentRevision(thisEntry);
+				
+				// notify the user that this a demo feature
+				Toast.makeText(Revisions.this, getString(R.string.three_views), 3000).show();
+				
+				// go to the log details screen
+				Intent intent = new Intent(Revisions.this, RevisionDetails.class);
+				startActivity(intent);
+			}
+			else {
+				// open the add repository activity
+				if(running == false) {
+
+					Toast.makeText(Revisions.this, getString(R.string.views_used), 3000).show();
+				}
+				else {
+					Toast.makeText(Revisions.this, getString(R.string.in_progress), 1500).show();
+				}
+			}
 		} 
 		catch (Exception e) {
 			//Toast.makeText(this, getString(R.string.create_connection), 1500).show();

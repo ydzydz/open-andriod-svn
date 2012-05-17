@@ -1,7 +1,7 @@
 <resources>
 
     <!-- General, logging and errors -->
-    <string name="app_name">"OASVN Pro"</string>
+    <string name="app_name">"OASVN"</string>
     <string name="loading">"Wird geladen..."</string>
     <string name="colon">":"</string>
     <string name="error">"Fehler"</string>

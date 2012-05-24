@@ -578,7 +578,7 @@ public class ConnectionDetails extends Activity {
 			            public void onClick(DialogInterface dialog, int which) {
 			            	synchronized (this) {
 			            		try{
-			            			app.initializePath();
+			            			app.initializePath(app.getAppFolder());
 			            			File tree = app.assignPath();
 			            			app.deleteRecursive(tree);
 			            			
@@ -640,7 +640,7 @@ public class ConnectionDetails extends Activity {
 						            	// user choose to delete the local folder
 						            	synchronized (this) {
 						            		try{
-						            			app.initializePath();
+						            			app.initializePath(app.getAppFolder());
 						            			File tree = app.assignPath();
 						            			app.deleteRecursive(tree);
 						            			

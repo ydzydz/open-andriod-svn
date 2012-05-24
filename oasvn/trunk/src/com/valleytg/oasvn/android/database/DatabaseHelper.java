@@ -43,7 +43,7 @@ import android.util.Log;
 public class DatabaseHelper extends SQLiteOpenHelper {
 Context mContext;
 	
-	public static final String DB_NAME = "OASVN";
+	public static String DB_NAME = "OASVN";
 	
 	// Version 3 will include the first_run in settings
 	public static final int VERSION = 3;
@@ -54,6 +54,12 @@ Context mContext;
 		super(context, DB_NAME, null, VERSION);
 		mContext = context;
 		
+	}
+	
+	public DatabaseHelper(Context context, OASVNApplication app, String databaseName) {
+		super(context, DB_NAME, null, VERSION);
+		mContext = context;
+		this.DB_NAME = databaseName;
 	}
 
 	@Override

@@ -51,6 +51,7 @@ import com.valleytg.oasvn.android.model.LogItem;
 import com.valleytg.oasvn.android.util.Settings;
 
 import android.app.Application;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
@@ -165,6 +166,12 @@ public class OASVNApplication extends Application {
      */
     private String commitComments = "";
     
+    /**
+     * Default application folder this will reside in the mountable storage on the device
+     * and will be the root folder for all connections data.
+     */
+    private String appFolder = "OASVN/";
+    
     
     /**
      * Constructor
@@ -184,7 +191,7 @@ public class OASVNApplication extends Application {
 		this.initAuthManager();
 		
 		// make sure the path is ready
-		this.initializePath();
+		this.initializePath(this.getAppFolder());
     	
     }
     
@@ -211,12 +218,87 @@ public class OASVNApplication extends Application {
 		// try to retrieve the data
 		this.retrieveSettings();
 		
+		// check to see if this is a first run of the pro version
+		checkFirstRun();
+		
 		// see if settings existed
 		if(Settings.getInstance().getRootFolder().length() == 0) {
 			// there are no settings in the database create default
-			Settings.getInstance().setRootFolder("OASVN/");
+			Settings.getInstance().setRootFolder(this.getAppFolder());
 			Settings.getInstance().saveToLocalDB(this);
 		}
+	}
+	
+	/**
+	 * This method is used by the pro version to check if this is a first
+	 * run of the application (database is new).  And if so it will try to
+	 * determine if the user should be asked about importing old data that
+	 * might exist from the lite version.
+	 */
+	private void checkFirstRun() {
+		if(Settings.getInstance().getFirstRun() > 0) {
+			// first run
+			// check to see if there is oasvn lite data to migrate
+    		
+	    	File folder = new File(Environment.getExternalStorageDirectory() + "/OASVNlite/");
+	    	
+		    if(folder.exists()){
+		    	// OASVN lite folder exists check for the database
+		    	// retrieve the lite version database
+		    	
+		    	Context sharedContext = null;
+		        try {
+		            sharedContext = this.createPackageContext("com.valleytg.oasvnlite.android", Context.CONTEXT_INCLUDE_CODE);
+		            if (sharedContext == null) {
+		                return;
+		            }
+		        } catch (Exception e) {
+		            String error = e.getMessage(); 
+		            return;
+		        }   
+
+				DatabaseHelper liteDBHelper = new DatabaseHelper(sharedContext, this, "OASVNlite");
+				SQLiteDatabase liteDatabase = liteDBHelper.getWritableDatabase();
+				
+				// try to retrieve any connections that exist for the lite version
+				String sql = "select * from connection where active > 0;";
+				Cursor dbCursor = liteDatabase.rawQuery(sql, null);
+				dbCursor.moveToFirst();
+				
+				// if there are connections in the lite db iterate through them and create connections for them
+				if(!dbCursor.isAfterLast()) {
+					
+					// clear out any user currently stored in mem
+					this.allConnections.removeAll(this.allConnections);
+					
+					// iterate through local and populate
+					while(!dbCursor.isAfterLast()) {
+						Connection thisConnection = new Connection();
+						thisConnection.setData(dbCursor);
+						dbCursor.moveToNext();
+						
+						this.allConnections.add(thisConnection);
+						
+						// save the connection to this database
+						thisConnection.saveToLocalDB(this);
+					}
+				}
+				dbCursor.close();
+				
+				// if there are any connections we have successfully retrieved them from the lite db we need to copy the data over
+				if(this.allConnections.size() > 0) {
+					
+					// TODO::: figure out how to copy all the data from one directory to the other.
+				}
+				
+		    }
+		   
+			
+		}
+		
+		// turn the first run off
+		Settings.getInstance().setFirstRun(0);
+		Settings.getInstance().saveToLocalDB(this);
 	}
     
 	/**
@@ -286,7 +368,10 @@ public class OASVNApplication extends Application {
     	return null;
     }
     
-    
+    /**
+     * Recursively deletes all data in a file tree
+     * @param tree
+     */
     public void deleteRecursive(File tree) {
     	if (tree.isDirectory())
 	        for (File child : tree.listFiles())
@@ -316,13 +401,13 @@ public class OASVNApplication extends Application {
 	    }
     }
     
-    public void initializePath() {
+    public void initializePath(String path) {
     	try {
     		String mainFolder = "";
     		
     		// check to see if there is a default folder from the settings
     		if(Settings.getInstance().getRootFolder().length() == 0) {
-    			mainFolder = "OASVN/";
+    			mainFolder = path;
     		}
     		else {
     			mainFolder = Settings.getInstance().getRootFolder();
@@ -596,7 +681,7 @@ public class OASVNApplication extends Application {
     		this.initAuthManager();
     		
     		// make sure the path is ready
-    		initializePath();
+    		initializePath(this.getAppFolder());
     		
     		SVNURL myURL = this.currentConnection.getRepositoryURL();
     		File myFile = this.assignPath();
@@ -692,7 +777,7 @@ public class OASVNApplication extends Application {
     		this.initAuthManager();
     		
     		// make sure the path is ready
-    		initializePath();
+    		initializePath(this.getAppFolder());
     		
     		SVNURL myURL = this.currentConnection.getRepositoryURL();
     		File myFile = this.assignPath();
@@ -750,7 +835,7 @@ public class OASVNApplication extends Application {
     	
 		
 		// make sure the path is ready
-		initializePath();
+		initializePath(this.getAppFolder());
 		
 		SVNURL myURL = this.currentConnection.getRepositoryURL();
 		File myFile = this.assignPath();
@@ -1205,5 +1290,13 @@ public class OASVNApplication extends Application {
 
 	public SVNWCUtil getWcUtil() {
 		return wcUtil;
+	}
+
+	public String getAppFolder() {
+		return appFolder;
+	}
+
+	public void setAppFolder(String appFolder) {
+		this.appFolder = appFolder;
 	}
 }

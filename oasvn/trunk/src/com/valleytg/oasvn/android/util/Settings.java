@@ -30,6 +30,7 @@ import com.valleytg.oasvn.android.model.OASVNModelLocalDB;
 
 public class Settings extends OASVNModelLocalDB {
 	private String rootFolder = "";
+	private Integer firstRun = 0;
 	
 	public Settings() {
 		super("setting");
@@ -50,6 +51,7 @@ public class Settings extends OASVNModelLocalDB {
 	@Override
 	public void saveToLocalDB(OASVNApplication app) {
 		values.put("root_folder", this.getRootFolder());
+		values.put("first_run", this.getFirstRun());
 		
 		super.saveToLocalDB(app);
 	}
@@ -58,6 +60,12 @@ public class Settings extends OASVNModelLocalDB {
 	public void setData(Cursor results) {
 		try {
 			this.setRootFolder(results.getString(results.getColumnIndex("root_folder")));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			this.setFirstRun(results.getInt(results.getColumnIndex("first_run")));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -75,6 +83,14 @@ public class Settings extends OASVNModelLocalDB {
 
 	public String getRootFolder() {
 		return rootFolder;
+	}
+
+	public Integer getFirstRun() {
+		return firstRun;
+	}
+
+	public void setFirstRun(Integer firstRun) {
+		this.firstRun = firstRun;
 	}
 
 	

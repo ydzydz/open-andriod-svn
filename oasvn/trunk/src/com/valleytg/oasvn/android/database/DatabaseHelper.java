@@ -43,10 +43,8 @@ import android.util.Log;
 public class DatabaseHelper extends SQLiteOpenHelper {
 Context mContext;
 	
-	public static String DB_NAME = "OASVN";
-	
-	// Version 3 will include the first_run in settings
-	public static final int VERSION = 3;
+	public static final String DB_NAME = "OASVN";
+	public static final int VERSION = 2;
 	
 	public String pNumber;
 	
@@ -54,12 +52,6 @@ Context mContext;
 		super(context, DB_NAME, null, VERSION);
 		mContext = context;
 		
-	}
-	
-	public DatabaseHelper(Context context, OASVNApplication app, String databaseName) {
-		super(context, DB_NAME, null, VERSION);
-		mContext = context;
-		this.DB_NAME = databaseName;
 	}
 
 	@Override
@@ -71,48 +63,23 @@ Context mContext;
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// upgrades will go here
 		
-		// version ????? db version 2
-		if(newVersion == 2) {
+		try {
+			String[] sql = mContext.getString(R.string.db_update_1_1).split("\n");
+			db.beginTransaction();
 			try {
-				String[] sql = mContext.getString(R.string.db_update_1_1).split("\n");
-				db.beginTransaction();
-				try {
-					// Create tables & test data
-					execMultipleSQL(db, sql);
-					db.setTransactionSuccessful();
-					Log.d("Database upgrade", "Database upgrade successful!");
-				} catch (SQLException e) {
-		            Log.e("Error creating tables and debug data", e.toString());
-		        } finally {
-		        	db.endTransaction();
-		        }
-				
-			}
-			catch(SQLException e) {
-				Log.e("Database upgrade for version 1.1.0 failed", e.toString());
-			}
+				// Create tables & test data
+				execMultipleSQL(db, sql);
+				db.setTransactionSuccessful();
+				Log.d("Database upgrade", "Database upgrade successful!");
+			} catch (SQLException e) {
+	            Log.e("Error creating tables and debug data", e.toString());
+	        } finally {
+	        	db.endTransaction();
+	        }
+			
 		}
-		
-		// version 1.0.10 db version 3
-		if(newVersion == 3) {
-			try {
-				String[] sql = mContext.getString(R.string.db_update_1_0_10).split("\n");
-				db.beginTransaction();
-				try {
-					// Create tables & test data
-					execMultipleSQL(db, sql);
-					db.setTransactionSuccessful();
-					Log.d("Database upgrade", "Database upgrade successful!");
-				} catch (SQLException e) {
-		            Log.e("Error creating tables and debug data", e.toString());
-		        } finally {
-		        	db.endTransaction();
-		        }
-				
-			}
-			catch(SQLException e) {
-				Log.e("Database upgrade for version 1.1.0 failed", e.toString());
-			}
+		catch(SQLException e) {
+			Log.e("Database upgrade for version 1.1.0 failed", e.toString());
 		}
 	}
 	

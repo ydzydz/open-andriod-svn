@@ -24,6 +24,11 @@
 package com.valleytg.oasvn.android.application;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -218,15 +223,15 @@ public class OASVNApplication extends Application {
 		// try to retrieve the data
 		this.retrieveSettings();
 		
-		// check to see if this is a first run of the pro version
-		checkFirstRun();
-		
 		// see if settings existed
 		if(Settings.getInstance().getRootFolder().length() == 0) {
 			// there are no settings in the database create default
 			Settings.getInstance().setRootFolder(this.getAppFolder());
 			Settings.getInstance().saveToLocalDB(this);
 		}
+		
+		// check to see if this is a first run of the pro version
+		//checkFirstRun();
 	}
 	
 	/**
@@ -236,7 +241,7 @@ public class OASVNApplication extends Application {
 	 * might exist from the lite version.
 	 */
 	private void checkFirstRun() {
-		if(Settings.getInstance().getFirstRun() > 0) {
+		if(Settings.getInstance().getFirstRun() == 0) {
 			// first run
 			// check to see if there is oasvn lite data to migrate
     		
@@ -245,6 +250,11 @@ public class OASVNApplication extends Application {
 		    if(folder.exists()){
 		    	// OASVN lite folder exists check for the database
 		    	// retrieve the lite version database
+		    	
+		    	
+		    	/*
+		    	 * Shared context will not work for me as android:sharedUserId="com.valleytg.oasvn" is not an
+		    	 * option if the app is already deployed on the market.  Need to work on ContentProvider
 		    	
 		    	Context sharedContext = null;
 		        try {
@@ -259,6 +269,11 @@ public class OASVNApplication extends Application {
 
 				DatabaseHelper liteDBHelper = new DatabaseHelper(sharedContext, this, "OASVNlite");
 				SQLiteDatabase liteDatabase = liteDBHelper.getWritableDatabase();
+				
+				*
+		    	
+		    	
+		    	
 				
 				// try to retrieve any connections that exist for the lite version
 				String sql = "select * from connection where active > 0;";
@@ -287,17 +302,25 @@ public class OASVNApplication extends Application {
 				
 				// if there are any connections we have successfully retrieved them from the lite db we need to copy the data over
 				if(this.allConnections.size() > 0) {
-					
-					// TODO::: figure out how to copy all the data from one directory to the other.
+					// destination directory
+					File proFolder = new File(Environment.getExternalStorageDirectory() + "/OASVN/");
+					try {
+						copyDirectory(folder, proFolder);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 				
+				// close the connection to the old db
+			    liteDatabase.close();
+				*/
 		    }
-		   
-			
+
 		}
 		
 		// turn the first run off
-		Settings.getInstance().setFirstRun(0);
+		Settings.getInstance().setFirstRun(1);
 		Settings.getInstance().saveToLocalDB(this);
 	}
     
@@ -1169,6 +1192,42 @@ public class OASVNApplication extends Application {
 		connection.saveToLocalDB(this);
 		
 	}
+    
+    
+    /**
+     * Copies the contents of the sourceLocation to the targetLocation
+     * @param sourceLocation - location that contains the files to be copied
+     * @param targetLocation - location to copy the files too
+     * @throws IOException
+     */
+    // If targetLocation does not exist, it will be created.
+    private void copyDirectory(File sourceLocation , File targetLocation) throws IOException {
+        
+        if (sourceLocation.isDirectory()) {
+            if (!targetLocation.exists()) {
+                targetLocation.mkdir();
+            }
+            
+            String[] children = sourceLocation.list();
+            for (int i=0; i<children.length; i++) {
+                copyDirectory(new File(sourceLocation, children[i]),
+                        new File(targetLocation, children[i]));
+            }
+        } else {
+            
+            InputStream in = new FileInputStream(sourceLocation);
+            OutputStream out = new FileOutputStream(targetLocation);
+            
+            // Copy the bits from instream to outstream
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+        }
+    }
     
    
 	public void setmExternalStorageAvailable(boolean mExternalStorageAvailable) {

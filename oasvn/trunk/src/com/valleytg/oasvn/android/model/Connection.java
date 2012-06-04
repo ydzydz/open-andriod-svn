@@ -76,7 +76,7 @@ public class Connection extends OASVNModelLocalDB {
 	
 	private ArrayList<LogItem> logs = new ArrayList<LogItem>();
 	
-	// members not saved in the databse
+	// members not saved in the database
 	private Collection<SVNDirEntry> directories = null;
 	private List<SVNLogEntry> revisions;
 	

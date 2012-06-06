@@ -24,6 +24,7 @@
 package com.valleytg.oasvn.android.model;
 
 import java.sql.Statement;
+import java.util.Date;
 
 import com.valleytg.oasvn.android.application.OASVNApplication;
 import com.valleytg.oasvn.android.util.DateUtil;
@@ -43,6 +44,14 @@ public abstract class OASVNModelLocalDB extends OASVNModel {
 	 * Table name: Stores the name of the table if the object implements the LocalDatabase
 	 */
 	private String tableName;
+	
+	/**
+	 * Date / Time that this repository object was last compared against 
+	 * the actual SVN repository.  This date can be used to determine 
+	 * current data dirty state and also as feed back to the user about
+	 * the age of their current information.
+	 */
+    private Date lastRemoteUpdate;
 	
 	
 	protected ContentValues values;
@@ -105,6 +114,8 @@ public abstract class OASVNModelLocalDB extends OASVNModel {
 		if(this.getDateCreated() != null) {
 			values.put("date_created", DateUtil.dateFormat.format(this.getDateCreated()));
 		}
+		
+		values.put("last_remote_upadate", DateUtil.dateFormat.format(this.getLastRemoteUpdate()));
 		
 		// call the database insert
 		this.databaseInsertOrUpdate(values, app);
@@ -223,6 +234,15 @@ public abstract class OASVNModelLocalDB extends OASVNModel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		try {
+			if(results.getString(results.getColumnIndex("last_remote_upadate")) != null) {
+				this.setLastRemoteUpdate(DateUtil.toDate(results.getString(results.getColumnIndex("last_remote_upadate"))));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -257,5 +277,13 @@ public abstract class OASVNModelLocalDB extends OASVNModel {
 
 	public String getTableName() {
 		return tableName;
+	}
+	
+	public Date getLastRemoteUpdate() {
+		return lastRemoteUpdate;
+	}
+
+	public void setLastRemoteUpdate(Date date) {
+		this.lastRemoteUpdate = lastRemoteUpdate;
 	}
 }

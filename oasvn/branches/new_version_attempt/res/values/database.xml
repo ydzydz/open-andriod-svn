@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources> 
+	<string name="db_create">"
+	    CREATE TABLE setting (id integer primary key not null DEFAULT '1', root_folder VARCHAR(120) DEFAULT 'oasvn/', last_remote_upadate DATETIME NULL DEFAULT NULL, active tinyint(1) NOT NULL DEFAULT '1', date_modified TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, date_created DATETIME NULL DEFAULT NULL);
+	    CREATE TABLE repository (id integer primary key not null, name VARCHAR(200), url VARCHAR(260), protocol VARCHAR(100), username VARCHAR(100), password VARCHAR(100), head integer default 0, last_remote_upadate DATETIME NULL DEFAULT NULL, active tinyint(1) NOT NULL DEFAULT '1', date_modified TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, date_created DATETIME NULL DEFAULT NULL);
+	    CREATE TABLE revision (id integer primary key not null, author VARCHAR(200), commit_date DATETIME, message text, revision_number integer,  last_remote_upadate DATETIME NULL DEFAULT NULL, active tinyint(1) NOT NULL DEFAULT '1', date_modified TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, date_created DATETIME NULL DEFAULT NULL));
+	    CREATE TABLE logging (id integer primary key not null, connectionId integer, log_number varchar(50), short_message text, message text, last_remote_upadate DATETIME NULL DEFAULT NULL, active tinyint(1) NOT NULL DEFAULT '1', date_modified TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, date_created DATETIME NULL DEFAULT NULL);
+	"</string>
+	<string name="db_insert">""</string>
+	<string name="db_update_1.1">"
+	    CREATE TABLE logging (id integer primary key not null, connectionId integer, log_number varchar(50), short_message text, message text, active tinyint(1) NOT NULL DEFAULT '1', date_modified TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, date_created DATETIME NULL DEFAULT NULL);
+	"</string>
+	<string name="db_update_1.2">"
+	    CREATE TABLE repository (id integer primary key not null, name VARCHAR(200), url VARCHAR(260), protocol VARCHAR(100), username VARCHAR(100), password VARCHAR(100), head integer default 0, lastRemoteUpadate DATETIME NULL DEFAULT NULL, active tinyint(1) NOT NULL DEFAULT '1', date_modified TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, date_created DATETIME NULL DEFAULT NULL);
+	    CREATE TABLE revision (id integer primary key not null, author VARCHAR(200), commit_date DATETIME, message text, revision_number integer,  last_remote_upadate DATETIME NULL DEFAULT NULL, active tinyint(1) NOT NULL DEFAULT '1', date_modified TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, date_created DATETIME NULL DEFAULT NULL));
+	    ALTER TABLE setting ADD COLUMN last_remote_upadate DATETIME NULL DEFAULT NULL;
+	    ALTER TABLE logging ADD COLUMN last_remote_upadate DATETIME NULL DEFAULT NULL;
+	"</string>
+</resources>

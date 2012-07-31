@@ -24,12 +24,18 @@
 
 package com.valleytg.oasvn.android.model;
 
+import java.util.Collection;
 import java.util.Date;
 
+import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.io.SVNRepository;
+import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
 import android.database.Cursor;
 
+import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.application.OASVNApplication;
 import com.valleytg.oasvn.android.model.Repository.PROTOCOL_TYPE;
 import com.valleytg.oasvn.android.util.DateUtil;
@@ -52,6 +58,153 @@ public class Revision extends OASVNModelLocalDB {
 	private Long revisionNumber;
 	
 	
+	/**
+     * Retrieves all of the directories for the current repository, from the root
+     * @return ArrayList<SVNDirEntry> - Contains all directories as objects
+     */
+    public Collection<Repository> getAllRevisions(Repository repo, OASVNApplication app) {
+    	
+    	Collection<Repository> logEntries = null;
+    	
+    	long startRevision = 0;
+    	long endRevision = -1; //HEAD (i.e. the latest) revision
+    	
+		try {
+	    	logEntries = repo.repository.log( new String[] { "" }, null, startRevision, endRevision, true, true );
+	    	
+		} 
+		catch(SVNException se) {
+			String msg = se.getMessage();
+			
+			// log this failure
+			repo.createLogEntry(app, app.getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
+			
+			se.printStackTrace();
+		}
+		catch(VerifyError ve) {
+			String msg = ve.getMessage();
+			
+			// log this failure
+			repo.createLogEntry(app, app.getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
+			
+			ve.printStackTrace();
+		}
+		catch(Exception e) {
+			String msg = e.getMessage();
+			
+			// log this failure
+			repo.createLogEntry(app, app.getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
+			
+			e.printStackTrace();
+		}
+		
+    	return logEntries;
+    	
+    }
+    
+    /**
+     * Retrieves the last (num) the revisions for the current repository, from the root
+     * NOTE: not helping. will need another approach.
+     * @param num = The number of revisions you want to recover.  Will retrieve the last
+     * (num) revisions
+     * @return ArrayList<SVNDirEntry> - Contains all directories as objects
+     */
+    public Collection<Repository> getXRevisions(Long num, Repository repo, OASVNApplication app) {
+
+    	Collection<Repository> logEntries = null;
+
+		try {
+			
+			// get the most recent revision
+			long endRevision = repo.repository.getLatestRevision();
+		
+			long startRevision;
+			// determine the start revision number
+			if (endRevision - num >= 0) {
+				startRevision = endRevision - num;
+			}
+			else {
+				startRevision = 0;
+			}
+
+	    	logEntries = repo.repository.log( new String[] { "" }, null, startRevision, endRevision, true, true );
+	    	
+		} 
+		catch (SVNException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch(VerifyError ve) {
+			String msg = ve.getMessage();
+			
+			// log this failure
+			repo.createLogEntry(app, app.getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
+			
+			ve.printStackTrace();
+		}
+		catch(Exception e) {
+			String msg = e.getMessage();
+			
+			// log this failure
+			repo.createLogEntry(app, app.getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
+			e.printStackTrace();
+		}
+		
+    	return logEntries;
+    	
+    }
+    
+    /**
+     * Gets the revision number.
+     * @return integer value of the current checked out revision
+     */
+    public Integer getRevisionNumber(Repository repo, OASVNApplication app) {
+    	
+    	try {
+    		// make sure there is a selected connection
+        	if(repo != null) {
+        		
+        		Integer rev = (int) repo.repository.get.getStatusClient().doStatus(this.assignPath(), false).getRevision().getNumber();
+        		
+        		// log that the revision number was retrieved 
+        		this.getCurrentConnection().createLogEntry(this, getString(R.string.revision), getString(R.string.rev_no) + getString(R.string.colon) 
+        				+ " " + rev, getString(R.string.local_rev_updated) + getString(R.string.colon) + " " + rev);
+        		
+        		return rev;
+        	}
+        	else {
+        		return 0;
+        	}
+			
+    	}
+    	catch(SVNException se) {
+			String msg = se.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
+			
+			return 0;
+		}
+		catch(VerifyError ve) {
+			String msg = ve.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
+			
+			ve.printStackTrace();
+			return 0;
+		}
+		catch(Exception e) {
+			String msg = e.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
+			
+			e.printStackTrace();
+			return 0;
+		}
+
+    }
 	
 	
 	/**

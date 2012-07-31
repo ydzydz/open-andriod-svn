@@ -28,6 +28,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;
@@ -41,6 +43,8 @@ import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
+import com.valleytg.oasvn.android.R;
+import com.valleytg.oasvn.android.application.OASVNApplication;
 import com.valleytg.oasvn.android.svn.InfoHandler;
 import com.valleytg.oasvn.android.svn.StatusHandler;
 
@@ -61,6 +65,57 @@ public class WorkingCopy extends LocalCopy {
 		
 		ourClientManager = SVNClientManager.newInstance( options , myAuthManager );
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * Retrieve all of the revisions that are associated with the connection.
+	 * Saves them in the logs ArrayList.
+	 * 
+	 * @param app - Application context, required to access the database
+	 */
+	public String retrieveAllRevisions(OASVNApplication app) {
+		try {
+			List<Revision> list;
+			if (app.getAllRevisions() instanceof List)
+			  list = (List<Revision>)app.getAllRevisions();
+			else
+			  list = new ArrayList<Revision>(app.getAllRevisions());
+			//Collections.sort(list);
+			
+			this.revisions = list;
+			
+			return "";
+		}
+		catch(VerifyError ve) {
+			String msg = app.getString(R.string.problem);
+			ve.printStackTrace();
+			
+			return msg;
+		}
+		catch(Exception e) {
+			String msg = app.getString(R.string.problem);
+			e.printStackTrace();
+			
+			return msg;
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	private static SVNCommitInfo makeDirectory( SVNURL url , String commitMessage ) throws SVNException {

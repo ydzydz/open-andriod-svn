@@ -101,7 +101,7 @@ public class Repository extends OASVNModelLocalDB {
 	/**
 	 * List of revisions for this repository
 	 */
-	private List<SVNLogEntry> revisions;
+	private List<Revision> revisions;
 	
 	/**
 	 * ArrayList of logitems for this repository
@@ -219,11 +219,11 @@ public class Repository extends OASVNModelLocalDB {
 	 */
 	public String retrieveAllRevisions(OASVNApplication app) {
 		try {
-			List<SVNLogEntry> list;
-			if (app.getAllRevisions() instanceof List)
-			  list = (List<SVNLogEntry>)app.getAllRevisions();
+			List<Revision> list;
+			if (this.getRevisions() instanceof List)
+			  list = (List<Revision>)this.getRevisions();
 			else
-			  list = new ArrayList<SVNLogEntry>(app.getAllRevisions());
+			  list = new ArrayList<Revision>(this.getRevisions());
 			//Collections.sort(list);
 			
 			this.revisions = list;
@@ -246,15 +246,15 @@ public class Repository extends OASVNModelLocalDB {
 	
 	/**
 	 * Retrieve all of the revisions that are associated with the connection.
-	 * Saves them in the logs ArrayList.
+	 * Saves them in the revisions ArrayList.
 	 * 
 	 * @param app - Application context, required to access the database
 	 */
 	public String retrieveXRevisions(OASVNApplication app, long numRevisions) {
 		try {
-			List<SVNLogEntry> list;
-			if (app.getXRevisions(numRevisions) instanceof List)
-			  list = (List<SVNLogEntry>)app.getXRevisions(numRevisions);
+			List<Revision> list;
+			if (this.getRevisions() instanceof List)
+			  list = (List<Revision>)this.get
 			else
 			  list = new ArrayList<SVNLogEntry>(app.getXRevisions(numRevisions));
 			//Collections.sort(list);
@@ -580,11 +580,11 @@ public class Repository extends OASVNModelLocalDB {
 		this.head = head;
 	}
 
-	public List<SVNLogEntry> getRevisions() {
+	public List<Revision> getRevisions() {
 		return revisions;
 	}
 
-	public void setRevisions(List<SVNLogEntry> revisions) {
+	public void setRevisions(List<Revision> revisions) {
 		this.revisions = revisions;
 	}
 

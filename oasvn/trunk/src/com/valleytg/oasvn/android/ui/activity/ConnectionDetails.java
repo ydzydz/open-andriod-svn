@@ -85,10 +85,13 @@ public class ConnectionDetails extends Activity {
 	
 	Button btnCheckoutHead;
 	Button btnCommit;
-	Button btnEdit;
+	//Button btnEdit;
 	Button btnLog;
 	Button btnRevisions;
-	Button btnFileManager;
+	//Button btnFileManager;
+	
+	Button btnLocalBrowser;
+	Button btnRemoteBrowser;
 	
 	/**
 	 * Keep track of the menu so it can be updated
@@ -131,10 +134,12 @@ public class ConnectionDetails extends Activity {
         // buttons
         btnCheckoutHead = (Button) findViewById(R.id.conndetail_full_checkout);
         btnCommit = (Button) findViewById(R.id.conndetail_full_commit);
-        btnEdit = (Button) findViewById(R.id.conndetail_edit);
-        btnFileManager = (Button) findViewById(R.id.conndetail_open_fm);
+        //btnEdit = (Button) findViewById(R.id.conndetail_edit);
+        //btnFileManager = (Button) findViewById(R.id.conndetail_open_fm);
         btnLog = (Button) findViewById(R.id.conndetail_logs);
         btnRevisions = (Button) findViewById(R.id.conndetail_revisions);
+        btnLocalBrowser = (Button) findViewById(R.id.conndetail_local_browse);
+        btnRemoteBrowser = (Button) findViewById(R.id.conndetail_remote_browse);
         
         // populate the top
         populateTopInfo();
@@ -178,32 +183,46 @@ public class ConnectionDetails extends Activity {
 				
 			}
 		});
-
-        this.btnEdit.setOnClickListener(new View.OnClickListener() {
-			
-			public void onClick(View v) {
-				
-				// open the add repository activity
-				Intent intent = new Intent(ConnectionDetails.this, AddRepository.class);
-				startActivity(intent);
-				
-			}
-		});
         
-        this.btnFileManager.setOnClickListener(new View.OnClickListener() {
+		this.btnLocalBrowser.setOnClickListener(new View.OnClickListener() {
+					
+			public void onClick(View v) {
+				// try to text the phone number
+				try
+				{
+					//Intent callIntent = new Intent(ConnectionDetails.this, ConnectionBrowse.class);
+					
+					//ConnectionDetails.this.startActivity(callIntent);
+				}
+				catch (ActivityNotFoundException e)
+				{
+					e.printStackTrace();
+				}	
+						
+						
+			}
+		});
+		
+		this.btnRemoteBrowser.setOnClickListener(new View.OnClickListener() {
 			
 			public void onClick(View v) {
-				// Warn the user that not all file browser support landing in the correct directory
-				Toast.makeText(ConnectionDetails.this, getString(R.string.file_manager_warning), 6000).show();
+				// try to text the phone number
+				try
+				{
+					Intent callIntent = new Intent(ConnectionDetails.this, ConnectionBrowse.class);
+					
+					ConnectionDetails.this.startActivity(callIntent);
+				}
+				catch (ActivityNotFoundException e)
+				{
+					e.printStackTrace();
+				}
 				
-	            Intent intent = new Intent();  
-	            intent.addCategory(Intent.CATEGORY_OPENABLE);
-	            intent.setAction(Intent.ACTION_GET_CONTENT);  
-	            intent.setDataAndType(Uri.parse(app.assignPath().toString()), "*/*");
-	            startActivity(intent);  
 				
 			}
 		});
+
+ 
 
 	}
 	
@@ -445,9 +464,12 @@ public class ConnectionDetails extends Activity {
 				}
 				
 				// options that should always be at the bottom of the menu
+				
+				// edit connection
+				this.menu.add(0, R.id.edit, 6, R.string.edit);
 
 				// delete the connection (and possibly the entire working copy as well)
-				this.menu.add(0, R.id.delete_connection, 6, R.string.delete_connection);
+				this.menu.add(0, R.id.delete_connection, 7, R.string.delete_connection);
 			}
 		}
 		catch(Exception e) {
@@ -471,6 +493,18 @@ public class ConnectionDetails extends Activity {
 				else {
 					Toast.makeText(ConnectionDetails.this, getString(R.string.in_progress), 2500).show();
 				}
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+			return true;
+		}
+	    else if (item.getItemId() == R.id.edit) {
+
+			try {
+				// open the add repository activity
+				Intent intent = new Intent(ConnectionDetails.this, AddRepository.class);
+				startActivity(intent);
 			}
 			catch(Exception e) {
 				e.printStackTrace();

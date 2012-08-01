@@ -119,5 +119,12 @@
 	<string name="three_views">Free-Version erlaubt 3 Revision Detailansichten.</string>
 	<string name="views_used">Demo Detailansichten überschritten. Pro-Version erlaubt die uneingeschränkte Nutzung.</string>
 	<string name="pro_only">Commit ist nur mit der Pro-Version verfügbar.</string>
+	
+	<!-- Browse -->
+  	<string name="browse">Browse</string>
+  	<string name="remote_browse">Repo Browse</string>
+  	<string name="local_browse">Lokale Browse</string>
+  	<string name="choose_action">Aktion wählen</string>
+  	<string name="empty">leer</string>
 
 </resources>

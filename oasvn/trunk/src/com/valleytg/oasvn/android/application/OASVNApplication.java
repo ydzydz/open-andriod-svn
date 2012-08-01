@@ -265,27 +265,56 @@ public class OASVNApplication extends Application {
     	wcUtil = new SVNWCUtil();
     }
     
-    /**
-     * Gets the current connection path 
-     * @return the path as a File.
-     */
-    public File assignPath() {
-    	// check to see that there is a path
-    	try {
-	    	if(this.currentConnection != null && this.currentConnection.getFolder().length() > 0) {
-	    		// get the sd card directory
-				File file = new File(this.getRootPath(), this.currentConnection.getFolder());
-				
-				return file;
-	    	}
-    	}
-    	catch(Exception e) {
-    		e.printStackTrace();
-    		return null;
-    	}
-    	return null;
-    }
     
+    // contributed code
+    
+    /**
+	 * Gets the current connection path
+	 * 
+	 * @return the path as a File.
+	 */
+	public File assignPath()
+	{
+		return assignPath("");
+	}
+
+	public File assignPath(String subPath)
+	{
+		return assignPath("", subPath, true);
+	}
+
+	public File assignPath(String sdPath, String svnPath, boolean useWCroot)
+	{
+		// check to see that there is a path
+		try
+		{
+			if (this.currentConnection != null
+					&& this.currentConnection.getFolder().length() > 0)
+			{
+				// get the sd card directory
+				File file = null;
+
+				if (useWCroot)
+					file = new File(this.getRootPath(),
+							this.currentConnection.getFolder() + svnPath);
+				else
+					file = new File("/mnt/sdcard/",
+							sdPath);
+
+				return file;
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+		return null;
+	}
+    
+	// end contributed code
+	
+	
     
     public void deleteRecursive(File tree) {
     	if (tree.isDirectory())
@@ -508,47 +537,71 @@ public class OASVNApplication extends Application {
     	
     }
     
+    
+    // contributed code
+    
     /**
-     * Retrieves all of the directories for the current repository, from the root
-     * @return ArrayList<SVNDirEntry> - Contains all directories as objects
-     */
-    public Collection<SVNDirEntry> getAllDirectories() {
-    	// initialize the auth manager
+	 * Retrieves all of the directories for the given repository
+	 * 
+	 * @param revision
+	 *            as SVNRevision
+	 * @param subpath
+	 *            in the repository
+	 * @return ArrayList<SVNDirEntry> - Contains all directories as objects
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<SVNDirEntry> getAllDirectories(SVNRevision revision,
+			String subPath)
+	{
+		// initialize the auth manager
 		this.initAuthManager();
-		
-    	SVNURL url = this.currentConnection.getRepositoryURL();
 
-    	Collection<SVNDirEntry> entriesList = null;
-		try {
+		SVNURL url = this.currentConnection.getRepositoryURL();
+
+		Collection<SVNDirEntry> entriesList = null;
+		try
+		{
 			SVNRepository repos = SVNRepositoryFactory.create(url);
 			repos.setAuthenticationManager(getMyAuthManager());
-	    	long headRevision = repos.getLatestRevision();
-			entriesList = repos.getDir("", headRevision, null, (Collection) null);
-
-		} 
-		catch (SVNException e) {
+			entriesList = repos.getDir(subPath, revision.getNumber(), null,
+					(Collection<?>) null);
+		}
+		catch (SVNException e)
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		catch(VerifyError ve) {
+		catch (VerifyError ve)
+		{
 			String msg = ve.getMessage();
-			
+
 			// log this failure
-			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
-			
+			this.getCurrentConnection().createLogEntry(this,
+					getString(R.string.error),
+					ve.getMessage().substring(0, 19),
+					ve.getMessage().toString());
+
 			ve.printStackTrace();
 		}
-		catch(Exception e) {
+		catch (Exception e)
+		{
 			String msg = e.getMessage();
-			
+
 			// log this failure
-			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
+			this.getCurrentConnection().createLogEntry(this,
+					getString(R.string.error),
+					e.getCause().toString().substring(0, 19),
+					e.getMessage().toString());
 			e.printStackTrace();
 		}
-		
-    	return entriesList;
-    	
-    }
+
+		return entriesList;
+
+	}
+	
+	// end contributed code
+	
+	
     
     /**
      * Does full checkout of the Head revision
@@ -656,91 +709,7 @@ public class OASVNApplication extends Application {
     		return rValue;
     }
     
-    /**
-     * Does an export of version supplied does not create a working copy.
-     * @param revision as long
-     * @return success or failure message
-     */
-    public String doExport(long revision) {
-    	// create the return holder
-    	String rValue ="";
-    	
-    	// convert the Long parameter value to an SVNRevision
-    	try {
-    		SVNRevision thisRev = SVNRevision.create(revision);
-    		rValue = doExport(thisRev);
-    	}
-    	catch(Exception e) {
-    		if(rValue.length() == 0) {
-    			rValue = "Invalid Revision";
-    		}
-    		e.printStackTrace();
-    	}
-    	 
-    	return rValue;
-    }
     
-
-    
-    /**
-     * Does an export of the remote folder to the local.  This does not create a working copy and 
-     * will not work if a working copy is already in the local location.  
-     * @param revision of the remote repo to export
-     * @return success or failure message
-     */
-    public String doExport(SVNRevision revision) {
-    	try {
-    		// initialize the auth manager
-    		this.initAuthManager();
-    		
-    		// make sure the path is ready
-    		initializePath();
-    		
-    		SVNURL myURL = this.currentConnection.getRepositoryURL();
-    		File myFile = this.assignPath();
-    		SVNRevision pegRevision = SVNRevision.UNDEFINED;
-    		SVNRevision myRevision = revision;
-    		SVNDepth depth = SVNDepth.INFINITY;
-    		try {
-    			// do the export
-    			Long rev = updateClient.doExport(myURL, myFile, pegRevision, myRevision, null, true, depth);
-    			
-    			// log this success
-    			this.getCurrentConnection().createLogEntry(this, getString(R.string.export), "", getString(R.string.revision) + " " + rev.toString());
-    		}
-    		catch(SVNException se) {
-    			String msg = se.getMessage();
-    			
-    			// log this failure
-    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
-    			
-    			return msg;
-    		}
-    		catch(VerifyError ve) {
-    			String msg = ve.getMessage();
-    			
-    			// log this failure
-    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
-    			
-    			ve.printStackTrace();
-    			return getString(R.string.verify) + " " + msg;
-    		}
-    		catch(Exception e) {
-    			String msg = e.getMessage();
-    			
-    			// log this failure
-    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
-    			
-    			e.printStackTrace();
-    			return getString(R.string.exception) + " " + msg;
-    		}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return e.getMessage();
-		}
-		return "success";
-    }
     
     
     /**
@@ -810,6 +779,150 @@ public class OASVNApplication extends Application {
 		}
 		return "success";
     }
+    
+    
+    // contributed code
+    
+    
+    /**
+	 * Does an export of version supplied does not create a working copy.
+	 * 
+	 * @param revision
+	 *            as long
+	 * @return success or failure message
+	 */
+	public String doExport(long revision)
+	{
+		// create the return holder
+		String rValue = "";
+
+		// convert the Long parameter value to an SVNRevision
+		try
+		{
+			SVNRevision thisRev = SVNRevision.create(revision);
+			rValue = doExport(thisRev);
+		}
+		catch (Exception e)
+		{
+			if (rValue.length() == 0)
+			{
+				rValue = "Invalid Revision";
+			}
+			e.printStackTrace();
+		}
+
+		return rValue;
+	}
+
+	/**
+	 * Does an export of the remote folder to the local. This does not create a
+	 * working copy and will not work if a working copy is already in the local
+	 * location.
+	 * 
+	 * @param revision
+	 *            of the remote repo to export
+	 * @return success or failure message
+	 */
+	public String doExport(SVNRevision revision)
+	{
+		return doExport(revision, "");
+	}
+
+	public String doExport(SVNRevision revision, String subPath)
+	{
+		return doExport(revision, "", subPath,true);
+	}
+	
+	/**
+	 * Does an export of the remote folder to the local. This does not create a
+	 * working copy and will not work if a working copy is already in the local
+	 * location.
+	 * 
+	 * @param revision
+	 *            of the remote repo to export
+	 * @param subpath
+	 *            of the object to export
+	 * @return success or failure message
+	 */
+	public String doExport(SVNRevision revision, String sdPath, String svnPath,
+			boolean useWCroot)
+	{
+		try
+		{
+			// initialize the auth manager
+			this.initAuthManager();
+
+			// make sure the path is ready
+			initializePath();
+
+			SVNURL myURL = this.currentConnection.getRepositoryURL()
+					.appendPath(svnPath, false);
+			File myFile = this.assignPath(sdPath, svnPath, useWCroot);
+			SVNRevision pegRevision = SVNRevision.UNDEFINED;
+			SVNRevision myRevision = revision;
+			SVNDepth depth = SVNDepth.INFINITY;
+			try
+			{
+				// do the export
+				Long rev = updateClient.doExport(myURL, myFile, pegRevision,
+						myRevision, null, true, depth);
+
+				// log this success
+				this.getCurrentConnection().createLogEntry(this,
+						getString(R.string.export), "",
+						getString(R.string.revision) + " " + rev.toString());
+			}
+			catch (SVNException se)
+			{
+				String msg = se.getMessage();
+
+				// log this failure
+				this.getCurrentConnection().createLogEntry(this,
+						getString(R.string.error),
+						se.getMessage().substring(0, 19),
+						se.getMessage().toString());
+
+				return msg;
+			}
+			catch (VerifyError ve)
+			{
+				String msg = ve.getMessage();
+
+				// log this failure
+				this.getCurrentConnection().createLogEntry(this,
+						getString(R.string.error),
+						ve.getMessage().substring(0, 19),
+						ve.getMessage().toString());
+
+				ve.printStackTrace();
+				return getString(R.string.verify) + " " + msg;
+			}
+			catch (Exception e)
+			{
+				String msg = e.getMessage();
+
+				// log this failure
+				this.getCurrentConnection().createLogEntry(this,
+						getString(R.string.error),
+						e.getCause().toString().substring(0, 19),
+						e.getMessage().toString());
+
+				e.printStackTrace();
+				return getString(R.string.exception) + " " + msg;
+			}
+		}
+		catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return e.getMessage();
+		}
+		return "success";
+	}
+    
+    
+    // end contributed code
+    
     
     
     /**

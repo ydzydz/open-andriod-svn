@@ -6,5 +6,6 @@
     <item android:id="@+id/cleanup" android:title="@string/cleanup" />
     <item android:id="@+id/revert" android:title="@string/revert" />
     <item android:id="@+id/delete_working_copy" android:title="@string/delete_folder" />
+    <item android:id="@+id/edit" android:title="@string/edit" />
     <item android:id="@+id/delete_connection" android:title="@string/delete_connection" />
 </menu>

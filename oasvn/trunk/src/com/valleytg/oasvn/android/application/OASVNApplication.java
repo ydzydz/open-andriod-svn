@@ -275,7 +275,12 @@ public class OASVNApplication extends Application {
 	 */
 	public File assignPath()
 	{
-		return assignPath("");
+		// get the sd card directory
+		File file = null;
+
+		file = new File(this.currentConnection.getFolder());
+		
+		return file;
 	}
 
 	public File assignPath(String subPath)
@@ -295,11 +300,9 @@ public class OASVNApplication extends Application {
 				File file = null;
 
 				if (useWCroot)
-					file = new File(this.getRootPath(),
-							this.currentConnection.getFolder() + svnPath);
+					file = new File(this.getRootPath(), this.currentConnection.getFolder() + svnPath);
 				else
-					file = new File("/mnt/sdcard/",
-							sdPath);
+					file = new File("/mnt/sdcard/", sdPath);
 
 				return file;
 			}
@@ -380,6 +383,20 @@ public class OASVNApplication extends Application {
     		e.printStackTrace();
     	}
     }
+    
+    
+    /**
+     * Created to be a central way to check the validity of paths across
+     * multiple devices, sd-cards, etc.
+     * 
+     * see OASVN-67 for more details.
+     */
+    public void checkValidPath() {
+    	
+    }
+    
+    
+    
     
     // SVNKit wrapper
     

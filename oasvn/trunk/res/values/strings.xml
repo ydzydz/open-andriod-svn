@@ -13,6 +13,7 @@
     <string name="files">Files</string>
     <string name="directory_created">Directory is created</string>
     <string name="directory_exists">Directory already exists</string>
+    <string name="directory_write_fail">Invalid permissions to write to the directory</string>
     <string name="no_change">No change</string>
     <string name="no_changes_available">No changes were available to commit to the repository</string>
     <string name="commit_success">Commit Successful Revision</string>
@@ -54,7 +55,7 @@
     <string name="connection">Connection</string>
     <string name="no_connection_selected">No connection selected...</string>
     <string name="choose_revision">Please enter the revision number.</string>
-    <string name="choose_export_folder">Please enter the new folder to export to.</string>
+    <string name="choose_export_folder">Please enter the path to export to.</string>
     <string name="head">Head</string>
     <string name="specified">Specified</string>
     <string name="checkout">Checkout</string>

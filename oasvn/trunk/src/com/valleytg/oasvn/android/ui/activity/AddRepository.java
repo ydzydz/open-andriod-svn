@@ -77,6 +77,9 @@ public class AddRepository extends Activity {
 		username = (EditText) findViewById(R.id.add_username);
 		password = (EditText) findViewById(R.id.add_password);
 		folder = (EditText) findViewById(R.id.add_folder);
+		
+		// set the folder path to the default
+		folder.setText(app.getFullPathToMain().toString());
         
         // check to see if we are editing a connection
         if(app.getCurrentConnection() != null) {
@@ -154,8 +157,8 @@ public class AddRepository extends Activity {
 		}
 		
 		// check to see if the folder already exists in the database
-		Log.d("path considered", app.getFullPathToMain().toString() + this.folder.getText().toString());
-		File file = new File(app.getFullPathToMain().toString() + this.folder.getText().toString());
+		Log.d("path considered", this.folder.getText().toString());
+		File file = new File(this.folder.getText().toString());
 		
 		// check all existing connections
 		if(app.getAllConnections().size() > 0) {
@@ -220,6 +223,21 @@ public class AddRepository extends Activity {
 			ready = true;
 		}
 		
+		// double check that we can write to the path and it is valid
+		try {
+			if(!file.exists()) {
+				file.mkdir();
+				if (!file.canWrite() ) {
+					Toast.makeText(this, getString(R.string.directory_write_fail), 5000).show();	
+					return;
+				}
+			}
+		}
+		catch(Exception e) {
+			Toast.makeText(this, getString(R.string.directory_write_fail), 5000).show();	
+			return;
+		}
+
 		// made it to the end, save the connection
 		if (ready) {
 			this.save();

@@ -313,7 +313,7 @@ public class ConnectionDetails extends Activity {
 				
 				String folder = "";
 				try {
-					folder = app.getFullPathToMain().toString() + this.app.getCurrentConnection().getFolder().toString();
+					folder = this.app.getCurrentConnection().getFolder().toString();
 				}
 				catch(Exception e) {
 					folder = getString(R.string.unknown);
@@ -875,7 +875,7 @@ public class ConnectionDetails extends Activity {
 		final EditText input = new EditText(this);
 		
 		// populate the default value
-		input.setText("");
+		input.setText(app.getFullPathToMain().toString());
 		
 		// make the input type numeric
 		input.setRawInputType(InputType.TYPE_CLASS_TEXT);	
@@ -901,8 +901,8 @@ public class ConnectionDetails extends Activity {
             			}
             			
             			// check to see if the folder already exists in the database
-            			Log.d("path considered", app.getFullPathToMain() + "/" + value);
-            			final File file = new File(app.getFullPathToMain() + "/" + value);
+            			Log.d("path considered", value);
+            			final File file = new File(value);
             			
             			// check all existing connections
             			if(app.getAllConnections().size() > 0) {
@@ -977,6 +977,12 @@ public class ConnectionDetails extends Activity {
             				ready = true;
             			}
 
+            			// double check that we can write to the path and it is valid
+            			if (!file.canWrite() ) {
+            				Toast.makeText(ConnectionDetails.this, getString(R.string.directory_write_fail), 5000).show();	
+            				return;
+            			}
+            			
             			if(ready) {
             				if(!ConnectionDetails.this.running) {
                 				ConnectionDetails.this.running = true;

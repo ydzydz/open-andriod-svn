@@ -12,6 +12,7 @@
     <string name="files">"Dateien"</string>
     <string name="directory_created">"Verzeichnis erstellt"</string>
     <string name="directory_exists">"Verzeichnis bereits vorhanden"</string>
+    <string name="directory_write_fail">"Ungültige Berechtigungen, um in das Verzeichnis schreiben"</string>
     <string name="no_change">"Keine Änderung"</string>
     <string name="no_changes_available">"Keine Änderungen für ein Commit in das Repository verfügbar"</string>
     <string name="commit_success">"Commit erfolgreich"</string>

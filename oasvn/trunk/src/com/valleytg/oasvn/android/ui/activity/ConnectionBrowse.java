@@ -58,22 +58,20 @@ import android.widget.Toast;
 import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.application.OASVNApplication;
 
-public class ConnectionBrowse extends ListActivity implements Runnable,
-		OnItemLongClickListener
-{
+public class ConnectionBrowse extends ListActivity implements Runnable, OnItemLongClickListener {
 	private static final int DIALOG_WAIT_LOADING = 1;
 	private static final int DIALOG_WAIT_EXPORT = 2;
 	private static final int DIALOG_CHOSE_ACTION_DIR = 3;
 	private static final int DIALOG_CHOSE_ACTION_FILE = 4;
 	private static final int DIALOG_EXPORT = 5;
-
+	
 	private Context mContext;
 	private OASVNApplication mApp;
-
+	
 	private ProgressDialog mLoadingDialog;
 	private BrowseAdapter mAdapter;
 	private int mLoadingDialogType;
-
+	
 	private List<SVNDirEntry> mDirs;
 	private List<List<SVNDirEntry>> mDirCache;
 	private boolean mDirCacheInit = false;
@@ -82,33 +80,30 @@ public class ConnectionBrowse extends ListActivity implements Runnable,
 	private String mLastExportPath;
 	private SVNRevision mCurRevision = SVNRevision.HEAD;
 	private String mExportMsg;
-
+	
 	@Override
-	protected Dialog onCreateDialog(int id)
-	{
+	protected Dialog onCreateDialog(int id) {
 		Dialog dialog = null;
-
-		switch (id)
-		{
+		
+		switch (id) {
 			case DIALOG_CHOSE_ACTION_DIR:
 			case DIALOG_CHOSE_ACTION_FILE:
 				dialog = createChoseActionDialog();
 				break;
-
+		
 			case DIALOG_EXPORT:
 				dialog = createExportDialog();
 				break;
 		}
 		mLoadingDialogType = id;
-
+		
 		return dialog;
 	}
-
-	private Dialog createChoseActionDialog()
-	{
+	
+	private Dialog createChoseActionDialog() {
 		final CharSequence[] items =
 		{ getResources().getString(R.string.export).toLowerCase() };
-
+		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.choose_action);
 		builder.setItems(items, new DialogInterface.OnClickListener()
@@ -123,29 +118,27 @@ public class ConnectionBrowse extends ListActivity implements Runnable,
 				}
 			}
 		});
-
+		
 		return builder.create();
 	}
-
-	protected Dialog createExportDialog()
-	{
+	
+	protected Dialog createExportDialog() {
 		AlertDialog.Builder builder;
 		AlertDialog alertDialog;
-
+		
 		LayoutInflater inflater = (LayoutInflater) mContext
 				.getSystemService(LAYOUT_INFLATER_SERVICE);
 		View layout = inflater
 				.inflate(
 						R.layout.connection_browse_export_dialog,
 						(ViewGroup) findViewById(R.id.connbrowse_export_dialog_layout_root));
-
+		
 		final EditText path = (EditText) layout
 				.findViewById(R.id.connbrowse_export_dialog_path_edit);
-
+		
 		Button save = (Button) layout
 				.findViewById(R.id.connbrowse_export_dialog_save_btn);
-		save.setOnClickListener(new OnClickListener()
-		{
+		save.setOnClickListener(new OnClickListener() {
 			public void onClick(View v)
 			{
 				mLastExportPath = path.getText().toString();
@@ -153,31 +146,29 @@ public class ConnectionBrowse extends ListActivity implements Runnable,
 				startExport();
 			}
 		});
-
+		
 		builder = new AlertDialog.Builder(mContext);
 		builder.setView(layout);
-
+		
 		return builder.create();
 	}
-
+	
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.connection_browse);
-
+		
 		mContext = this;
 		mApp = (OASVNApplication) getApplication();
 		mDirCache = new ArrayList<List<SVNDirEntry>>();
-
+		
 		updateDataAndList();
-
+		
 		getListView().setOnItemLongClickListener(this);
 	}
-
+	
 	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id)
-	{
+	protected void onListItemClick(ListView l, View v, int position, long id) {
 		SVNDirEntry entry = mDirs.get(position);
 		if (entry.getKind().compareTo(SVNNodeKind.DIR) == 0)
 		{
@@ -189,33 +180,28 @@ public class ConnectionBrowse extends ListActivity implements Runnable,
 			mLastDialogElem = position;
 			showDialog(DIALOG_CHOSE_ACTION_FILE);
 		}
-
+		
 		super.onListItemClick(l, v, position, id);
 	}
-
-
-	public boolean onItemLongClick(AdapterView<?> av, View v, int position,
-			long id)
-	{
+	
+	
+	public boolean onItemLongClick(AdapterView<?> av, View v, int position, long id) {
 		SVNDirEntry entry = mDirs.get(position);
-
-		if (entry.getKind().compareTo(SVNNodeKind.DIR) == 0)
-		{
+		
+		if (entry.getKind().compareTo(SVNNodeKind.DIR) == 0) {
 			mLastDialogElem = position;
 			showDialog(DIALOG_CHOSE_ACTION_DIR);
 		}
-		else if (entry.getKind().compareTo(SVNNodeKind.FILE) == 0)
-		{
+		else if (entry.getKind().compareTo(SVNNodeKind.FILE) == 0) {
 			mLastDialogElem = position;
 			showDialog(DIALOG_CHOSE_ACTION_FILE);
 		}
-
+		
 		return false;
 	}
-
+	
 	@Override
-	public void onBackPressed()
-	{
+	public void onBackPressed() {
 		if (mCurDir.compareTo("") == 0)
 			super.onBackPressed();
 		else
@@ -225,78 +211,72 @@ public class ConnectionBrowse extends ListActivity implements Runnable,
 				mCurDir = mCurDir.substring(0, mCurDir.length() - 1);
 			}
 			while (mCurDir.endsWith("/") == false && mCurDir.compareTo("") != 0);
-
+		
 			mDirs = mDirCache.remove(mDirCache.size() - 1);
 			updateList();
 		}
 	}
-
-	private void startExport()
-	{
+	
+	private void startExport() {
 		mLoadingDialog = ProgressDialog.show(this, "", getResources()
 				.getString(R.string.performing_export), true, false);
-
+		
 		mLoadingDialogType = DIALOG_WAIT_EXPORT;
 		
 		Thread thread = new Thread(this);
 		thread.start();
 	}
-
-	private String exportSingleElement()
-	{
+	
+	private String exportSingleElement() {
 		String sdPath = mLastExportPath;
 		String filename = mDirs.get(mLastDialogElem).getName();
-
+		
 		if (sdPath.length() > 0 && sdPath.endsWith("/") == false)
 			sdPath += "/";
-
+		
 		if (sdPath.endsWith(filename) == false)
 			sdPath += filename;
-
+		
 		return mApp.doExport(mCurRevision, sdPath, mCurDir + filename, false);
 	}
-
-	private void updateDataAndList()
-	{
+	
+	private void updateDataAndList() {
 		mLoadingDialog = ProgressDialog.show(this, "", getResources().getString(R.string.loading), true, false);
 		mLoadingDialogType = DIALOG_WAIT_LOADING;
 		
 		Thread thread = new Thread(this);
 		thread.start();
 	}
-
+	
 	@SuppressWarnings("unchecked")
-	private void updateData()
-	{
+	private void updateData() {
 		if (mDirCacheInit)
 			mDirCache.add(mDirs);
 		else
 			mDirCacheInit = true;
-
+		
 		mDirs = new ArrayList<SVNDirEntry>();
-
+		
 		Collection<SVNDirEntry> coll = mApp.getAllDirectories(mCurRevision, mCurDir);
 		if (coll != null)
 		{
 			Iterator<SVNDirEntry> it = coll.iterator();
-
+		
 			if (it != null)
 				while (it.hasNext())
 					mDirs.add(it.next());
-
+		
 			Collections.sort(mDirs);
 		}
-		else
-			mDirs.add(new SVNDirEntry(null, null, "- "
-					+ getResources().getString(R.string.empty) + " -",
-					SVNNodeKind.NONE, 0, false, 0, null, "", ""));
+		else {
+			mDirs.add(new SVNDirEntry(null, null, "- " + getResources().getString(R.string.empty) + " -", SVNNodeKind.NONE, 0, false, 0, null, "", ""));
+		}
 	}
-
-	private void updateList()
-	{
+	
+	private void updateList() {
 		mAdapter = new BrowseAdapter(mContext, mDirs);
 		setListAdapter(mAdapter);
-
+		
 		switch (mLoadingDialogType)
 		{
 			case DIALOG_WAIT_EXPORT:
@@ -306,15 +286,13 @@ public class ConnectionBrowse extends ListActivity implements Runnable,
 				else
 					Toast.makeText(getApplicationContext(), mExportMsg,
 							Toast.LENGTH_SHORT).show();
-
+		
 				break;
 		}
 	}
-
-	public void run()
-	{
-		switch (mLoadingDialogType)
-		{
+	
+	public void run() {
+		switch (mLoadingDialogType) {
 			case DIALOG_WAIT_LOADING:
 				updateData();
 				break;
@@ -322,12 +300,11 @@ public class ConnectionBrowse extends ListActivity implements Runnable,
 				mExportMsg = exportSingleElement();
 				break;
 		}
-
+		
 		handler.sendEmptyMessage(0);
 	}
-
-	private Handler handler = new Handler()
-	{
+	
+	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg)
 		{
@@ -336,33 +313,30 @@ public class ConnectionBrowse extends ListActivity implements Runnable,
 			updateList();
 		}
 	};
-
-	private class BrowseAdapter extends ArrayAdapter<SVNDirEntry>
-	{
-		public BrowseAdapter(Context context, List<SVNDirEntry> dirNames)
-		{
+	
+	private class BrowseAdapter extends ArrayAdapter<SVNDirEntry> {
+		public BrowseAdapter(Context context, List<SVNDirEntry> dirNames) {
 			super(context, R.layout.connection_browse_listitem, dirNames);
 		}
-
+	
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent)
-		{
+		public View getView(int position, View convertView, ViewGroup parent) {
 			LayoutInflater inflater = getLayoutInflater();
 			View row = inflater.inflate(R.layout.connection_browse_listitem,
 					parent, false);
-
+		
 			TextView kind = (TextView) row
 					.findViewById(R.id.connbrowse_listitem_kind);
 			TextView name = (TextView) row
 					.findViewById(R.id.connbrowse_listitem_name);
-
+		
 			SVNDirEntry entry = mDirs.get(position);
-
+		
 			if (entry.getKind().compareTo(SVNNodeKind.FILE) == 0)
 				kind.setVisibility(View.INVISIBLE);
-
+		
 			name.setText(entry.getName());
-
+		
 			return row;
 		}
 	}

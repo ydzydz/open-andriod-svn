@@ -36,92 +36,286 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
-public class LocalBrowse extends ListActivity {
-
-	private List<String> item = null;
-
-	private List<String> path = null;
-
-	private String root="/";
-
-	private TextView myPath;
-
-	 
-
-	/** Called when the activity is first created. */
+public class LocalBrowse extends ListActivity implements Runnable, OnItemLongClickListener {
+	private static final int DIALOG_WAIT_LOADING = 1;
+	private static final int DIALOG_WAIT_EXPORT = 2;
+	private static final int DIALOG_CHOSE_ACTION_DIR = 3;
+	private static final int DIALOG_CHOSE_ACTION_FILE = 4;
+	private static final int DIALOG_EXPORT = 5;
+	
+	private Context mContext;
+	private OASVNApplication mApp;
+	
+	private ProgressDialog mLoadingDialog;
+	private BrowseAdapter mAdapter;
+	private int mLoadingDialogType;
+	
+	private List<File> mDirs;
+	private List<List<File>> mDirCache;
+	private boolean mDirCacheInit = false;
+	private String mCurDir = "";
+	private int mLastDialogElem;
+	private String mLastExportPath;
+	private SVNRevision mCurRevision = SVNRevision.HEAD;
+	private String mExportMsg;
+	
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-
+	protected Dialog onCreateDialog(int id) {
+		Dialog dialog = null;
+		
+		switch (id) {
+			case DIALOG_CHOSE_ACTION_DIR:
+			case DIALOG_CHOSE_ACTION_FILE:
+				dialog = createChoseActionDialog();
+				break;
+		
+			case DIALOG_EXPORT:
+				dialog = createExportDialog();
+				break;
+		}
+		mLoadingDialogType = id;
+		
+		return dialog;
+	}
+	
+	private Dialog createChoseActionDialog() {
+		final CharSequence[] items =
+		{ getResources().getString(R.string.export).toLowerCase() };
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.choose_action);
+		builder.setItems(items, new DialogInterface.OnClickListener()
+		{
+			public void onClick(DialogInterface dialog, int item)
+			{
+				switch (item)
+				{
+					case 0: // export
+						showDialog(DIALOG_EXPORT);
+						break;
+				}
+			}
+		});
+		
+		return builder.create();
+	}
+	
+	protected Dialog createExportDialog() {
+		AlertDialog.Builder builder;
+		AlertDialog alertDialog;
+		
+		LayoutInflater inflater = (LayoutInflater) mContext
+				.getSystemService(LAYOUT_INFLATER_SERVICE);
+		View layout = inflater
+				.inflate(
+						R.layout.connection_browse_export_dialog,
+						(ViewGroup) findViewById(R.id.connbrowse_export_dialog_layout_root));
+		
+		final EditText path = (EditText) layout
+				.findViewById(R.id.connbrowse_export_dialog_path_edit);
+		
+		Button save = (Button) layout
+				.findViewById(R.id.connbrowse_export_dialog_save_btn);
+		save.setOnClickListener(new OnClickListener() {
+			public void onClick(View v)
+			{
+				mLastExportPath = path.getText().toString();
+				dismissDialog(DIALOG_EXPORT);
+				startExport();
+			}
+		});
+		
+		builder = new AlertDialog.Builder(mContext);
+		builder.setView(layout);
+		
+		return builder.create();
+	}
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// needs a layout of its own
-		setContentView(R.layout.localbrowse);
+		setContentView(R.layout.connection_browse);
 		
-
-		myPath = (TextView)findViewById(R.id.path);
+		mContext = this;
+		mApp = (OASVNApplication) getApplication();
+		mDirCache = new ArrayList<List<File>>();
+		mCurDir = "/";
 		
+		updateDataAndList();
 		
-		getDir(root);
+		getListView().setOnItemLongClickListener(this);
 	}
-
-	// I was doing something here formating the following two methods, must have gotten them off the web.
-
-	private void getDir(String dirPath) {
-		myPath.setText("Location: " + dirPath);
-		item = new ArrayList<String>();
-		path = new ArrayList<String>();
-		File f = new File(dirPath);
-		File[] files = f.listFiles();
-		
-		if(!dirPath.equals(root)) {
-			item.add(root);
-			path.add(root);
-			item.add("../");
-			path.add(f.getParent());
-		}
-		
-		for(int i=0; i < files.length; i++) {
-			File file = files[i];
-			path.add(file.getPath());
-			if(file.isDirectory()) {
-				item.add(file.getName() + "/");
-			}
-			else {
-				item.add(file.getName());
-		
-			}
-		}
-		
-		ArrayAdapter<String> fileList = new ArrayAdapter<String>(this, R.layout.row, item); 
-		setListAdapter(fileList);
-	}
-	
-	
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		File file = new File(path.get(position));
-		if (file.isDirectory()) {
-			if(file.canRead())
-				getDir(path.get(position));
-			else
+		File entry = mDirs.get(position);
+		if (entry.isDirectory()) {
+			mCurDir = mCurDir + entry.getName() + "/";
+			updateDataAndList();
+		}
+		else if (entry.isFile())
+		{
+			mLastDialogElem = position;
+			showDialog(DIALOG_CHOSE_ACTION_FILE);
+		}
+		
+		super.onListItemClick(l, v, position, id);
+	}
+	
+	
+	public boolean onItemLongClick(AdapterView<?> av, View v, int position, long id) {
+		File entry = mDirs.get(position);
+		
+		if (entry.isDirectory()) {
+			mLastDialogElem = position;
+			showDialog(DIALOG_CHOSE_ACTION_DIR);
+		}
+		else if (entry.isFile()) {
+			mLastDialogElem = position;
+			showDialog(DIALOG_CHOSE_ACTION_FILE);
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public void onBackPressed() {
+		if (mCurDir.compareTo("") == 0)
+			super.onBackPressed();
+		else
+		{
+			do
 			{
-				new AlertDialog.Builder(this).setIcon(R.drawable.folder).setTitle("[" + file.getName() + "] folder can't be read!")
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-					public void onClick(DialogInterface dialog, int which) {
-						
-					}
-				}).show();
+				mCurDir = mCurDir.substring(0, mCurDir.length() - 1);
+			}
+			while (mCurDir.endsWith("/") == false && mCurDir.compareTo("") != 0);
+		
+			mDirs = mDirCache.remove(mDirCache.size() - 1);
+			updateList();
+		}
+	}
+	
+	private void startExport() {
+		mLoadingDialog = ProgressDialog.show(this, "", getResources()
+				.getString(R.string.performing_export), true, false);
+		
+		mLoadingDialogType = DIALOG_WAIT_EXPORT;
+		
+		Thread thread = new Thread(this);
+		thread.start();
+	}
+	
+	private String exportSingleElement() {
+		String sdPath = mLastExportPath;
+		String filename = mDirs.get(mLastDialogElem).getName();
+		
+		if (sdPath.length() > 0 && sdPath.endsWith("/") == false)
+			sdPath += "/";
+		
+		if (sdPath.endsWith(filename) == false)
+			sdPath += filename;
+		
+		return mApp.doExport(mCurRevision, sdPath, mCurDir + filename, false);
+	}
+	
+	private void updateDataAndList() {
+		mLoadingDialog = ProgressDialog.show(this, "", getResources().getString(R.string.loading), true, false);
+		mLoadingDialogType = DIALOG_WAIT_LOADING;
+		
+		Thread thread = new Thread(this);
+		thread.start();
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void updateData() {
+		if (mDirCacheInit)
+			mDirCache.add(mDirs);
+		else
+			mDirCacheInit = true;
+		
+		mDirs = new ArrayList<File>();
+		
+		File f = new File(mCurDir);
+		File[] files = f.listFiles();
+  
+		if(files.length > 0) {
+			for(int i=0; i < files.length; i++) {
+	
+				File file = files[i];
+				mDirs.add(file);
 			}
 		}
 		else {
-			new AlertDialog.Builder(this).setIcon(R.drawable.folder).setTitle("[" + file.getName() + "]").setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-				public void onClick(DialogInterface dialog, int which) {
-				
-				}
-			}).show();
+			mDirs.add(new File("- " + getResources().getString(R.string.empty) + " -"));
+		}
+		
+	}
+	
+	private void updateList() {
+		mAdapter = new BrowseAdapter(mContext, mDirs);
+		setListAdapter(mAdapter);
+		
+		switch (mLoadingDialogType)
+		{
+			case DIALOG_WAIT_EXPORT:
+				if (mExportMsg.equals("success"))
+					Toast.makeText(getApplicationContext(), getResources().getString(R.string.export_successful)
+									+ ": "+ mDirs.get(mLastDialogElem).getName(), Toast.LENGTH_SHORT).show();
+				else
+					Toast.makeText(getApplicationContext(), mExportMsg,
+							Toast.LENGTH_SHORT).show();
+		
+				break;
 		}
 	}
-
+	
+	public void run() {
+		switch (mLoadingDialogType) {
+			case DIALOG_WAIT_LOADING:
+				updateData();
+				break;
+			case DIALOG_WAIT_EXPORT:
+				mExportMsg = exportSingleElement();
+				break;
+		}
+		
+		handler.sendEmptyMessage(0);
+	}
+	
+	private Handler handler = new Handler() {
+		@Override
+		public void handleMessage(Message msg)
+		{
+			mLoadingDialog.dismiss();
+			
+			updateList();
+		}
+	};
+	
+	private class BrowseAdapter extends ArrayAdapter<File> {
+		public BrowseAdapter(Context context, List<File> dirNames) {
+			super(context, R.layout.connection_browse_listitem, dirNames);
+		}
+	
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			LayoutInflater inflater = getLayoutInflater();
+			View row = inflater.inflate(R.layout.connection_browse_listitem,
+					parent, false);
+		
+			TextView kind = (TextView) row
+					.findViewById(R.id.connbrowse_listitem_kind);
+			TextView name = (TextView) row
+					.findViewById(R.id.connbrowse_listitem_name);
+		
+			File entry = mDirs.get(position);
+		
+			if (entry.isFile())
+				kind.setVisibility(View.INVISIBLE);
+		
+			name.setText(entry.getName());
+		
+			return row;
+		}
+	}
 }

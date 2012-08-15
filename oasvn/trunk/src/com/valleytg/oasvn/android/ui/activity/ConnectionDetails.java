@@ -190,9 +190,9 @@ public class ConnectionDetails extends Activity {
 				// try to text the phone number
 				try
 				{
-					//Intent callIntent = new Intent(ConnectionDetails.this, ConnectionBrowse.class);
+					Intent callIntent = new Intent(ConnectionDetails.this, LocalBrowse.class);
 					
-					//ConnectionDetails.this.startActivity(callIntent);
+					ConnectionDetails.this.startActivity(callIntent);
 				}
 				catch (ActivityNotFoundException e)
 				{

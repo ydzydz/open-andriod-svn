@@ -619,6 +619,42 @@ public class OASVNApplication extends Application {
 	// end contributed code
 	
 	
+	public File[] getLocalFilesSystemList() {
+
+		String folderDir = this.currentConnection.getFolder();
+
+		File[] localDirectory = null;
+		try {
+			File localFile = this.assignPath();
+			localDirectory = localFile.listFiles();
+		}
+		catch (VerifyError ve) {
+			String msg = ve.getMessage();
+
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this,
+					getString(R.string.error),
+					ve.getMessage().substring(0, 19),
+					ve.getMessage().toString());
+
+			ve.printStackTrace();
+		}
+		catch (Exception e) {
+			String msg = e.getMessage();
+
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this,
+					getString(R.string.error),
+					e.getCause().toString().substring(0, 19),
+					e.getMessage().toString());
+			e.printStackTrace();
+		}
+
+		return localDirectory;
+
+	}
+	
+	
     
     /**
      * Does full checkout of the Head revision

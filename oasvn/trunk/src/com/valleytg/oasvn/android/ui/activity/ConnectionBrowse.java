@@ -23,7 +23,6 @@
 
 package com.valleytg.oasvn.android.ui.activity;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,14 +33,12 @@ import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -261,9 +258,7 @@ public class ConnectionBrowse extends ListActivity implements Runnable,
 
 	private void updateDataAndList()
 	{
-		mLoadingDialog = ProgressDialog.show(this, "", getResources()
-				.getString(R.string.loading), true, false);
-
+		mLoadingDialog = ProgressDialog.show(this, "", getResources().getString(R.string.loading), true, false);
 		mLoadingDialogType = DIALOG_WAIT_LOADING;
 		
 		Thread thread = new Thread(this);
@@ -306,13 +301,8 @@ public class ConnectionBrowse extends ListActivity implements Runnable,
 		{
 			case DIALOG_WAIT_EXPORT:
 				if (mExportMsg.equals("success"))
-					Toast.makeText(
-							getApplicationContext(),
-							getResources()
-									.getString(R.string.export_successful)
-									+ ": "
-									+ mDirs.get(mLastDialogElem).getName(),
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(), getResources().getString(R.string.export_successful)
+									+ ": "+ mDirs.get(mLastDialogElem).getName(), Toast.LENGTH_SHORT).show();
 				else
 					Toast.makeText(getApplicationContext(), mExportMsg,
 							Toast.LENGTH_SHORT).show();

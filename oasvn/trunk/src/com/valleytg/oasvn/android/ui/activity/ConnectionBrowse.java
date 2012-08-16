@@ -24,6 +24,7 @@
 
 package com.valleytg.oasvn.android.ui.activity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -102,8 +103,7 @@ public class ConnectionBrowse extends ListActivity implements Runnable, OnItemLo
 	}
 	
 	private Dialog createChoseActionDialog() {
-		final CharSequence[] items =
-		{ getResources().getString(R.string.export).toLowerCase() };
+		final CharSequence[] items = { getResources().getString(R.string.export).toLowerCase() };
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.choose_action);
@@ -227,15 +227,19 @@ public class ConnectionBrowse extends ListActivity implements Runnable, OnItemLo
 	
 	private String exportSingleElement() {
 		String sdPath = mLastExportPath;
-		String filename = mDirs.get(mLastDialogElem).getName();
+		SVNDirEntry filename = mDirs.get(mLastDialogElem);
 		
 		if (sdPath.length() > 0 && sdPath.endsWith("/") == false)
 			sdPath += "/";
 		
-		if (sdPath.endsWith(filename) == false)
-			sdPath += filename;
+		if (sdPath.endsWith(filename.toString()) == false)
+			sdPath += filename.getName();
 		
-		return mApp.doExport(mCurRevision, sdPath, filename, false);
+		System.out.println("mDirs : " + mDirs.toString());
+		System.out.println("sdPath : " + sdPath);
+		System.out.println("filename : " + filename);
+		
+		return mApp.doExport(mCurRevision, sdPath, filename.toString(), false);
 	}
 	
 	private void updateDataAndList() {

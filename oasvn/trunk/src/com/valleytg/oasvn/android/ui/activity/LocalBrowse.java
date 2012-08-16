@@ -67,6 +67,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 	private static final int DIALOG_CHOSE_ACTION_DIR = 3;
 	private static final int DIALOG_CHOSE_ACTION_FILE = 4;
 	private static final int DIALOG_EXPORT = 5;
+	private static final int DIALOG_COPY = 6;
 	
 	private Context mContext;
 	private OASVNApplication mApp;
@@ -94,8 +95,8 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 				dialog = createChoseActionDialog();
 				break;
 		
-			case DIALOG_EXPORT:
-				dialog = createExportDialog();
+			case DIALOG_COPY:
+				dialog = createCopyDialog();
 				break;
 		}
 		mLoadingDialogType = id;
@@ -105,7 +106,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 	
 	private Dialog createChoseActionDialog() {
 		final CharSequence[] items =
-		{ getResources().getString(R.string.export).toLowerCase() };
+		{ getResources().getString(R.string.copy).toLowerCase() };
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.choose_action);
@@ -115,8 +116,8 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 			{
 				switch (item)
 				{
-					case 0: // export
-						showDialog(DIALOG_EXPORT);
+					case 0: // copy
+						showDialog(DIALOG_COPY);
 						break;
 				}
 			}
@@ -125,7 +126,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		return builder.create();
 	}
 	
-	protected Dialog createExportDialog() {
+	protected Dialog createCopyDialog() {
 		AlertDialog.Builder builder;
 		AlertDialog alertDialog;
 		
@@ -133,19 +134,19 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 				.getSystemService(LAYOUT_INFLATER_SERVICE);
 		View layout = inflater
 				.inflate(
-						R.layout.connection_browse_export_dialog,
-						(ViewGroup) findViewById(R.id.connbrowse_export_dialog_layout_root));
+						R.layout.connection_browse_copy_dialog,
+						(ViewGroup) findViewById(R.id.connbrowse_copy_dialog_layout_root));
 		
-		final EditText path = (EditText) layout.findViewById(R.id.connbrowse_export_dialog_path_edit);
+		final EditText path = (EditText) layout.findViewById(R.id.connbrowse_copy_dialog_path_edit);
 		
 		path.setText(mApp.getRootPath().toString() + "/", TextView.BufferType.EDITABLE);
 		
-		Button save = (Button) layout.findViewById(R.id.connbrowse_export_dialog_save_btn);
+		Button save = (Button) layout.findViewById(R.id.connbrowse_copy_dialog_save_btn);
 		save.setOnClickListener(new OnClickListener() {
 			public void onClick(View v)
 			{
 				mLastExportPath = path.getText().toString();
-				dismissDialog(DIALOG_EXPORT);
+				dismissDialog(DIALOG_COPY);
 				startExport();
 			}
 		});

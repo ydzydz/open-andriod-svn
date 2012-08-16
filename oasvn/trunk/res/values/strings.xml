@@ -127,8 +127,9 @@
   	<string name="browse">Browse</string>
   	<string name="remote_browse">Repo Browse</string>
  	<string name="local_browse">Local Browse</string>
-  	<string name="choose_action">Aktion wählen</string>
+  	<string name="choose_action">Choose action</string>
   	<string name="empty">empty</string>
-
+  	<string name="copy">Copy</string>
+	<string name="choose_copy_path">Please enter the path to copy to.</string>
   	
 </resources>

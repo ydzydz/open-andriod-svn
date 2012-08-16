@@ -127,5 +127,7 @@
   	<string name="local_browse">Lokale Browse</string>
   	<string name="choose_action">Aktion wählen</string>
   	<string name="empty">leer</string>
+  	<string name="copy">Kopieren</string>
+  	<string name="choose_copy_path">Geben Sie bitte neuen Ordner zu Kopieren.</string>
 
 </resources>

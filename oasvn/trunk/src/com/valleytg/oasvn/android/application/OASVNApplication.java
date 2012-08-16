@@ -795,9 +795,11 @@ public class OASVNApplication extends Application {
 	            FileChannel out = new FileOutputStream( destination ).getChannel();
 
 	            out.transferFrom( in, 0, in.size() );
+	            
+	            rValue = getString(R.string.success);
     		}
     		else {
-    			rValue = "Destination is not a valid directory!";
+    			rValue = getString(R.string.directory_write_fail);
     		}
     		
     		
@@ -948,8 +950,7 @@ public class OASVNApplication extends Application {
 	 *            of the object to export
 	 * @return success or failure message
 	 */
-	public String doExport(SVNRevision revision, String sdPath, String svnPath,
-			boolean useWCroot)
+	public String doExport(SVNRevision revision, String sdPath, String svnPath, boolean useWCroot)
 	{
 		try
 		{
@@ -959,12 +960,14 @@ public class OASVNApplication extends Application {
 			// make sure the path is ready
 			initializePath();
 
-			SVNURL myURL = this.currentConnection.getRepositoryURL()
-					.appendPath(svnPath, false);
+			SVNURL myURL = this.currentConnection.getRepositoryURL().appendPath(svnPath, false);
 			File myFile = this.assignPath(sdPath, svnPath, useWCroot);
 			SVNRevision pegRevision = SVNRevision.UNDEFINED;
 			SVNRevision myRevision = revision;
 			SVNDepth depth = SVNDepth.INFINITY;
+			
+			System.out.println("repository url : " + myURL.toString());
+			System.out.println("local path : " + myFile.toString());
 			try
 			{
 				// do the export

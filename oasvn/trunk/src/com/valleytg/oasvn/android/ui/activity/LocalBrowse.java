@@ -1,3 +1,28 @@
+/**
+ * @author brian.gormanly
+ * @author Sascha Zieger
+ * 
+ * OASVN (Open Android SVN)
+ * Copyright (C) 2012 Brian Gormanly
+ * Valley Technologies Group
+ * http://www.valleytg.com
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version. 
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ */
+
 package com.valleytg.oasvn.android.ui.activity;
 
 import java.io.File;
@@ -111,11 +136,11 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 						R.layout.connection_browse_export_dialog,
 						(ViewGroup) findViewById(R.id.connbrowse_export_dialog_layout_root));
 		
-		final EditText path = (EditText) layout
-				.findViewById(R.id.connbrowse_export_dialog_path_edit);
+		final EditText path = (EditText) layout.findViewById(R.id.connbrowse_export_dialog_path_edit);
 		
-		Button save = (Button) layout
-				.findViewById(R.id.connbrowse_export_dialog_save_btn);
+		path.setText(mApp.getRootPath().toString() + "/", TextView.BufferType.EDITABLE);
+		
+		Button save = (Button) layout.findViewById(R.id.connbrowse_export_dialog_save_btn);
 		save.setOnClickListener(new OnClickListener() {
 			public void onClick(View v)
 			{
@@ -139,7 +164,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		mContext = this;
 		mApp = (OASVNApplication) getApplication();
 		mDirCache = new ArrayList<List<File>>();
-		mCurDir = "/";
+		mCurDir = mApp.getCurrentConnection().getFolder().toString() + "/";
 		
 		updateDataAndList();
 		
@@ -151,6 +176,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		File entry = mDirs.get(position);
 		if (entry.isDirectory()) {
 			mCurDir = mCurDir + entry.getName() + "/";
+			System.out.println("new dir:" + mCurDir);
 			updateDataAndList();
 		}
 		else if (entry.isFile())
@@ -190,7 +216,12 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 			}
 			while (mCurDir.endsWith("/") == false && mCurDir.compareTo("") != 0);
 		
-			mDirs = mDirCache.remove(mDirCache.size() - 1);
+			try {
+				mDirs = mDirCache.remove(mDirCache.size() - 1);
+			}
+			catch (Exception e) {
+				this.finish();
+			}
 			updateList();
 		}
 	}
@@ -207,15 +238,15 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 	
 	private String exportSingleElement() {
 		String sdPath = mLastExportPath;
-		String filename = mDirs.get(mLastDialogElem).getName();
+		File file = mDirs.get(mLastDialogElem);
 		
 		if (sdPath.length() > 0 && sdPath.endsWith("/") == false)
 			sdPath += "/";
 		
-		if (sdPath.endsWith(filename) == false)
-			sdPath += filename;
+		if (sdPath.endsWith(file.toString()) == false)
+			sdPath += file.getName();
 		
-		return mApp.doExport(mCurRevision, sdPath, mCurDir + filename, false);
+		return mApp.doLocalCopy(file, new File(sdPath));
 	}
 	
 	private void updateDataAndList() {
@@ -238,15 +269,17 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		File f = new File(mCurDir);
 		File[] files = f.listFiles();
   
-		if(files.length > 0) {
-			for(int i=0; i < files.length; i++) {
-	
-				File file = files[i];
-				mDirs.add(file);
+		if(files != null) {
+			if(files.length > 0) {
+				for(int i=0; i < files.length; i++) {
+		
+					File file = files[i];
+					mDirs.add(file);
+				}
 			}
-		}
-		else {
-			mDirs.add(new File("- " + getResources().getString(R.string.empty) + " -"));
+			else {
+				mDirs.add(new File("- " + getResources().getString(R.string.empty) + " -"));
+			}
 		}
 		
 	}
@@ -266,6 +299,11 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 							Toast.LENGTH_SHORT).show();
 		
 				break;
+		}
+		
+		if(mDirs.size() == 0) {
+			// no files to display
+			Toast.makeText(getApplicationContext(), getResources().getString(R.string.folder_invalid), Toast.LENGTH_SHORT).show();
 		}
 	}
 	
@@ -289,6 +327,8 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 			mLoadingDialog.dismiss();
 			
 			updateList();
+			
+			mLoadingDialogType = -1;
 		}
 	};
 	

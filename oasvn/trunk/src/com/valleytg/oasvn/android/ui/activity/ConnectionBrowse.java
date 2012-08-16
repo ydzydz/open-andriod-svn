@@ -1,4 +1,5 @@
 /**
+ * @author Sascha Zieger
  * @author brian.gormanly
  * OASVN (Open Android SVN)
  * Copyright (C) 2012 Brian Gormanly
@@ -126,18 +127,15 @@ public class ConnectionBrowse extends ListActivity implements Runnable, OnItemLo
 		AlertDialog.Builder builder;
 		AlertDialog alertDialog;
 		
-		LayoutInflater inflater = (LayoutInflater) mContext
-				.getSystemService(LAYOUT_INFLATER_SERVICE);
-		View layout = inflater
-				.inflate(
-						R.layout.connection_browse_export_dialog,
-						(ViewGroup) findViewById(R.id.connbrowse_export_dialog_layout_root));
+		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
+		View layout = inflater.inflate(R.layout.connection_browse_export_dialog,
+				(ViewGroup) findViewById(R.id.connbrowse_export_dialog_layout_root));
 		
-		final EditText path = (EditText) layout
-				.findViewById(R.id.connbrowse_export_dialog_path_edit);
+		final EditText path = (EditText) layout.findViewById(R.id.connbrowse_export_dialog_path_edit);
 		
-		Button save = (Button) layout
-				.findViewById(R.id.connbrowse_export_dialog_save_btn);
+		path.setText(mApp.getRootPath().toString() + "/", TextView.BufferType.EDITABLE);
+		
+		Button save = (Button) layout.findViewById(R.id.connbrowse_export_dialog_save_btn);
 		save.setOnClickListener(new OnClickListener() {
 			public void onClick(View v)
 			{
@@ -237,7 +235,7 @@ public class ConnectionBrowse extends ListActivity implements Runnable, OnItemLo
 		if (sdPath.endsWith(filename) == false)
 			sdPath += filename;
 		
-		return mApp.doExport(mCurRevision, sdPath, mCurDir + filename, false);
+		return mApp.doExport(mCurRevision, sdPath, filename, false);
 	}
 	
 	private void updateDataAndList() {
@@ -311,6 +309,8 @@ public class ConnectionBrowse extends ListActivity implements Runnable, OnItemLo
 			mLoadingDialog.dismiss();
 			
 			updateList();
+			
+			mLoadingDialogType = -1;
 		}
 	};
 	

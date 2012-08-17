@@ -276,8 +276,7 @@ public class OASVNApplication extends Application {
 	 * 
 	 * @return the path as a File.
 	 */
-	public File assignPath()
-	{
+	public File assignPath() {
 		// get the sd card directory
 		File file = null;
 
@@ -286,16 +285,13 @@ public class OASVNApplication extends Application {
 		return file;
 	}
 
-	public File assignPath(String subPath)
-	{
+	public File assignPath(String subPath) {
 		return assignPath("", subPath, true);
 	}
 
-	public File assignPath(String sdPath, String svnPath, boolean useWCroot)
-	{
+	public File assignPath(String sdPath, String svnPath, boolean useWCroot) {
 		// check to see that there is a path
-		try
-		{
+		try {
 			if (this.currentConnection != null
 					&& this.currentConnection.getFolder().length() > 0)
 			{
@@ -310,8 +306,7 @@ public class OASVNApplication extends Application {
 				return file;
 			}
 		}
-		catch (Exception e)
-		{
+		catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -320,7 +315,39 @@ public class OASVNApplication extends Application {
     
 	// end contributed code
 	
-	
+	/**
+	 * Creates path of File path given.  Will look backwards through the 
+	 * path to create the entire folder structure needed, not just the 
+	 * top level folder.
+	 * @param path full directory path to be created. Can include part existing
+	 * and new path.
+	 */
+	public void createPath(File path) {
+		// folder does not yet exist, create it.
+		System.out.println("Going to create : " + path.toString());
+		// check to see if the parent exists and try to create
+		int counter = 0;
+		File parentFile = path.getParentFile();
+		while (!parentFile.exists()) {
+			counter++;
+			parentFile = parentFile.getParentFile();
+		}
+		
+		System.out.println("counter reached : " + counter);
+		int counter2 = counter;
+		for(int i=0; i<counter; i++) {
+			File itFile = path;
+			for(int j=0; j<counter2; j++) {
+				itFile = itFile.getParentFile();
+				
+			}
+			itFile.mkdir();
+			System.out.println("Folder created : " + itFile);
+			counter2--;
+		}
+		path.mkdir();
+		System.out.println("Folder(s) created");
+	}
     
     public void deleteRecursive(File tree) {
     	if (tree.isDirectory())
@@ -370,9 +397,9 @@ public class OASVNApplication extends Application {
 	    	
 		    if(!folder.exists()){
 		    	// folder does not yet exist, create it.
-		         folder.mkdir();
-		         this.setRootPath(folder);
-		         Log.i(getString(R.string.FILE), getString(R.string.directory_created)); 
+		    	createPath(folder);
+		    	this.setRootPath(folder);
+		    	Log.i(getString(R.string.FILE), getString(R.string.directory_created)); 
 		    }
 		    else {
 		    	// folder already exists
@@ -570,8 +597,7 @@ public class OASVNApplication extends Application {
 	 * @return ArrayList<SVNDirEntry> - Contains all directories as objects
 	 */
 	@SuppressWarnings("unchecked")
-	public Collection<SVNDirEntry> getAllDirectories(SVNRevision revision,
-			String subPath)
+	public Collection<SVNDirEntry> getAllDirectories(SVNRevision revision, String subPath)
 	{
 		// initialize the auth manager
 		this.initAuthManager();
@@ -781,9 +807,8 @@ public class OASVNApplication extends Application {
     		// create the local path
     		if(!new File(destination.getParent()).exists()){
 		    	// folder does not yet exist, create it.
-				new File(destination.getParent()).mkdir();
-    			
-    			System.out.println("Folder created");
+				createPath(new File(destination.getParent()));
+
     		}
     		
     		System.out.println("is Directory: " + new File(destination.getParent()).isDirectory());
@@ -836,7 +861,7 @@ public class OASVNApplication extends Application {
     		// create the local path
     		if(!newFolder.exists()){
 		    	// folder does not yet exist, create it.
-    			newFolder.mkdir();
+    			createPath(newFolder);
     			System.out.println("Folder created");
     		}
     		
@@ -936,7 +961,8 @@ public class OASVNApplication extends Application {
 
 	public String doExport(SVNRevision revision, String subPath)
 	{
-		return doExport(revision, "", subPath,true);
+		SVNURL svnDir = this.currentConnection.getRepositoryURL();
+		return doExport(revision, new File(this.currentConnection.getFolder()), svnDir, true);
 	}
 	
 	/**
@@ -950,18 +976,25 @@ public class OASVNApplication extends Application {
 	 *            of the object to export
 	 * @return success or failure message
 	 */
-	public String doExport(SVNRevision revision, String sdPath, String svnPath, boolean useWCroot)
+	public String doExport(SVNRevision revision, File sdPath, SVNURL svnPath, boolean useWCroot)
 	{
 		try
 		{
 			// initialize the auth manager
-			this.initAuthManager();
-
-			// make sure the path is ready
-			initializePath();
-
-			SVNURL myURL = this.currentConnection.getRepositoryURL().appendPath(svnPath, false);
-			File myFile = this.assignPath(sdPath, svnPath, useWCroot);
+    		this.initAuthManager();
+    		
+    		// make sure the path is ready
+    		initializePath();
+    		
+    		// create the local path
+    		if(!sdPath.exists()){
+		    	// folder does not yet exist, create it.
+    			createPath(sdPath);
+    		}
+    		System.out.println(svnPath.toString());
+    		SVNURL myURL = svnPath;
+    		File myFile = sdPath;
+    		
 			SVNRevision pegRevision = SVNRevision.UNDEFINED;
 			SVNRevision myRevision = revision;
 			SVNDepth depth = SVNDepth.INFINITY;

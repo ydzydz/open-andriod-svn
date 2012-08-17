@@ -162,14 +162,19 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.connection_browse);
 		
-		mContext = this;
-		mApp = (OASVNApplication) getApplication();
-		mDirCache = new ArrayList<List<File>>();
-		mCurDir = mApp.getCurrentConnection().getFolder().toString() + "/";
-		
-		updateDataAndList();
-		
-		getListView().setOnItemLongClickListener(this);
+		try {
+			mContext = this;
+			mApp = (OASVNApplication) getApplication();
+			mDirCache = new ArrayList<List<File>>();
+			mCurDir = mApp.getCurrentConnection().getFolder().toString() + "/";
+			
+			updateDataAndList();
+			
+			getListView().setOnItemLongClickListener(this);
+		}
+		catch(Exception e) {
+			this.finish();
+		}
 	}
 	
 	@Override

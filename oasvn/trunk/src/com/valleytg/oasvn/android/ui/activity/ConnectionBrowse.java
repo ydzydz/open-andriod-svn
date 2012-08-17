@@ -33,6 +33,7 @@ import java.util.List;
 
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import android.app.AlertDialog;
@@ -156,13 +157,18 @@ public class ConnectionBrowse extends ListActivity implements Runnable, OnItemLo
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.connection_browse);
 		
-		mContext = this;
-		mApp = (OASVNApplication) getApplication();
-		mDirCache = new ArrayList<List<SVNDirEntry>>();
-		
-		updateDataAndList();
-		
-		getListView().setOnItemLongClickListener(this);
+		try {
+			mContext = this;
+			mApp = (OASVNApplication) getApplication();
+			mDirCache = new ArrayList<List<SVNDirEntry>>();
+			
+			updateDataAndList();
+			
+			getListView().setOnItemLongClickListener(this);
+		}
+		catch(Exception e) {
+			this.finish();
+		}
 	}
 	
 	@Override
@@ -227,19 +233,19 @@ public class ConnectionBrowse extends ListActivity implements Runnable, OnItemLo
 	
 	private String exportSingleElement() {
 		String sdPath = mLastExportPath;
-		SVNDirEntry filename = mDirs.get(mLastDialogElem);
+		SVNDirEntry url = mDirs.get(mLastDialogElem);
 		
 		if (sdPath.length() > 0 && sdPath.endsWith("/") == false)
 			sdPath += "/";
 		
-		if (sdPath.endsWith(filename.toString()) == false)
-			sdPath += filename.getName();
+		if (sdPath.endsWith(url.toString()) == false)
+			sdPath += url.getName();
 		
 		System.out.println("mDirs : " + mDirs.toString());
 		System.out.println("sdPath : " + sdPath);
-		System.out.println("filename : " + filename);
+		System.out.println("filename : " + url);
 		
-		return mApp.doExport(mCurRevision, sdPath, filename.toString(), false);
+		return mApp.doExport(mCurRevision, new File(sdPath), url.getURL(), false);
 	}
 	
 	private void updateDataAndList() {

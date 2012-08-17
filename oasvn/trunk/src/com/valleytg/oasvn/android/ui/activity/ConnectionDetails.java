@@ -976,8 +976,11 @@ public class ConnectionDetails extends Activity {
             			}
             			else {
             				ready = true;
+            				app.createPath(file);
             			}
 
+            			System.out.println("file : " + file.toString());
+            			System.out.println("can write :" + file.canWrite());
             			// double check that we can write to the path and it is valid
             			if (!file.canWrite() ) {
             				Toast.makeText(ConnectionDetails.this, getString(R.string.directory_write_fail), 5000).show();	

@@ -842,6 +842,59 @@ public class OASVNApplication extends Application {
     	return rValue;
     }
     
+    /**
+     * Does an copy of the local file to the destination provided.  
+     * @param source - file to be copied
+     * @param destination - path to copy the file to
+     * @return success or failure message
+     */
+    public String doLocalMove(File source, File destination) {
+    	String rValue = "";
+    	
+    	System.out.println("Source : " + source + " Destination : " + destination);
+    	try {
+    		
+    		// create the local path
+    		if(!new File(destination.getParent()).exists()){
+		    	// folder does not yet exist, create it.
+				createPath(new File(destination.getParent()));
+
+    		}
+    		
+    		System.out.println("is Directory: " + new File(destination.getParent()).isDirectory());
+    		System.out.println("is Writable : " + new File(destination.getParent()).canWrite());
+    		// check to see that the destination is a directory
+    		if(new File(destination.getParent()).isDirectory() && new File(destination.getParent()).canWrite()) {
+	    		
+	    		FileChannel in = new FileInputStream( source ).getChannel();
+	            FileChannel out = new FileOutputStream( destination ).getChannel();
+
+	            out.transferFrom( in, 0, in.size() );
+	            
+	            // delete the org
+	            source.delete();
+	            
+	            rValue = getString(R.string.success);
+    		}
+    		else {
+    			rValue = getString(R.string.directory_write_fail);
+    		}
+    		
+    		
+    	}
+    	catch(Exception e) {
+			String msg = e.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
+			
+			e.printStackTrace();
+			return getString(R.string.exception) + " " + msg;
+		}
+    	
+    	return rValue;
+    }
+    
     
     /**
      * Does an export of the local folder to the folder provided.  This does  

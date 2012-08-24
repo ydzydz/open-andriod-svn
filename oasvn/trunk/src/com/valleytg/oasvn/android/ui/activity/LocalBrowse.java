@@ -68,6 +68,8 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 	private static final int DIALOG_CHOSE_ACTION_FILE = 4;
 	private static final int DIALOG_EXPORT = 5;
 	private static final int DIALOG_COPY = 6;
+	private static final int DIALOG_MOVE = 7;
+	private static final int DIALOG_WAIT_MOVE = 8;
 	
 	private Context mContext;
 	private OASVNApplication mApp;
@@ -98,6 +100,9 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 			case DIALOG_COPY:
 				dialog = createCopyDialog();
 				break;
+				
+			case DIALOG_MOVE:
+				dialog = createMoveDialog();
 		}
 		mLoadingDialogType = id;
 		
@@ -105,8 +110,10 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 	}
 	
 	private Dialog createChoseActionDialog() {
-		final CharSequence[] items =
-		{ getResources().getString(R.string.copy).toLowerCase() };
+		final CharSequence[] items = { 
+				getResources().getString(R.string.copy).toLowerCase(),
+				getResources().getString(R.string.move).toLowerCase()
+				};
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.choose_action);
@@ -118,6 +125,10 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 				{
 					case 0: // copy
 						showDialog(DIALOG_COPY);
+						break;
+						
+					case 1: // move
+						showDialog(DIALOG_MOVE);
 						break;
 				}
 			}
@@ -156,6 +167,38 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		
 		return builder.create();
 	}
+	
+	protected Dialog createMoveDialog() {
+		AlertDialog.Builder builder;
+		AlertDialog alertDialog;
+		
+		LayoutInflater inflater = (LayoutInflater) mContext
+				.getSystemService(LAYOUT_INFLATER_SERVICE);
+		View layout = inflater
+				.inflate(
+						R.layout.connection_browse_move_dialog,
+						(ViewGroup) findViewById(R.id.connbrowse_move_dialog_layout_root));
+		
+		final EditText path = (EditText) layout.findViewById(R.id.connbrowse_move_dialog_path_edit);
+		
+		path.setText(mApp.getRootPath().toString() + "/", TextView.BufferType.EDITABLE);
+		
+		Button save = (Button) layout.findViewById(R.id.connbrowse_move_dialog_save_btn);
+		save.setOnClickListener(new OnClickListener() {
+			public void onClick(View v)
+			{
+				mLastExportPath = path.getText().toString();
+				dismissDialog(DIALOG_MOVE);
+				startMove();
+			}
+		});
+		
+		builder = new AlertDialog.Builder(mContext);
+		builder.setView(layout);
+		
+		return builder.create();
+	}
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -242,6 +285,16 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		thread.start();
 	}
 	
+	private void startMove() {
+		mLoadingDialog = ProgressDialog.show(this, "", getResources()
+				.getString(R.string.performing_export), true, false);
+		
+		mLoadingDialogType = DIALOG_WAIT_MOVE;
+		
+		Thread thread = new Thread(this);
+		thread.start();
+	}
+	
 	private String exportSingleElement() {
 		String sdPath = mLastExportPath;
 		File file = mDirs.get(mLastDialogElem);
@@ -253,6 +306,19 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 			sdPath += file.getName();
 		
 		return mApp.doLocalCopy(file, new File(sdPath));
+	}
+	
+	private String moveSingleElement() {
+		String sdPath = mLastExportPath;
+		File file = mDirs.get(mLastDialogElem);
+		
+		if (sdPath.length() > 0 && sdPath.endsWith("/") == false)
+			sdPath += "/";
+		
+		if (sdPath.endsWith(file.toString()) == false)
+			sdPath += file.getName();
+		
+		return mApp.doLocalMove(file, new File(sdPath));
 	}
 	
 	private void updateDataAndList() {
@@ -320,6 +386,9 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 				break;
 			case DIALOG_WAIT_EXPORT:
 				mExportMsg = exportSingleElement();
+				break;
+			case DIALOG_WAIT_MOVE:
+				mExportMsg = moveSingleElement();
 				break;
 		}
 		

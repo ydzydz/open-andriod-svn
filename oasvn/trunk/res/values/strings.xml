@@ -130,6 +130,9 @@
   	<string name="choose_action">Choose action</string>
   	<string name="empty">empty</string>
   	<string name="copy">Copy</string>
+  	<string name="move">Move</string>
 	<string name="choose_copy_path">Please enter the path to copy to.</string>
+	<string name="choose_move_path">Please enter the path to move to.</string>
+  	<string name="performing_move">Performing Move!!!</string>
   	
 </resources>

@@ -52,6 +52,7 @@ Context mContext;
 	
 	public DatabaseHelper(Context context, OASVNApplication app) {
 		super(context, DB_NAME, null, VERSION);
+		this.app = app;
 		mContext = context;
 	}
 
@@ -85,9 +86,12 @@ Context mContext;
 		}
 		
 		if(newVersion == 3) {
+			// make sure get get all the existing connections
+			app.retrieveAllConnections(db);
+			
 			try {
 				for(Connection thisConn : app.getAllConnections()) {
-					thisConn.setFolder(app.getRootPath() + thisConn.getFolder());
+					thisConn.setFolder(app.getRootPath() + "/" + thisConn.getFolder());
 					thisConn.saveToLocalDB(app);
 				}
 			}

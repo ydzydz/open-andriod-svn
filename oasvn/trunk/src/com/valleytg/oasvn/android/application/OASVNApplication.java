@@ -986,11 +986,14 @@ public class OASVNApplication extends Application {
     		// make sure the path is ready
     		initializePath();
     		
+    		// get the parent folder
+    		File parentFolder = sdPath.getParentFile();
     		// create the local path
-    		if(!sdPath.exists()){
+    		if(!parentFolder.exists()){
 		    	// folder does not yet exist, create it.
-    			createPath(sdPath);
+    			createPath(parentFolder);
     		}
+    		
     		System.out.println(svnPath.toString());
     		SVNURL myURL = svnPath;
     		File myFile = sdPath;
@@ -1333,6 +1336,11 @@ public class OASVNApplication extends Application {
     /**
      * Local member special methods
      */
+    public void retrieveAllConnections(SQLiteDatabase database) {
+    	this.setDatabase(database);
+    	retrieveAllConnections();
+    	
+    }
     
     /**
      * Get all stored connections from the local database

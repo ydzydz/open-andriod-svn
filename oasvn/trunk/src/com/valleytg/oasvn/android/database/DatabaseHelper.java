@@ -25,6 +25,7 @@ package com.valleytg.oasvn.android.database;
 
 import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.application.OASVNApplication;
+import com.valleytg.oasvn.android.model.Connection;
 
 import android.content.Context;
 import android.database.SQLException;
@@ -44,14 +45,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 Context mContext;
 	
 	public static final String DB_NAME = "OASVN";
-	public static final int VERSION = 2;
+	public static final int VERSION = 3;
 	
 	public String pNumber;
+	OASVNApplication app;
 	
 	public DatabaseHelper(Context context, OASVNApplication app) {
 		super(context, DB_NAME, null, VERSION);
 		mContext = context;
-		
 	}
 
 	@Override
@@ -62,25 +63,42 @@ Context mContext;
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// upgrades will go here
-		
-		try {
-			String[] sql = mContext.getString(R.string.db_update_1_1).split("\n");
-			db.beginTransaction();
+		if(newVersion == 2) {
 			try {
-				// Create tables & test data
-				execMultipleSQL(db, sql);
-				db.setTransactionSuccessful();
-				Log.d("Database upgrade", "Database upgrade successful!");
-			} catch (SQLException e) {
-	            Log.e("Error creating tables and debug data", e.toString());
-	        } finally {
-	        	db.endTransaction();
-	        }
-			
+				String[] sql = mContext.getString(R.string.db_update_1_1).split("\n");
+				db.beginTransaction();
+				try {
+					// Create tables & test data
+					execMultipleSQL(db, sql);
+					db.setTransactionSuccessful();
+					Log.d("Database upgrade", "Database upgrade successful!");
+				} catch (SQLException e) {
+		            Log.e("Error creating tables and debug data", e.toString());
+		        } finally {
+		        	db.endTransaction();
+		        }
+				
+			}
+			catch(SQLException e) {
+				Log.e("Database upgrade for version 1.1.0 failed", e.toString());
+			}
 		}
-		catch(SQLException e) {
-			Log.e("Database upgrade for version 1.1.0 failed", e.toString());
+		
+		if(newVersion == 3) {
+			try {
+				for(Connection thisConn : app.getAllConnections()) {
+					thisConn.setFolder(app.getRootPath() + thisConn.getFolder());
+					thisConn.saveToLocalDB(app);
+				}
+			}
+			catch (SQLException se) {
+				Log.e("Database upgrade for version 3 failed", se.toString());
+			}
+			catch (Exception e) {
+				Log.e("Database upgrade for version 3 failed", e.toString());
+			}
 		}
+		
 	}
 	
 	/**

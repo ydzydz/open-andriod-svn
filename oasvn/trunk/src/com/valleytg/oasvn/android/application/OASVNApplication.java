@@ -42,6 +42,8 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNCommitClient;
 import org.tmatesoft.svn.core.wc.SVNRevision;
+import org.tmatesoft.svn.core.wc.SVNStatus;
+import org.tmatesoft.svn.core.wc.SVNTreeConflictDescription;
 import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCClient;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
@@ -1119,6 +1121,19 @@ public class OASVNApplication extends Application {
     
     // end contributed code
     
+	/**
+	 * Check the working copy for any conflicts
+	 * @param status - SVN Status
+	 * @return SVNTreeConflictDescription if null there were no conflicts, 
+	 * if not null, contains conflict information
+	 */
+	public SVNTreeConflictDescription checkForConflicts(SVNStatus status) {
+		
+		SVNTreeConflictDescription desc = null;
+		SVNTreeConflictDescription treeConflict = status.getTreeConflict();
+		
+		return desc;
+	}
     
     
     /**
@@ -1200,39 +1215,56 @@ public class OASVNApplication extends Application {
     		SVNRevision pegRevision = SVNRevision.UNDEFINED;
     		SVNRevision myRevision = SVNRevision.HEAD;
     		SVNDepth depth = SVNDepth.INFINITY;
-    		try {
-    			// do the checkout
-    			rev = updateClient.doUpdate(myFile, myRevision, SVNDepth.INFINITY, false, true);
-    			
-    			// log this success
-    			this.getCurrentConnection().createLogEntry(this, getString(R.string.update), " ", getString(R.string.revision) + " " + rev.toString());
+    		
+    		// get the svn status of the server and the working copy
+    		SVNStatus remoteStatus = clientManager.getStatusClient().doStatus(new File(this.currentConnection.getFolder()), true);
+    		SVNStatus localStatus = clientManager.getStatusClient().doStatus(new File(this.currentConnection.getFolder()), false);
+    		
+    		// check the status
+    		SVNTreeConflictDescription remote = this.checkForConflicts(remoteStatus);
+    		SVNTreeConflictDescription local = this.checkForConflicts(localStatus);
+    		
+    		if(remote == null && local == null) {
+    			try {
+        			// do the checkout
+        			rev = updateClient.doUpdate(myFile, myRevision, SVNDepth.INFINITY, false, true);
+        			
+        			// log this success
+        			this.getCurrentConnection().createLogEntry(this, getString(R.string.update), " ", getString(R.string.revision) + " " + rev.toString());
+        		}
+        		catch(SVNException se) {
+        			String msg = se.getMessage();
+        			
+        			// log this failure
+        			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
+        			
+        			return msg;
+        		}
+        		catch(VerifyError ve) {
+        			String msg = ve.getMessage();
+        			
+        			// log this failure
+        			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
+        			
+        			ve.printStackTrace();
+        			return getString(R.string.verify) + " " + msg;
+        		}
+        		catch(Exception e) {
+        			String msg = e.getMessage();
+        			
+        			// log this failure
+        			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
+        			
+        			e.printStackTrace();
+        			return getString(R.string.exception) + " " + msg;
+        		}
     		}
-    		catch(SVNException se) {
-    			String msg = se.getMessage();
-    			
-    			// log this failure
-    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
-    			
-    			return msg;
+    		else {
+    			System.out.println("remote Status: " + remote.getConflictReason().getName().toString());
+    			System.out.println("local Status: " + local.getConflictReason().getName().toString());
     		}
-    		catch(VerifyError ve) {
-    			String msg = ve.getMessage();
-    			
-    			// log this failure
-    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
-    			
-    			ve.printStackTrace();
-    			return getString(R.string.verify) + " " + msg;
-    		}
-    		catch(Exception e) {
-    			String msg = e.getMessage();
-    			
-    			// log this failure
-    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
-    			
-    			e.printStackTrace();
-    			return getString(R.string.exception) + " " + msg;
-    		}
+    		
+    		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

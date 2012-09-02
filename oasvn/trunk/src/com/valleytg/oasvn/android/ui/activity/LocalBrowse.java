@@ -35,6 +35,8 @@ import java.util.List;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.wc.SVNRevision;
+import org.tmatesoft.svn.core.wc.SVNStatus;
+import org.tmatesoft.svn.core.wc.SVNStatusType;
 
 import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.application.OASVNApplication;
@@ -259,8 +261,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 			super.onBackPressed();
 		else
 		{
-			do
-			{
+			do {
 				mCurDir = mCurDir.substring(0, mCurDir.length() - 1);
 			}
 			while (mCurDir.endsWith("/") == false && mCurDir.compareTo("") != 0);
@@ -337,6 +338,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 			mDirCacheInit = true;
 		
 		mDirs = new ArrayList<File>();
+
 		
 		File f = new File(mCurDir);
 		File[] files = f.listFiles();
@@ -346,7 +348,21 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 				for(int i=0; i < files.length; i++) {
 		
 					File file = files[i];
-					mDirs.add(file);
+					
+					// is there a conflict?
+					SVNStatus status = mApp.isFileInConflict(file);
+					if(status != null) {
+						if(status.getContentsStatus() == SVNStatusType.STATUS_CONFLICTED || status.getContentsStatus() == SVNStatusType.STATUS_MODIFIED) {
+							File temp = new File(file + " - " + status.getContentsStatus());
+							mDirs.add(temp);
+						}
+						else {
+							mDirs.add(file);
+						}
+					}
+					else {
+						mDirs.add(file);
+					}
 				}
 			}
 			else {

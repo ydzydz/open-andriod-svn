@@ -43,6 +43,8 @@ import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNCommitClient;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNStatus;
+import org.tmatesoft.svn.core.wc.SVNStatusClient;
+import org.tmatesoft.svn.core.wc.SVNStatusType;
 import org.tmatesoft.svn.core.wc.SVNTreeConflictDescription;
 import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCClient;
@@ -161,6 +163,11 @@ public class OASVNApplication extends Application {
     private SVNWCUtil wcUtil;
     
     /**
+     * Contains the Status of any interesting file status.
+     */
+    private ArrayList<SVNStatus> problemFiles = new ArrayList<SVNStatus>();
+    
+    /**
      * 
      */
     private SVNCommitInfo info;
@@ -169,7 +176,6 @@ public class OASVNApplication extends Application {
      * Commit comments
      */
     private String commitComments = "";
-    
     
     /**
      * Constructor
@@ -1127,13 +1133,11 @@ public class OASVNApplication extends Application {
 	 * @return SVNTreeConflictDescription if null there were no conflicts, 
 	 * if not null, contains conflict information
 	 */
-	public SVNTreeConflictDescription checkForConflicts(SVNStatus status) {
-		
-		SVNTreeConflictDescription desc = null;
-		SVNTreeConflictDescription treeConflict = status.getTreeConflict();
-		
-		return desc;
+	private void showStatus(File wcPath, boolean isRecursive, boolean isRemote, boolean isReportAll, boolean isIncludeIgnored, boolean isCollectParentExternals) throws SVNException {
+		clientManager.getStatusClient( ).doStatus(wcPath, isRecursive, isRemote, isReportAll, isIncludeIgnored, isCollectParentExternals, new StatusHandler(isRemote, this));
 	}
+	
+
     
     
     /**
@@ -1217,14 +1221,40 @@ public class OASVNApplication extends Application {
     		SVNDepth depth = SVNDepth.INFINITY;
     		
     		// get the svn status of the server and the working copy
-    		SVNStatus remoteStatus = clientManager.getStatusClient().doStatus(new File(this.currentConnection.getFolder()), true);
-    		SVNStatus localStatus = clientManager.getStatusClient().doStatus(new File(this.currentConnection.getFolder()), false);
+    		//SVNStatus remoteStatus = clientManager.getStatusClient().doStatus(new File(this.currentConnection.getFolder()), true);
+    		//SVNStatus localStatus = clientManager.getStatusClient().doStatus(new File(this.currentConnection.getFolder()), false);
     		
     		// check the status
-    		SVNTreeConflictDescription remote = this.checkForConflicts(remoteStatus);
-    		SVNTreeConflictDescription local = this.checkForConflicts(localStatus);
+    		//Boolean remote = this.checkForConflicts(remoteStatus);
+    		//Boolean local = this.checkForConflicts(localStatus);
     		
-    		if(remote == null && local == null) {
+    		//SVNStatusClient thisStatus = clientManager.getStatusClient();
+    		//thisStatus.doStatus(myFile, true, true, true, true, new StatusHandler(true));
+    		//thisStatus.doStatus(myFile, true, false, true, true, new StatusHandler(false));
+    		
+    		// Clear out the problemFiles
+        	this.problemFiles.clear();
+        	
+    		try {
+                /*
+                 * gets and shows status information for the WC directory.
+                 * status will be recursive on wcDir, will also cover the repository, 
+                 * won't cover unmodified entries, will disregard 'svn:ignore' property 
+                 * ignores (if any), will ignore externals definitions.
+                 */
+                showStatus( myFile , true , true , false , true , false );
+            } catch ( SVNException svne ) {
+                System.out.println( "error while recursively performing status for '" + myFile.getAbsolutePath( ) + "'");
+            }
+    		
+    		// check to see if there are any conflicts, etc.
+    		for(SVNStatus problems: this.problemFiles) {
+    			SVNStatusType thisStatus = problems.getContentsStatus();
+    		}
+    		
+    		
+    		
+    		//if(remote && local) {
     			try {
         			// do the checkout
         			rev = updateClient.doUpdate(myFile, myRevision, SVNDepth.INFINITY, false, true);
@@ -1241,7 +1271,7 @@ public class OASVNApplication extends Application {
         			return msg;
         		}
         		catch(VerifyError ve) {
-        			String msg = ve.getMessage();
+        			String msg = ve.getLocalizedMessage() + "\n" + ve.toString() + "\n" + ve.hashCode() + "\n" + ve.getMessage();
         			
         			// log this failure
         			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
@@ -1258,11 +1288,13 @@ public class OASVNApplication extends Application {
         			e.printStackTrace();
         			return getString(R.string.exception) + " " + msg;
         		}
+    		/*
     		}
     		else {
-    			System.out.println("remote Status: " + remote.getConflictReason().getName().toString());
-    			System.out.println("local Status: " + local.getConflictReason().getName().toString());
+    			System.out.println("remote Status: " + remote.toString());
+    			System.out.println("local Status: " + local.toString());
     		}
+    		*/
     		
     		
 		} catch (Exception e) {
@@ -1413,9 +1445,25 @@ public class OASVNApplication extends Application {
 
     }
     
-    //public ArrayList<Revision> getAllRevisions() {
-    //	lookClient.
-    //}
+    
+    /**
+     * Check to see if this file is known 
+     * @param fileToCheck
+     * @return
+     */
+    public SVNStatus isFileInConflict(File fileToCheck) {
+    	Boolean conflict = false;
+    	
+    	if(this.problemFiles.size() > 0) {
+    		for(SVNStatus status : this.problemFiles) {
+    			String thisPath = status.getFile().getPath();
+	    		if(fileToCheck.toString().equals(thisPath)) {
+	    			return status;
+	    		}
+    		}
+    	}
+    	return null;
+    }
     
     
     /**
@@ -1622,5 +1670,13 @@ public class OASVNApplication extends Application {
 
 	public SVNWCUtil getWcUtil() {
 		return wcUtil;
+	}
+
+	public ArrayList<SVNStatus> getProblemFiles() {
+		return problemFiles;
+	}
+
+	public void setProblemFiles(ArrayList<SVNStatus> problemFiles) {
+		this.problemFiles = problemFiles;
 	}
 }

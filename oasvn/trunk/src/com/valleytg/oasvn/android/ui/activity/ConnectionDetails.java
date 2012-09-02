@@ -32,7 +32,6 @@ import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.application.OASVNApplication;
 import com.valleytg.oasvn.android.model.Connection;
 import com.valleytg.oasvn.android.ui.activity.ConnectionDetails;
-import com.valleytg.oasvn.android.ui.activity.Revisions.RetrieveRevisionsThread;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -40,12 +39,9 @@ import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Looper;
-import android.text.InputFilter;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -229,7 +225,6 @@ public class ConnectionDetails extends Activity {
 	
 	@Override
 	protected void onRestart() {
-		// TODO Auto-generated method stub
 		super.onRestart();
 		
 		// populate the top
@@ -238,7 +233,6 @@ public class ConnectionDetails extends Activity {
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 		
 		// populate the top
@@ -249,7 +243,6 @@ public class ConnectionDetails extends Activity {
 
 	@Override
 	public void finish() {
-		// TODO Auto-generated method stub
 		super.finish();
 		
 		app.setCurrentConnection(null);

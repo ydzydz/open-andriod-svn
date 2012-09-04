@@ -37,10 +37,16 @@ import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
+import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
+import org.tmatesoft.svn.core.wc.ISVNConflictHandler;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNCommitClient;
+import org.tmatesoft.svn.core.wc.SVNConflictChoice;
+import org.tmatesoft.svn.core.wc.SVNConflictDescription;
+import org.tmatesoft.svn.core.wc.SVNConflictResult;
+import org.tmatesoft.svn.core.wc.SVNInfo;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNStatus;
 import org.tmatesoft.svn.core.wc.SVNStatusClient;
@@ -121,39 +127,6 @@ public class OASVNApplication extends Application {
      * The SVNClientManager class is used to manage SVN*Client objects
      */
     private SVNClientManager clientManager;
-    
-    /**
-     * The SVNLookClient class provides API for examining different aspects of a 
-     * Subversion repository. Its functionality is similar to the one of the 
-     * Subversion command-line utility called svnlook. The following table matches 
-     * methods of SVNLookClient to the corresponding commands of the svnlook 
-     * utility (to make sense what its different methods are for):
-     */
-    private SVNLookClient lookClient;
-    
-    /**
-     * This class provides methods which allow to check out, update, switch and 
-     * relocate a Working Copy as well as export an unversioned directory or file 
-     * from a repository.
-     */
-    private SVNUpdateClient updateClient;
-    
-    /**
-     * The SVNCommitClient class provides methods to perform operations that relate 
-     * to committing changes to an SVN repository. These operations are similar to 
-     * respective commands of the native SVN command line client and include ones 
-     * which operate on working copy items as well as ones that operate only on a 
-     * repository.
-     */
-    private SVNCommitClient commitClient;
-    
-    /**
-     * The SVNWCClient class combines a number of version control operations mainly 
-     * intended for local work with Working Copy items. This class includes those 
-     * operations that are destined only for local work on a Working Copy as well 
-     * as those that are moreover able to access a repository.
-     */
-    private SVNWCClient wcClient;
     
     /**
      * The SVNWCUtil is a utility class providing some common methods used by 
@@ -260,17 +233,6 @@ public class OASVNApplication extends Application {
     }
     
     public void initManagerChildren() {
-    	// Update Client
-    	updateClient = clientManager.getUpdateClient();
-    	
-    	// Commit Client
-    	commitClient = clientManager.getCommitClient();
-    	
-    	// look client
-    	lookClient = clientManager.getLookClient();
-    	
-    	// Working copy client
-    	wcClient = new SVNWCClient(this.myAuthManager, null); 
     	
     	// working copy util
     	wcUtil = new SVNWCUtil();
@@ -748,7 +710,7 @@ public class OASVNApplication extends Application {
     		SVNDepth depth = SVNDepth.INFINITY;
     		try {
     			// do the checkout
-    			Long rev = updateClient.doCheckout(myURL, myFile, pegRevision, myRevision, depth, true);
+    			Long rev = clientManager.getUpdateClient().doCheckout(myURL, myFile, pegRevision, myRevision, depth, true);
     			
     			// log this success
     			this.getCurrentConnection().createLogEntry(this, getString(R.string.checkout), "", getString(R.string.revision) + " " + rev.toString());
@@ -933,7 +895,7 @@ public class OASVNApplication extends Application {
     		SVNDepth depth = SVNDepth.INFINITY;
     		try {
     			// do the export
-    			Long rev = updateClient.doExport(myURL, myFile, pegRevision, myRevision, null, true, depth);
+    			Long rev = clientManager.getUpdateClient().doExport(myURL, myFile, pegRevision, myRevision, null, true, depth);
     			
     			// log this success
     			this.getCurrentConnection().createLogEntry(this, getString(R.string.export), "", getString(R.string.revision) + " " + rev.toString());
@@ -1068,7 +1030,7 @@ public class OASVNApplication extends Application {
 			try
 			{
 				// do the export
-				Long rev = updateClient.doExport(myURL, myFile, pegRevision,
+				Long rev = clientManager.getUpdateClient().doExport(myURL, myFile, pegRevision,
 						myRevision, null, true, depth);
 
 				// log this success
@@ -1134,11 +1096,37 @@ public class OASVNApplication extends Application {
 	 * if not null, contains conflict information
 	 */
 	private void showStatus(File wcPath, boolean isRecursive, boolean isRemote, boolean isReportAll, boolean isIncludeIgnored, boolean isCollectParentExternals) throws SVNException {
-		clientManager.getStatusClient( ).doStatus(wcPath, isRecursive, isRemote, isReportAll, isIncludeIgnored, isCollectParentExternals, new StatusHandler(isRemote, this));
+		
+		// Clear out the problemFiles
+    	this.problemFiles.clear();
+    	
+		try {
+            /*
+             * gets and shows status information for the WC directory.
+             * status will be recursive on wcDir, will also cover the repository, 
+             * won't cover unmodified entries, will disregard 'svn:ignore' property 
+             * ignores (if any), will ignore externals definitions.
+             */
+            clientManager.getStatusClient( ).doStatus(wcPath, isRecursive, isRemote, isReportAll, isIncludeIgnored, isCollectParentExternals, new StatusHandler(isRemote, this));
+        } 
+		catch (SVNException se) {
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
+			se.printStackTrace();
+		} 
+		catch(Exception e) {
+			String msg = e.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getMessage().substring(0, 19), e.getMessage().toString());
+
+		}
+		
+		
+		
 	}
 	
 
-    
     
     /**
      * Does a full commit to the repository
@@ -1156,9 +1144,9 @@ public class OASVNApplication extends Application {
 		SVNRevision myRevision = SVNRevision.HEAD;
 		
 		try {
-			wcClient.doAdd(myFile, true, false, false, SVNDepth.INFINITY, false, 
-			false, false);
-		} catch (SVNException se) {
+			clientManager.getWCClient().doAdd(myFile, true, false, false, SVNDepth.INFINITY, false, false, false);
+		} 
+		catch (SVNException se) {
 			// log this failure
 			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
 			se.printStackTrace();
@@ -1174,7 +1162,7 @@ public class OASVNApplication extends Application {
 		
 
 		try {
-			setInfo(commitClient.doCommit(new File[] {myFile} , false, this.commitComments , false , true));
+			setInfo(clientManager.getCommitClient().doCommit(new File[] {myFile} , false , this.commitComments , false , true ));
 			System.out.println("Revision " + getInfo().getNewRevision());
 			
 			// check to see if the commit revision is -1 (means nothing was committed - no change)
@@ -1219,45 +1207,17 @@ public class OASVNApplication extends Application {
     		SVNRevision pegRevision = SVNRevision.UNDEFINED;
     		SVNRevision myRevision = SVNRevision.HEAD;
     		SVNDepth depth = SVNDepth.INFINITY;
+
+    		// get the current status of the working copy
+    		showStatus( myFile , true , true , false , true , false );
     		
-    		// get the svn status of the server and the working copy
-    		//SVNStatus remoteStatus = clientManager.getStatusClient().doStatus(new File(this.currentConnection.getFolder()), true);
-    		//SVNStatus localStatus = clientManager.getStatusClient().doStatus(new File(this.currentConnection.getFolder()), false);
-    		
-    		// check the status
-    		//Boolean remote = this.checkForConflicts(remoteStatus);
-    		//Boolean local = this.checkForConflicts(localStatus);
-    		
-    		//SVNStatusClient thisStatus = clientManager.getStatusClient();
-    		//thisStatus.doStatus(myFile, true, true, true, true, new StatusHandler(true));
-    		//thisStatus.doStatus(myFile, true, false, true, true, new StatusHandler(false));
-    		
-    		// Clear out the problemFiles
-        	this.problemFiles.clear();
-        	
-    		try {
-                /*
-                 * gets and shows status information for the WC directory.
-                 * status will be recursive on wcDir, will also cover the repository, 
-                 * won't cover unmodified entries, will disregard 'svn:ignore' property 
-                 * ignores (if any), will ignore externals definitions.
-                 */
-                showStatus( myFile , true , true , false , true , false );
-            } catch ( SVNException svne ) {
-                System.out.println( "error while recursively performing status for '" + myFile.getAbsolutePath( ) + "'");
-            }
-    		
-    		// check to see if there are any conflicts, etc.
-    		for(SVNStatus problems: this.problemFiles) {
-    			SVNStatusType thisStatus = problems.getContentsStatus();
-    		}
-    		
-    		
+    		DefaultSVNOptions opts = (DefaultSVNOptions) clientManager.getUpdateClient().getOptions(); 
+    		opts.setConflictHandler(new ConflictHandler()); 
     		
     		//if(remote && local) {
     			try {
         			// do the checkout
-        			rev = updateClient.doUpdate(myFile, myRevision, SVNDepth.INFINITY, false, true);
+        			rev = clientManager.getUpdateClient().doUpdate(myFile, myRevision, SVNDepth.INFINITY, false, true);
         			
         			// log this success
         			this.getCurrentConnection().createLogEntry(this, getString(R.string.update), " ", getString(R.string.revision) + " " + rev.toString());
@@ -1316,7 +1276,7 @@ public class OASVNApplication extends Application {
     public String cleanUp() {
     	try {
     		// do the cleanup on the current connection
-    		wcClient.doCleanup(this.assignPath());
+    		clientManager.getWCClient().doCleanup(this.assignPath());
     		
     		// log this success
 			this.getCurrentConnection().createLogEntry(this, getString(R.string.cleanup), "",  getString(R.string.success));
@@ -1357,7 +1317,7 @@ public class OASVNApplication extends Application {
     public String revertToHead() {
     	try {
     		// do the revert on the current connection
-    		wcClient.doRevert((new File[] {this.assignPath()}), SVNDepth.INFINITY, null);
+    		clientManager.getWCClient().doRevert((new File[] {this.assignPath()}), SVNDepth.INFINITY, null);
     		
     		// log this success
 			this.getCurrentConnection().createLogEntry(this, getString(R.string.revert), "",  getString(R.string.success));
@@ -1606,14 +1566,6 @@ public class OASVNApplication extends Application {
 
 	public void setCm(SVNClientManager clientManager) {
 		this.clientManager = clientManager;
-	}
-
-	public SVNUpdateClient getUc() {
-		return updateClient;
-	}
-
-	public void setUc(SVNUpdateClient updateClient) {
-		this.updateClient = updateClient;
 	}
 
 	public void setAllConnections(ArrayList<Connection> allConnections) {

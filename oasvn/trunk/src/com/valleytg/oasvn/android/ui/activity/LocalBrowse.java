@@ -338,7 +338,6 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 			mDirCacheInit = true;
 		
 		mDirs = new ArrayList<File>();
-
 		
 		File f = new File(mCurDir);
 		File[] files = f.listFiles();
@@ -348,21 +347,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 				for(int i=0; i < files.length; i++) {
 		
 					File file = files[i];
-					
-					// is there a conflict?
-					SVNStatus status = mApp.isFileInConflict(file);
-					if(status != null) {
-						if(status.getContentsStatus() == SVNStatusType.STATUS_CONFLICTED || status.getContentsStatus() == SVNStatusType.STATUS_MODIFIED) {
-							File temp = new File(file + " - " + status.getContentsStatus());
-							mDirs.add(temp);
-						}
-						else {
-							mDirs.add(file);
-						}
-					}
-					else {
-						mDirs.add(file);
-					}
+					mDirs.add(file);
 				}
 			}
 			else {
@@ -443,8 +428,24 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		
 			if (entry.isFile())
 				kind.setVisibility(View.INVISIBLE);
+			
+			// is there a conflict?
+			SVNStatus status = mApp.isFileInConflict(entry);
+			
+			String temp = "";
+			if(status != null) {
+				if(status.getContentsStatus() == SVNStatusType.STATUS_CONFLICTED || status.getContentsStatus() == SVNStatusType.STATUS_MODIFIED) {
+					temp = entry.getName() + " | " + status.getContentsStatus();
+				}
+				else {
+					temp = entry.getName();
+				}
+			}
+			else {
+				temp = entry.getName();
+			}
 		
-			name.setText(entry.getName());
+			name.setText(temp);
 		
 			return row;
 		}

@@ -132,4 +132,8 @@
   	<string name="choose_copy_path">Geben Sie bitte neuen Ordner zu Kopieren.</string>
 	<string name="choose_move_path">Geben Sie bitte neuen Ordner zu Bewegen.</string>
 	<string name="performing_move">Führe Bewegen aus!</string>
+	
+	<!-- Conflict -->
+  	<string name="theirs">Theirs</string>
+  	<string name="mine">Mine</string>
 </resources>

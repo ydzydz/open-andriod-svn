@@ -151,6 +151,12 @@ public class OASVNApplication extends Application {
     private String commitComments = "";
     
     /**
+     * Container for any conflicts that are found during update
+     */
+    private SVNConflictDescription currentConflict = null;
+    
+    
+    /**
      * Constructor
      */
     public OASVNApplication() {
@@ -1212,7 +1218,7 @@ public class OASVNApplication extends Application {
     		showStatus( myFile , true , true , false , true , false );
     		
     		DefaultSVNOptions opts = (DefaultSVNOptions) clientManager.getUpdateClient().getOptions(); 
-    		opts.setConflictHandler(new ConflictHandler()); 
+    		opts.setConflictHandler(new ConflictHandler(this)); 
     		
     		//if(remote && local) {
     			try {
@@ -1630,5 +1636,13 @@ public class OASVNApplication extends Application {
 
 	public void setProblemFiles(ArrayList<SVNStatus> problemFiles) {
 		this.problemFiles = problemFiles;
+	}
+
+	public SVNConflictDescription getCurrentConflict() {
+		return currentConflict;
+	}
+
+	public void setCurrentConflict(SVNConflictDescription currentConflict) {
+		this.currentConflict = currentConflict;
 	}
 }

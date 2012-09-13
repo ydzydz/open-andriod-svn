@@ -135,4 +135,7 @@
 	<string name="choose_move_path">Please enter the path to move to.</string>
   	<string name="performing_move">Performing Move!!!</string>
   	
+  	<!-- Conflict -->
+  	<string name="theirs">Theirs</string>
+  	<string name="mine">Mine</string>
 </resources>

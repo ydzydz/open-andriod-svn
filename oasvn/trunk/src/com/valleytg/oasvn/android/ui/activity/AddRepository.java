@@ -48,6 +48,7 @@ public class AddRepository extends Activity {
 	EditText url;
 	EditText username;
 	EditText password;
+	EditText key;
 	EditText folder;
 	
 	/**
@@ -76,6 +77,7 @@ public class AddRepository extends Activity {
 		url = (EditText) findViewById(R.id.add_url);
 		username = (EditText) findViewById(R.id.add_username);
 		password = (EditText) findViewById(R.id.add_password);
+		key = (EditText) findViewById(R.id.add_key);
 		folder = (EditText) findViewById(R.id.add_folder);
 		
 		// set the folder path to the default
@@ -89,6 +91,7 @@ public class AddRepository extends Activity {
         	url.setText(app.getCurrentConnection().getTextURL());
         	username.setText(app.getCurrentConnection().getUsername());
         	password.setText(app.getCurrentConnection().getPassword());
+        	key.setText(app.getCurrentConnection().getKey());
         	folder.setText(app.getCurrentConnection().getFolder());
         }
         else {
@@ -120,6 +123,7 @@ public class AddRepository extends Activity {
 		thisConnection.setUrl(url.getText().toString());
 		thisConnection.setUsername(username.getText().toString());
 		thisConnection.setPassword(password.getText().toString());
+		thisConnection.setKey(key.getText().toString());
 		thisConnection.setFolder(folder.getText().toString());
 		
 		app.saveConnection(thisConnection);

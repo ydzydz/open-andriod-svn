@@ -23,7 +23,8 @@
 		    <EditText
 		        android:id="@+id/add_name"
 		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content" >
+		        android:layout_height="wrap_content">
+		        <requestFocus />
 		    </EditText>
 		    </TableRow>
 		    <TableRow>
@@ -70,6 +71,24 @@
 		        android:layout_height="wrap_content"
 		        android:inputType="textPassword" />
 		</TableRow>
+		<TableRow>
+
+		    <TextView
+		        android:id="@+id/add_key_txt"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/key"
+		        android:textAppearance="?android:attr/textAppearanceMedium" />
+		</TableRow>
+
+		<EditText
+		    android:id="@+id/add_key"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:ems="10"
+		    android:inputType="textNoSuggestions" >
+
+		</EditText>
 		<TableRow>
 		    <TextView
 		        android:id="@+id/add_folder_txt"

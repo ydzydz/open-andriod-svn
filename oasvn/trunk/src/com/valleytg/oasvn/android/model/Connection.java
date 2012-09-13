@@ -23,6 +23,7 @@
 
 package com.valleytg.oasvn.android.model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,6 +72,7 @@ public class Connection extends OASVNModelLocalDB {
 	private BasicAuthenticationManager authManager;
 	private String username ="";
 	private String password = "";
+	private String key = "";
 	private String folder = "";
 	private Integer head = 0;
 	
@@ -98,7 +100,7 @@ public class Connection extends OASVNModelLocalDB {
 	 * @param password
 	 * @param folder
 	 */
-	public Connection(String name, String url, PROTOCOL_TYPE type, String username, String password, String folder) {
+	public Connection(String name, String url, PROTOCOL_TYPE type, String username, String password, String key, String folder) {
 		
 		// call the super, setting the table name
 		super("connection");
@@ -107,6 +109,7 @@ public class Connection extends OASVNModelLocalDB {
 		this.setUrl(url);
 		this.setUsername(username);
 		this.setPassword(password);
+		this.setKey(key);
 		this.setFolder(folder);
 		this.initializeAuthManager();
 	}
@@ -122,6 +125,7 @@ public class Connection extends OASVNModelLocalDB {
 		values.put("protocol", this.type.toString());
 		values.put("username", this.getUsername());
 		values.put("password", this.getPassword());
+		values.put("key", this.getKey());
 		values.put("folder", this.getFolder());
 		values.put("head", this.getHead());
 		
@@ -148,6 +152,12 @@ public class Connection extends OASVNModelLocalDB {
 			e.printStackTrace();
 		}
 		
+		try {
+			this.setKey(results.getString(results.getColumnIndex("key")));
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}	
 		try {
 			this.setUrl(results.getString(results.getColumnIndex("url")));
 		} catch (Exception e) {
@@ -189,9 +199,10 @@ public class Connection extends OASVNModelLocalDB {
 	/**
 	 * Setup the BasicAuthManager with the supplied username and password
 	 */
-	public void initializeAuthManager(String username, String password) {
+	public void initializeAuthManager(String username, String password, String key) {
 		this.setUsername(username);
 		this.setPassword(password);
+		this.setKey(key);
 		this.initializeAuthManager();
 	}
 	
@@ -202,7 +213,10 @@ public class Connection extends OASVNModelLocalDB {
 	public void initializeAuthManager() {
 		try {
 			// check the user name and password exist
-			if(this.username.length() > 0 && this.password.length() > 0) {
+			if(this.username.length() > 0 && this.password.length() > 0 && this.key.length() > 0) {
+				this.authManager = new BasicAuthenticationManager(this.username, new File(this.key), this.password, 22);
+			} 
+			else if (this.username.length() > 0 && this.password.length() > 0) {
 				this.authManager = new BasicAuthenticationManager(this.username, this.password);
 			}
 		}
@@ -465,6 +479,15 @@ public class Connection extends OASVNModelLocalDB {
 		dateUpdated();
 	}
 
+	public String getKey() {
+		return key;
+	}
+	
+	public void setKey(String key) {
+		this.key = key;
+		dateUpdated();
+	}
+		
 	public void setFolder(String folder) {
 		this.folder = folder;
 		dateUpdated();

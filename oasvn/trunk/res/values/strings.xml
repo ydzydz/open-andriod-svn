@@ -50,6 +50,7 @@
 	<string name="folder_exists">The folder name you entered is already in use.</string>
 	<string name="name_invalid">A unique name is required for.the repository.</string>
 	<string name="local_folder_warning">A Local folder already exists with the folder name. Are you sure you want to use an existing folder?</string>
+    <string name="key">Private-Key</string>
     
     <!-- Connection Details -->
     <string name="connection">Connection</string>

@@ -86,6 +86,27 @@ Context mContext;
 		}
 		
 		if(newVersion == 3) {
+			
+			// add the private key field 
+			try {
+				String[] sql = mContext.getString(R.string.db_update_1_2).split("\n");
+				db.beginTransaction();
+				try {
+					// Create tables & test data
+					execMultipleSQL(db, sql);
+					db.setTransactionSuccessful();
+					Log.d("Database upgrade", "Database upgrade private key successful!");
+				} catch (SQLException e) {
+		            Log.e("Error creating tables and debug data", e.toString());
+		        } finally {
+		        	db.endTransaction();
+		        }
+				
+			}
+			catch(SQLException e) {
+				Log.e("Database upgrade for version 1.0.10 failed", e.toString());
+			}
+			
 			// make sure get get all the existing connections
 			app.retrieveAllConnections(db);
 			
@@ -96,13 +117,12 @@ Context mContext;
 				}
 			}
 			catch (SQLException se) {
-				Log.e("Database upgrade for version 3 failed", se.toString());
+				Log.e("Database upgrade for version 1.0.10 failed", se.toString());
 			}
 			catch (Exception e) {
-				Log.e("Database upgrade for version 3 failed", e.toString());
+				Log.e("Database upgrade for version 1.0.10 failed", e.toString());
 			}
 		}
-		
 	}
 	
 	/**

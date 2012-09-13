@@ -219,7 +219,12 @@ public class OASVNApplication extends Application {
 	    	// check to see that we have a current connection
 	    	if(currentConnection != null) { 
 	    		// initialize the Auth manager
-	    		myAuthManager = new BasicAuthenticationManager(this.currentConnection.getUsername(), this.currentConnection.getPassword());
+	    		if (this.currentConnection.getKey() != null && this.currentConnection.getKey().length() > 0) {
+	    			myAuthManager = new BasicAuthenticationManager(this.currentConnection.getUsername(), new File(this.currentConnection.getKey()), this.currentConnection.getPassword(), 22);
+	    		} 
+	    		else {
+	    			myAuthManager = new BasicAuthenticationManager(this.currentConnection.getUsername(), this.currentConnection.getPassword());
+	    		}
 	    	}
     	}
     	catch(Exception e) {

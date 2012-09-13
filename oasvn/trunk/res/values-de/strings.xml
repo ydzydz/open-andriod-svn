@@ -48,6 +48,7 @@
 	<string name="folder_exists">"Das von Ihnen eingegebene Verzeichnisname wird bereits verwendet."</string>
 	<string name="name_invalid">"Es wird ein eindeutiger Name für das Repository benötigt."</string>
 	<string name="local_folder_warning">"Ein lokales Verzeichnis mit dem gleichen Namen existiert bereits. Sind Sie sicher, dass Sie den vorhandenen Ordner verwenden möchten?"</string>
+    <string name="key">Privater Schlüssel</string>
     
     <!-- Connection Details -->
     <string name="connection">"Verbindung"</string>

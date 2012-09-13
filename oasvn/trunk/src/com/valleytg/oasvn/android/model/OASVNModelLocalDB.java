@@ -59,7 +59,7 @@ public abstract class OASVNModelLocalDB extends OASVNModel {
 		// set the initial database id to -1
 		this.setLocalDBId(-1);
 		
-		// initilize the values
+		// Initialize the values
 		values = new ContentValues();
 		
 		// make active by default

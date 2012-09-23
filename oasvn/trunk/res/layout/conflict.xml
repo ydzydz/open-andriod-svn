@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/layout_root"
+	android:orientation="horizontal"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:padding="10dp">
 	
     <TextView  
 	    android:id="@+id/conflict_top_header"
@@ -11,99 +12,32 @@
 	    android:layout_height="wrap_content"
 	    android:textSize="22sp"
 	    android:background="@color/drk_blue"
-	    android:textColor="@color/alice_blue"
-	    />
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/conflict_scroll_container"
-		android:layout_width="fill_parent"
-		android:layout_below="@id/conflict_top_header"
-		android:layout_height="wrap_content">
-	    <TableLayout android:layout_width="fill_parent"
-	        	android:id="@+id/conflict_scroll"
-	        	android:stretchColumns="*"
-                android:layout_height="wrap_content">
-		    <TableLayout android:layout_width="fill_parent"
-		        android:id="@+id/conflict_header_table"
-			    android:layout_height="wrap_content"
-			    android:stretchColumns="*">
-				<TableRow>
-				    <TextView  
-					    android:id="@+id/conflict_top1_title"
-					    android:layout_width="wrap_content" 
-					    android:textSize="18sp"
-					    android:layout_height="wrap_content" 
-					    android:layout_weight="1"
-					    android:textColor="@color/ice"
-					    />
-					<TextView  
-					    android:id="@+id/conflict_top1"
-					    android:layout_width="wrap_content" 
-					    android:textSize="18sp"
-					    android:layout_span="3"
-					    android:layout_height="wrap_content" 
-					    android:layout_weight="5"
-					    />
-				</TableRow>
-				<TableRow>
-				    <TextView  
-					    android:id="@+id/conflict_top2_title"
-					    android:layout_width="wrap_content" 
-					    android:textSize="18sp"
-					    android:layout_height="wrap_content" 
-					    android:layout_weight="1"
-					    android:textColor="@color/ice"
-					    />
-					<TextView  
-					    android:id="@+id/conflict_top2"
-					    android:layout_width="wrap_content" 
-					    android:textSize="18sp"
-					    android:layout_span="3"
-					    android:layout_height="wrap_content" 
-					    android:layout_weight="5"
-					    />
-				</TableRow>
-				<TableRow>
-				    <TextView  
-					    android:id="@+id/conflict_top3_title"
-					    android:layout_width="wrap_content" 
-					    android:textSize="18sp"
-					    android:layout_height="wrap_content" 
-					    android:layout_weight="1"
-					    android:textColor="@color/ice"
-					    />
-					<TextView  
-					    android:id="@+id/conflict_top3"
-					    android:layout_width="wrap_content" 
-					    android:textSize="18sp"
-					    android:layout_span="3"
-					    android:layout_height="wrap_content" 
-					    android:layout_weight="5"
-					    />
-				</TableRow>
-				
-			</TableLayout>
+	    android:textColor="@color/alice_blue" />
+	   
     
-    		<Button 
-			    android:id="@+id/conflict_theirs"
-			    android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:textSize="24sp"
-		        android:text="@string/theirs" />
-			<Button 
-			    android:id="@+id/conflict_mine"
-			    android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:textSize="24sp"
-		        android:text="@string/mine" />
-			<Button 
-			    android:id="@+id/conflict_cancel"
-			    android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:textSize="24sp"
-		        android:text="@string/cancel" />
-			
-			
-		</TableLayout>
-	</ScrollView>
-    
-</RelativeLayout>
+  	<Button 
+	    android:id="@+id/conflict_theirs"
+	    android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:text="@string/theirs" />
+	<Button 
+	    android:id="@+id/conflict_mine"
+	    android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:text="@string/mine" />
+	<Button 
+	    android:id="@+id/conflict_base"
+	    android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:text="@string/base" />
+	<Button 
+	    android:id="@+id/conflict_cancel"
+	    android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:text="@string/cancel" />
+
+</LinearLayout>

@@ -10,6 +10,7 @@
     <string name="exception">Exception</string>
     <string name="revision">Revision</string>
     <string name="FILE">FILE</string>
+    <string name="file">File</string>
     <string name="files">Files</string>
     <string name="directory_created">Directory is created</string>
     <string name="directory_exists">Directory already exists</string>
@@ -137,6 +138,11 @@
   	<string name="performing_move">Performing Move!!!</string>
   	
   	<!-- Conflict -->
+  	<string name="conflict">Conflict</string>
+  	<string name="detected">Detected</string>
+  	<string name="reason">Reason</string>
   	<string name="theirs">Theirs</string>
   	<string name="mine">Mine</string>
+  	<string name="base">Base</string>
+  	<string name="postpone">Postpone</string>
 </resources>

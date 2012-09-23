@@ -26,6 +26,8 @@ package com.valleytg.oasvn.android.ui.activity;
 
 import java.io.File;
 
+import org.tmatesoft.svn.core.wc.SVNConflictChoice;
+import org.tmatesoft.svn.core.wc.SVNConflictReason;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import com.valleytg.oasvn.android.R;
@@ -35,6 +37,7 @@ import com.valleytg.oasvn.android.ui.activity.ConnectionDetails;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
@@ -65,6 +68,8 @@ public class ConnectionDetails extends Activity {
 	 * Controls
 	 */
 	TextView topAreaHeader;
+	
+	
 	
 	TextView status;
 	
@@ -239,7 +244,46 @@ public class ConnectionDetails extends Activity {
         populateTopInfo();
 	}
 	
+	public Dialog onCreatePublic(int id) {
+		return onCreateDialog(id);
+	}
 	
+	/*
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		Dialog dialog = null;
+		
+		SVNConflictChoice choice = SVNConflictChoice.MINE_FULL;
+		
+		switch (id) {
+			case DIALOG_CHOOSE_ACTION:
+				dialog = promptForConflictDialog();
+				break;
+				
+			case CONFLICT_MINE_FULL:
+				choice = SVNConflictChoice.MINE_FULL;
+				break;
+					
+			case CONFLICT_THIERS_FULL:
+				choice = SVNConflictChoice.THEIRS_FULL;
+				break;
+		
+			case CONFLICT_BASE:
+				choice = SVNConflictChoice.BASE;
+				break;
+				
+			case CONFLICT_POSTPONE:
+				choice = SVNConflictChoice.POSTPONE;
+				break;
+		}
+		
+		app.setConflictDecision(choice);
+
+		return dialog;
+	}
+	*/
+	
+
 
 	@Override
 	public void finish() {
@@ -1004,7 +1048,49 @@ public class ConnectionDetails extends Activity {
 		builder.show();	
 	}
 	
+	/**
+	 * Prompt user if there is a conflict and get the user preference to
+	 * resolve the conflict
+	 *
+	public Dialog promptForConflictDialog() {
+		final CharSequence[] items = { 
+				getResources().getString(R.string.mine).toLowerCase(),
+				getResources().getString(R.string.theirs).toLowerCase(),
+				getResources().getString(R.string.base).toLowerCase(),
+				getResources().getString(R.string.postpone).toLowerCase()
+				};
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.choose_action);
+		builder.setItems(items, new DialogInterface.OnClickListener()
+		{
+			public void onClick(DialogInterface dialog, int item)
+			{
+				switch (item)
+				{
+					case 0: // mine
+						showDialog(CONFLICT_MINE_FULL);
+						break;
+						
+					case 1: // thiers
+						showDialog(CONFLICT_THIERS_FULL);
+						break;
+						
+					case 2: // base
+						showDialog(CONFLICT_BASE);
+						break;
+						
+					case 3: // postpone
+						showDialog(CONFLICT_POSTPONE);
+						break;
+				}
+			}
+		});
+		
+		return builder.create();
+	}
 	
+	*/
 	
 	/**
 	 * Threads
@@ -1301,7 +1387,7 @@ public class ConnectionDetails extends Activity {
 				
 				
 				// do the update
-				returned = app.update();
+				returned = app.update(ConnectionDetails.this);
 				
 				// get the current version
 				app.getCurrentConnection().setHead((int)app.getRevisionNumber());

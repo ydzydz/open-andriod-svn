@@ -40,22 +40,14 @@ import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
-import org.tmatesoft.svn.core.wc.ISVNConflictHandler;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNCommitClient;
 import org.tmatesoft.svn.core.wc.SVNConflictChoice;
 import org.tmatesoft.svn.core.wc.SVNConflictDescription;
-import org.tmatesoft.svn.core.wc.SVNConflictResult;
-import org.tmatesoft.svn.core.wc.SVNInfo;
+import org.tmatesoft.svn.core.wc.SVNConflictReason;
+import org.tmatesoft.svn.core.wc.SVNMergeFileSet;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNStatus;
-import org.tmatesoft.svn.core.wc.SVNStatusClient;
-import org.tmatesoft.svn.core.wc.SVNStatusType;
-import org.tmatesoft.svn.core.wc.SVNTreeConflictDescription;
-import org.tmatesoft.svn.core.wc.SVNUpdateClient;
-import org.tmatesoft.svn.core.wc.SVNWCClient;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
-import org.tmatesoft.svn.core.wc.admin.SVNLookClient;
 
 import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.database.DatabaseHelper;
@@ -63,6 +55,7 @@ import com.valleytg.oasvn.android.model.Connection;
 import com.valleytg.oasvn.android.model.LogItem;
 import com.valleytg.oasvn.android.util.Settings;
 
+import android.app.Activity;
 import android.app.Application;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -71,6 +64,11 @@ import android.util.Log;
 
 public class OASVNApplication extends Application {
 
+	/** 
+	 * Activity constants
+	 */
+	public static final int PICK_CONFLICT_ACTION_REQUEST = 0;
+	
 	/**
 	 * database
 	 */
@@ -155,8 +153,22 @@ public class OASVNApplication extends Application {
      */
     private SVNConflictDescription currentConflict = null;
     
+    /**
+     * Holds users choice for resolving the current conflict under consideration.
+     */
+    SVNConflictChoice conflictDecision = SVNConflictChoice.MINE_FULL;
     
     /**
+     * SVNConflictReason - contains the reason for conflict identified
+     */
+    SVNConflictReason conflictReason = null;
+    
+    /**
+     * List of files that are in a state of conflict
+     */
+    SVNMergeFileSet conflictFiles = null;
+    
+	/**
      * Constructor
      */
     public OASVNApplication() {
@@ -1206,66 +1218,57 @@ public class OASVNApplication extends Application {
     /**
      * Update the current connection
      * Will perform svn update on the repository
+     * @param pass the activity that called the update so if needed
+     * the user can be prompted for action.
      * @return revision number or error message
      */
-    public String update() {
-    	
+    public String update(Activity activity) {
     	Long rev = 0L;
     	try {
     		
-    		SVNURL myURL = this.currentConnection.getRepositoryURL();
     		File myFile = this.assignPath();
-    		SVNRevision pegRevision = SVNRevision.UNDEFINED;
     		SVNRevision myRevision = SVNRevision.HEAD;
-    		SVNDepth depth = SVNDepth.INFINITY;
 
     		// get the current status of the working copy
-    		showStatus( myFile , true , true , false , true , false );
+    		// showStatus( myFile , true , true , false , true , false );
     		
     		DefaultSVNOptions opts = (DefaultSVNOptions) clientManager.getUpdateClient().getOptions(); 
-    		opts.setConflictHandler(new ConflictHandler(this)); 
-    		
-    		//if(remote && local) {
-    			try {
-        			// do the checkout
-        			rev = clientManager.getUpdateClient().doUpdate(myFile, myRevision, SVNDepth.INFINITY, false, true);
-        			
-        			// log this success
-        			this.getCurrentConnection().createLogEntry(this, getString(R.string.update), " ", getString(R.string.revision) + " " + rev.toString());
-        		}
-        		catch(SVNException se) {
-        			String msg = se.getMessage();
-        			
-        			// log this failure
-        			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
-        			
-        			return msg;
-        		}
-        		catch(VerifyError ve) {
-        			String msg = ve.getLocalizedMessage() + "\n" + ve.toString() + "\n" + ve.hashCode() + "\n" + ve.getMessage();
-        			
-        			// log this failure
-        			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
-        			
-        			ve.printStackTrace();
-        			return getString(R.string.verify) + " " + msg;
-        		}
-        		catch(Exception e) {
-        			String msg = e.getMessage();
-        			
-        			// log this failure
-        			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
-        			
-        			e.printStackTrace();
-        			return getString(R.string.exception) + " " + msg;
-        		}
-    		/*
+    		opts.setConflictHandler(new ConflictHandler(this, activity)); 
+
+			try {
+    			// do the update
+    			rev = clientManager.getUpdateClient().doUpdate(myFile, myRevision, SVNDepth.INFINITY, false, true);
+    			
+    			// log this success
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.update), " ", getString(R.string.revision) + " " + rev.toString());
     		}
-    		else {
-    			System.out.println("remote Status: " + remote.toString());
-    			System.out.println("local Status: " + local.toString());
+    		catch(SVNException se) {
+    			String msg = se.getMessage();
+    			
+    			// log this failure
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
+    			
+    			return msg;
     		}
-    		*/
+    		catch(VerifyError ve) {
+    			String msg = ve.getLocalizedMessage() + "\n" + ve.toString() + "\n" + ve.hashCode() + "\n" + ve.getMessage();
+    			
+    			// log this failure
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), ve.getMessage().substring(0, 19), ve.getMessage().toString());
+    			
+    			ve.printStackTrace();
+    			return getString(R.string.verify) + " " + msg;
+    		}
+    		catch(Exception e) {
+    			String msg = e.getMessage();
+    			
+    			// log this failure
+    			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getCause().toString().substring(0, 19), e.getMessage().toString());
+    			
+    			e.printStackTrace();
+    			return getString(R.string.exception) + " " + msg;
+    		}
+
     		
     		
 		} catch (Exception e) {
@@ -1275,6 +1278,16 @@ public class OASVNApplication extends Application {
 		}
     	
     	return Long.toString(rev);
+    }
+    
+    /**
+     * Update the current connection
+     * Will perform svn update on the repository.  No activtiy is passed
+     * through this version.
+     * @return revision number or error message
+     */
+    public String update() {
+    	return this.update(null);
     }
     
     /**
@@ -1649,5 +1662,29 @@ public class OASVNApplication extends Application {
 
 	public void setCurrentConflict(SVNConflictDescription currentConflict) {
 		this.currentConflict = currentConflict;
+	}
+	
+	public SVNConflictChoice getConflictDecision() {
+		return conflictDecision;
+	}
+
+	public void setConflictDecision(SVNConflictChoice conflictDecision) {
+		this.conflictDecision = conflictDecision;
+	}
+
+	public SVNConflictReason getConflictReason() {
+		return conflictReason;
+	}
+
+	public void setConflictReason(SVNConflictReason conflictReason) {
+		this.conflictReason = conflictReason;
+	}
+
+	public SVNMergeFileSet getConflictFiles() {
+		return conflictFiles;
+	}
+
+	public void setConflictFiles(SVNMergeFileSet conflictFiles) {
+		this.conflictFiles = conflictFiles;
 	}
 }

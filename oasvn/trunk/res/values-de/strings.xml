@@ -8,7 +8,8 @@
     <string name="verify">"Verifizieren"</string>
     <string name="exception">"Ausnahme:"</string>
     <string name="revision">"Revision"</string>
-    <string name="FILE">"Datei:"</string>
+    <string name="FILE">"DATEI:"</string>
+    <string name="file">"Datei:"</string>
     <string name="files">"Dateien"</string>
     <string name="directory_created">"Verzeichnis erstellt"</string>
     <string name="directory_exists">"Verzeichnis bereits vorhanden"</string>
@@ -135,6 +136,11 @@
 	<string name="performing_move">Führe Bewegen aus!</string>
 	
 	<!-- Conflict -->
+	<string name="conflict">Conflict</string>
+	<string name="detected">Erkannt</string>
+	<string name="reason">Grund</string>
   	<string name="theirs">Theirs</string>
   	<string name="mine">Mine</string>
+  	<string name="base">Base</string>
+  	<string name="postpone">Postpone</string>
 </resources>

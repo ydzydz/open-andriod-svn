@@ -1106,7 +1106,7 @@ public class OASVNApplication extends Application {
 			e.printStackTrace();
 			return e.getMessage();
 		}
-		return "success";
+		return getString(R.string.success);
 	}
     
     
@@ -1118,7 +1118,7 @@ public class OASVNApplication extends Application {
 	 * @return SVNTreeConflictDescription if null there were no conflicts, 
 	 * if not null, contains conflict information
 	 */
-	private void showStatus(File wcPath, boolean isRecursive, boolean isRemote, boolean isReportAll, boolean isIncludeIgnored, boolean isCollectParentExternals) throws SVNException {
+	public String showStatus(File wcPath, boolean isRecursive, boolean isRemote, boolean isReportAll, boolean isIncludeIgnored, boolean isCollectParentExternals) throws SVNException {
 		
 		// Clear out the problemFiles
     	this.problemFiles.clear();
@@ -1136,16 +1136,17 @@ public class OASVNApplication extends Application {
 			// log this failure
 			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
 			se.printStackTrace();
+			return getString(R.string.status) + " " + se.getMessage();
 		} 
 		catch(Exception e) {
 			String msg = e.getMessage();
 			
 			// log this failure
 			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getMessage().substring(0, 19), e.getMessage().toString());
-
+			return getString(R.string.status) + " " + e.getMessage();
 		}
 		
-		
+		return getString(R.string.status) + " " + getString(R.string.success);
 		
 	}
 	
@@ -1229,8 +1230,8 @@ public class OASVNApplication extends Application {
     		File myFile = this.assignPath();
     		SVNRevision myRevision = SVNRevision.HEAD;
 
-    		// get the current status of the working copy
-    		// showStatus( myFile , true , true , false , true , false );
+    		// get the current status of the working copy this will build out the array of any problems or conflicts
+    		showStatus( myFile , true , true , false , true , false );
     		
     		DefaultSVNOptions opts = (DefaultSVNOptions) clientManager.getUpdateClient().getOptions(); 
     		opts.setConflictHandler(new ConflictHandler(this, activity)); 
@@ -1429,6 +1430,62 @@ public class OASVNApplication extends Application {
 
     }
     
+    /**
+     * Resolves conflicts in the working copy
+     * @param path - working copy path
+     * @param depth - determines recursive depth to solve conflicts
+     * 					SVNDepth.EMPTY - only the target chosen
+     * 					SVNDepth.FILES - target and conflicted children
+     * 					SVNDepth.IMMEDIATES - target and all children, both files and directories
+     * 					SVNDepth.INFINITY - resolves target and every conflicted file anywhere beneath it.
+     * @param choice - Resolution type
+     * 					SVNConflictChoice.BASE - use the base version of the file
+     * 					SVNConflictChoice.MERGED - use the merged version of the file
+     * 					SVNConflictChoice.MINE_CONFLICT - choose the own (for conflicted hunks) version of the file to resolve the conflict here and now.
+     * 					SVNConflictChoice.MINE - choose the own version of the file to resolve the conflict here and now.
+     * 					SVNConflictChoice.POSTPONE - Do not resolve the conflict now
+     * 					SVNConflictChoice.THEIRS_CONFLICT - choose the incoming (for conflicted hunks) version of the file to resolve the conflict here and now.
+     * 					SVNConflictChoice.THEIRS - choose the incoming version of the file to resolve the conflict here and now.
+     * 
+     * @return - status or error as string
+     */
+    public String resolveConflict(File path, SVNDepth depth, SVNConflictChoice choice) {
+    	
+    	try {
+    		// do the resolve on the file
+    		clientManager.getWCClient().doResolve(path, depth, true, true, choice);
+    		
+    		// log this success
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.reslove), "",  getString(R.string.success));
+    	} 
+    	catch (SVNException se) {
+    		String msg = se.getMessage();
+    		
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), se.getMessage().substring(0, 19), se.getMessage().toString());
+			
+			// catlog the failure
+			se.printStackTrace();
+			
+			// display the failure
+			return msg;
+		} 
+		catch(Exception e) {
+			String msg = e.getMessage();
+			
+			// log this failure
+			this.getCurrentConnection().createLogEntry(this, getString(R.string.error), e.getMessage().substring(0, 19), e.getMessage().toString());
+			
+			// catlog the failure
+			e.printStackTrace();
+			
+			// display the failure
+			return msg;
+		}
+		
+		return getString(R.string.success);
+    	
+    }
     
     /**
      * Check to see if this file is known 

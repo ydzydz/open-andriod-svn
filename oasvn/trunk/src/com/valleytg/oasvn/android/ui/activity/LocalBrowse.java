@@ -27,13 +27,10 @@ package com.valleytg.oasvn.android.ui.activity;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
-import org.tmatesoft.svn.core.SVNDirEntry;
-import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNDepth;
+import org.tmatesoft.svn.core.wc.SVNConflictChoice;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNStatus;
 import org.tmatesoft.svn.core.wc.SVNStatusType;
@@ -41,17 +38,22 @@ import org.tmatesoft.svn.core.wc.SVNStatusType;
 import com.valleytg.oasvn.android.R;
 import com.valleytg.oasvn.android.application.OASVNApplication;
 
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,6 +64,7 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 
 public class LocalBrowse extends ListActivity implements Runnable, OnItemLongClickListener {
 	private static final int DIALOG_WAIT_LOADING = 1;
@@ -72,6 +75,12 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 	private static final int DIALOG_COPY = 6;
 	private static final int DIALOG_MOVE = 7;
 	private static final int DIALOG_WAIT_MOVE = 8;
+	
+	private static final int DIALOG_CONFLICT_POSTPONE = 10;
+	private static final int DIALOG_CONFLICT_MINE = 11;
+	private static final int DIALOG_CONFLICT_THEIRS = 12;
+	private static final int DIALOG_CONFLICT_BASE = 13;
+	private static final int DIALOG_CONFLICT_MERGED = 14;
 	
 	private Context mContext;
 	private OASVNApplication mApp;
@@ -89,14 +98,17 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 	private SVNRevision mCurRevision = SVNRevision.HEAD;
 	private String mExportMsg;
 	
+	private File entry;
+	
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog = null;
 		
+		
 		switch (id) {
 			case DIALOG_CHOSE_ACTION_DIR:
 			case DIALOG_CHOSE_ACTION_FILE:
-				dialog = createChoseActionDialog();
+				dialog = createChooseActionDialog();
 				break;
 		
 			case DIALOG_COPY:
@@ -111,20 +123,42 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		return dialog;
 	}
 	
-	private Dialog createChoseActionDialog() {
-		final CharSequence[] items = { 
-				getResources().getString(R.string.copy).toLowerCase(),
-				getResources().getString(R.string.move).toLowerCase()
-				};
+	private Dialog createChooseActionDialog() {
+		
+		// is there a conflict?
+		SVNStatus status = mApp.isFileInConflict(entry);
+		CharSequence[] items;
+		
+		String temp = "";
+
+		if(status != null && status.getContentsStatus() == SVNStatusType.STATUS_CONFLICTED) {
+			items = new CharSequence[8];
+			items[0] = getResources().getString(R.string.copy).toLowerCase();
+			items[1] = getResources().getString(R.string.move).toLowerCase();
+			items[2] = getResources().getString(R.string.edit).toLowerCase();
+			items[3] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.mine).toLowerCase();
+			items[4] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.theirs).toLowerCase();
+			items[5] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.base).toLowerCase();
+			items[6] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.merge).toLowerCase();
+			items[7] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.postpone).toLowerCase();
+
+			
+		}
+		else {
+			items = new CharSequence[3];
+			items[0] = getResources().getString(R.string.copy).toLowerCase();
+			items[1] = getResources().getString(R.string.move).toLowerCase();
+			items[2] = getResources().getString(R.string.edit).toLowerCase();
+		}
+		
+
+		
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.choose_action);
-		builder.setItems(items, new DialogInterface.OnClickListener()
-		{
-			public void onClick(DialogInterface dialog, int item)
-			{
-				switch (item)
-				{
+		builder.setItems(items, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
+				switch (item) {
 					case 0: // copy
 						showDialog(DIALOG_COPY);
 						break;
@@ -132,7 +166,43 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 					case 1: // move
 						showDialog(DIALOG_MOVE);
 						break;
+						
+					case 2: // edit
+						Intent myIntent = new Intent();
+				        myIntent.setAction(Intent.ACTION_EDIT);  
+				        
+				        Uri selectedUri = Uri.fromFile(entry);
+				        String fileExtension= MimeTypeMap.getFileExtensionFromUrl(selectedUri.toString());
+				        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+				        
+				        myIntent.setDataAndType(Uri.parse(entry.getPath()), mimeType);
+				        startActivity(myIntent);
+						break;
+						
+					case 3: // mine
+						mApp.resolveConflict(new File(entry.getPath()), SVNDepth.INFINITY, SVNConflictChoice.MINE_FULL);
+						break;
+						
+					case 4: // theirs
+						mApp.resolveConflict(new File(entry.getPath()), SVNDepth.INFINITY, SVNConflictChoice.THEIRS_FULL);
+						break;
+						
+					case 5: // base
+						mApp.resolveConflict(new File(entry.getPath()), SVNDepth.INFINITY, SVNConflictChoice.BASE);
+						break;
+						
+					case 6: // merge
+						mApp.resolveConflict(new File(entry.getPath()), SVNDepth.INFINITY, SVNConflictChoice.MERGED);
+						break;
+						
+					case 7: // postpone
+						mApp.resolveConflict(new File(entry.getPath()), SVNDepth.INFINITY, SVNConflictChoice.POSTPONE);
+						break;	
+						
 				}
+				
+				StatusThread statusThread = new StatusThread();
+				statusThread.execute();
 			}
 		});
 		
@@ -145,10 +215,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		
 		LayoutInflater inflater = (LayoutInflater) mContext
 				.getSystemService(LAYOUT_INFLATER_SERVICE);
-		View layout = inflater
-				.inflate(
-						R.layout.connection_browse_copy_dialog,
-						(ViewGroup) findViewById(R.id.connbrowse_copy_dialog_layout_root));
+		View layout = inflater.inflate(R.layout.connection_browse_copy_dialog, (ViewGroup) findViewById(R.id.connbrowse_copy_dialog_layout_root));
 		
 		final EditText path = (EditText) layout.findViewById(R.id.connbrowse_copy_dialog_path_edit);
 		
@@ -174,12 +241,8 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		AlertDialog.Builder builder;
 		AlertDialog alertDialog;
 		
-		LayoutInflater inflater = (LayoutInflater) mContext
-				.getSystemService(LAYOUT_INFLATER_SERVICE);
-		View layout = inflater
-				.inflate(
-						R.layout.connection_browse_move_dialog,
-						(ViewGroup) findViewById(R.id.connbrowse_move_dialog_layout_root));
+		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
+		View layout = inflater.inflate(R.layout.connection_browse_move_dialog, (ViewGroup) findViewById(R.id.connbrowse_move_dialog_layout_root));
 		
 		final EditText path = (EditText) layout.findViewById(R.id.connbrowse_move_dialog_path_edit);
 		
@@ -213,6 +276,9 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 			mDirCache = new ArrayList<List<File>>();
 			mCurDir = mApp.getCurrentConnection().getFolder().toString() + "/";
 			
+			StatusThread statusThread = new StatusThread();
+			statusThread.execute();
+			
 			updateDataAndList();
 			
 			getListView().setOnItemLongClickListener(this);
@@ -224,14 +290,13 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		File entry = mDirs.get(position);
+		entry = mDirs.get(position);
 		if (entry.isDirectory()) {
 			mCurDir = mCurDir + entry.getName() + "/";
 			System.out.println("new dir:" + mCurDir);
 			updateDataAndList();
 		}
-		else if (entry.isFile())
-		{
+		else if (entry.isFile()) {
 			mLastDialogElem = position;
 			showDialog(DIALOG_CHOSE_ACTION_FILE);
 		}
@@ -241,7 +306,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 	
 	
 	public boolean onItemLongClick(AdapterView<?> av, View v, int position, long id) {
-		File entry = mDirs.get(position);
+		entry = mDirs.get(position);
 		
 		if (entry.isDirectory()) {
 			mLastDialogElem = position;
@@ -416,15 +481,14 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			LayoutInflater inflater = getLayoutInflater();
-			View row = inflater.inflate(R.layout.connection_browse_listitem,
-					parent, false);
+			View row = inflater.inflate(R.layout.connection_browse_listitem, parent, false);
 		
-			TextView kind = (TextView) row
-					.findViewById(R.id.connbrowse_listitem_kind);
-			TextView name = (TextView) row
-					.findViewById(R.id.connbrowse_listitem_name);
+			TextView kind = (TextView) row.findViewById(R.id.connbrowse_listitem_kind);
+			ImageView iButton = (ImageView) row.findViewById(R.id.connbrowse_listitem_image);
+			TextView name = (TextView) row.findViewById(R.id.connbrowse_listitem_name);
 		
-			File entry = mDirs.get(position);
+			entry = mDirs.get(position);
+			//iButton.setImageResource(R.drawable.warning);
 		
 			if (entry.isFile())
 				kind.setVisibility(View.INVISIBLE);
@@ -434,8 +498,9 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 			
 			String temp = "";
 			if(status != null) {
-				if(status.getContentsStatus() == SVNStatusType.STATUS_CONFLICTED || status.getContentsStatus() == SVNStatusType.STATUS_MODIFIED) {
-					temp = entry.getName() + " | " + status.getContentsStatus();
+				if(status.getContentsStatus() != null) {
+					iButton.setVisibility(View.VISIBLE);
+					temp = entry.getName() + "  --->  " + status.getContentsStatus();
 				}
 				else {
 					temp = entry.getName();
@@ -450,4 +515,83 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 			return row;
 		}
 	}
+	
+	/**
+	 * Threads
+	 */
+	
+	class StatusThread extends AsyncTask<Void, Void, String> {
+
+		ProgressDialog dialog;
+
+		@Override
+	    protected void onPreExecute() {
+	        dialog = new ProgressDialog(LocalBrowse.this);
+	        dialog.setMessage(getString(R.string.in_progress));
+	        dialog.setIndeterminate(true);
+	        dialog.setCancelable(false);
+	        dialog.show();
+	    }
+		
+		@Override
+		protected String doInBackground(Void... unused) {
+			try {
+				Looper.myLooper();
+				Looper.prepare();
+			}
+			catch(Exception e) {
+				// Looper only needs to be created if the thread is new, if reusing the thread we end up here
+			}
+			
+			String returned;
+			
+			try {
+				runOnUiThread(new Runnable() {
+				     public void run() {
+				    	// set the status
+				    	 //LocalBrowse.this.status.setText(R.string.performing_revert);
+
+				     }
+				});
+				
+				
+				// do the revert
+				returned = mApp.showStatus(mApp.assignPath(), true , true , false , true , false );
+
+				
+			}
+	        catch(Exception e) {
+	        	e.printStackTrace();
+	        	return e.getMessage();
+	        }
+			return returned;
+		}
+		
+		protected void onPostExecute(final String result) {
+			// unset the running flag
+			//LocalBrowse.this.resetIdle();
+
+			//android.util.Log.d(getString(R.string.alarm), getString(R.string.status_successful));
+
+	        dialog.dismiss();
+	        
+	        /*
+	        runOnUiThread(new Runnable() {
+			     public void run() {
+			    	// indicate to the user that the action completed
+					Toast.makeText(getApplicationContext(), result, 5000).show();
+			     }
+	        });
+	        */
+	        
+	        // populate the top
+	        //populateTopInfo();
+	        
+	        //ConnectionDetails.this.status.setText(R.string.idle);
+	        
+			// unset the running flag
+			//ConnectionDetails.this.running = false;
+	    }
+	}
+
 }

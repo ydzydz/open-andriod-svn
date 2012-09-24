@@ -1,34 +1,29 @@
 package com.valleytg.oasvn.android.application;
 
+import java.io.File;
+
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.wc.ISVNConflictHandler;
 import org.tmatesoft.svn.core.wc.SVNConflictChoice;
 import org.tmatesoft.svn.core.wc.SVNConflictDescription;
 import org.tmatesoft.svn.core.wc.SVNConflictReason;
 import org.tmatesoft.svn.core.wc.SVNConflictResult;
-import org.tmatesoft.svn.core.wc.SVNMergeFileSet;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Looper;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.valleytg.oasvn.android.R;
-import com.valleytg.oasvn.android.ui.activity.AddRepository;
-import com.valleytg.oasvn.android.ui.activity.ConflictActivity;
-import com.valleytg.oasvn.android.ui.activity.ConnectionDetails;
 
 public class ConflictHandler implements ISVNConflictHandler {
 	
@@ -82,7 +77,12 @@ public class ConflictHandler implements ISVNConflictHandler {
         		+ R.string.folder + R.string.colon + " " + this.app.getConflictFiles().getWCPath();
         Intent myIntent = new Intent();
         myIntent.setAction(Intent.ACTION_EDIT);  
-        myIntent.setDataAndType(Uri.parse(this.app.getConflictFiles().getWCPath()), "text/plain");
+        
+        
+        String fileExtension= MimeTypeMap.getFileExtensionFromUrl(this.app.getConflictFiles().getWCPath());
+        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+        
+        myIntent.setDataAndType(Uri.parse(this.app.getConflictFiles().getWCPath()), mimeType);
         
         
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, myIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -93,10 +93,7 @@ public class ConflictHandler implements ISVNConflictHandler {
            notificationText,
            pendingIntent);
         notificationManager.notify(MY_NOTIFICATION_ID, myNotification);
-	        
 
-
-        
         System.out.println("Automatically resolving conflict for " + this.app.getConflictFiles().getWCFile() + 
                 ", choosing " + SVNConflictChoice.POSTPONE.toString());
         return new SVNConflictResult(app.getConflictDecision(), this.app.getConflictFiles().getResultFile()); 

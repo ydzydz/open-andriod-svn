@@ -139,6 +139,9 @@
 	<string name="conflict">Conflict</string>
 	<string name="detected">Erkannt</string>
 	<string name="reason">Grund</string>
+	<string name="status">Status</string>
+	<string name="reslove">Resolve</string>
+	<string name="merge">Merge</string>
   	<string name="theirs">Theirs</string>
   	<string name="mine">Mine</string>
   	<string name="base">Base</string>

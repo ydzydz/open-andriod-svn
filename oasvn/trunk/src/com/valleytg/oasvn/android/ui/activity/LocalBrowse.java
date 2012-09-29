@@ -123,6 +123,27 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		return dialog;
 	}
 	
+	@Override
+	protected void onPrepareDialog(final int id, Dialog dialog) {
+		switch (id) {
+		case DIALOG_CHOSE_ACTION_DIR:
+		case DIALOG_CHOSE_ACTION_FILE:
+			removeDialog(DIALOG_CHOSE_ACTION_FILE);
+			dialog = createChooseActionDialog();
+			break;
+	
+		case DIALOG_COPY:
+			removeDialog(DIALOG_COPY);
+			dialog = createCopyDialog();
+			break;
+			
+		case DIALOG_MOVE:
+			removeDialog(DIALOG_MOVE);
+			dialog = createMoveDialog();
+		}
+		mLoadingDialogType = id;
+	}
+	
 	private Dialog createChooseActionDialog() {
 		
 		// is there a conflict?
@@ -132,23 +153,25 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		String temp = "";
 
 		if(status != null && status.getContentsStatus() == SVNStatusType.STATUS_CONFLICTED) {
-			items = new CharSequence[8];
+			items = new CharSequence[9];
 			items[0] = getResources().getString(R.string.copy).toLowerCase();
 			items[1] = getResources().getString(R.string.move).toLowerCase();
-			items[2] = getResources().getString(R.string.edit).toLowerCase();
-			items[3] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.mine).toLowerCase();
-			items[4] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.theirs).toLowerCase();
-			items[5] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.base).toLowerCase();
-			items[6] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.merge).toLowerCase();
-			items[7] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.postpone).toLowerCase();
+			items[2] = getResources().getString(R.string.view).toLowerCase();
+			items[3] = getResources().getString(R.string.edit).toLowerCase();
+			items[4] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.mine).toLowerCase();
+			items[5] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.theirs).toLowerCase();
+			items[6] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.base).toLowerCase();
+			items[7] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.merge).toLowerCase();
+			items[8] = getResources().getString(R.string.conflict).toLowerCase() + " " + getResources().getString(R.string.postpone).toLowerCase();
 
 			
 		}
 		else {
-			items = new CharSequence[3];
+			items = new CharSequence[4];
 			items[0] = getResources().getString(R.string.copy).toLowerCase();
 			items[1] = getResources().getString(R.string.move).toLowerCase();
-			items[2] = getResources().getString(R.string.edit).toLowerCase();
+			items[2] = getResources().getString(R.string.view).toLowerCase();
+			items[3] = getResources().getString(R.string.edit).toLowerCase();
 		}
 		
 
@@ -167,35 +190,63 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 						showDialog(DIALOG_MOVE);
 						break;
 						
-					case 2: // edit
-						Intent myIntent = new Intent();
-				        myIntent.setAction(Intent.ACTION_EDIT);  
-				        
-				        Uri selectedUri = Uri.fromFile(entry);
-				        String fileExtension= MimeTypeMap.getFileExtensionFromUrl(selectedUri.toString());
-				        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
-				        
-				        myIntent.setDataAndType(Uri.parse(entry.getPath()), mimeType);
-				        startActivity(myIntent);
+					case 2: // view
+						String viewMimeType = "";
+						try {
+							Intent myIntent = new Intent();
+					        myIntent.setAction(Intent.ACTION_VIEW);  
+					        
+					        Uri selectedUri = Uri.fromFile(entry);
+					        String fileExtension= MimeTypeMap.getFileExtensionFromUrl(selectedUri.toString());
+					        viewMimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+					        System.out.println("File extention : " + fileExtension + " Mime type :" + viewMimeType + " for path: " + entry.getPath());
+
+					        myIntent.setDataAndType(Uri.parse("file://" + entry.getAbsolutePath()), viewMimeType);
+					        startActivity(myIntent);
+						}
+						catch(Exception e) {
+							Toast toast=Toast.makeText(LocalBrowse.this, getString(R.string.no_application_found) + " " + viewMimeType, 2500);
+				    		toast.show();
+						}
 						break;
 						
-					case 3: // mine
+					case 3: // edit
+						String editMimeType = "";
+						try {
+							Intent myIntent = new Intent();
+					        myIntent.setAction(Intent.ACTION_EDIT);  
+					        
+					        Uri selectedUri = Uri.fromFile(entry);
+					        String fileExtension= MimeTypeMap.getFileExtensionFromUrl(selectedUri.toString());
+					        editMimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+					        System.out.println("File extention : " + fileExtension + " Mime type :" + editMimeType);
+					        
+					        myIntent.setDataAndType(Uri.parse("file://" + entry.getAbsolutePath()), editMimeType);
+					        startActivity(myIntent);
+						}
+						catch(Exception e) {
+							Toast toast=Toast.makeText(LocalBrowse.this, getString(R.string.no_application_found) + " " + editMimeType, 2500);
+				    		toast.show();
+						}
+						break;
+						
+					case 4: // mine
 						mApp.resolveConflict(new File(entry.getPath()), SVNDepth.INFINITY, SVNConflictChoice.MINE_FULL);
 						break;
 						
-					case 4: // theirs
+					case 5: // theirs
 						mApp.resolveConflict(new File(entry.getPath()), SVNDepth.INFINITY, SVNConflictChoice.THEIRS_FULL);
 						break;
 						
-					case 5: // base
+					case 6: // base
 						mApp.resolveConflict(new File(entry.getPath()), SVNDepth.INFINITY, SVNConflictChoice.BASE);
 						break;
 						
-					case 6: // merge
+					case 7: // merge
 						mApp.resolveConflict(new File(entry.getPath()), SVNDepth.INFINITY, SVNConflictChoice.MERGED);
 						break;
 						
-					case 7: // postpone
+					case 8: // postpone
 						mApp.resolveConflict(new File(entry.getPath()), SVNDepth.INFINITY, SVNConflictChoice.POSTPONE);
 						break;	
 						
@@ -203,6 +254,8 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 				
 				StatusThread statusThread = new StatusThread();
 				statusThread.execute();
+				
+				LocalBrowse.this.updateList();
 			}
 		});
 		
@@ -285,6 +338,39 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		}
 		catch(Exception e) {
 			this.finish();
+		}
+	}
+	
+	@Override
+	protected void onRestart() {
+		super.onRestart();
+		// check that we have a connection in memory
+		if(this.mApp.getCurrentConnection() != null) {
+			
+		}
+		else {
+			// no ticket was selected go back to ticket screen
+			// tell the user we are going to work
+        	Toast toast=Toast.makeText(this, getString(R.string.no_connection_selected), 2500);
+    		toast.show();
+    		this.finish();
+		}
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		// check that we have a connection in memory
+		if(this.mApp.getCurrentConnection() != null) {
+			
+		}
+		else {
+			// no ticket was selected go back to ticket screen
+			// tell the user we are going to work
+        	Toast toast=Toast.makeText(this, getString(R.string.no_connection_selected), 2500);
+    		toast.show();
+    		this.finish();
 		}
 	}
 	
@@ -546,16 +632,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 			String returned;
 			
 			try {
-				runOnUiThread(new Runnable() {
-				     public void run() {
-				    	// set the status
-				    	 //LocalBrowse.this.status.setText(R.string.performing_revert);
-
-				     }
-				});
-				
-				
-				// do the revert
+				// do a status check
 				returned = mApp.showStatus(mApp.assignPath(), true , true , false , true , false );
 
 				
@@ -574,6 +651,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 			//android.util.Log.d(getString(R.string.alarm), getString(R.string.status_successful));
 
 	        dialog.dismiss();
+	        LocalBrowse.this.updateList();
 	        
 	        /*
 	        runOnUiThread(new Runnable() {

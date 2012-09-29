@@ -82,7 +82,7 @@ public class ConflictHandler implements ISVNConflictHandler {
         String fileExtension= MimeTypeMap.getFileExtensionFromUrl(this.app.getConflictFiles().getWCPath());
         String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
         
-        myIntent.setDataAndType(Uri.parse(this.app.getConflictFiles().getWCPath()), mimeType);
+        myIntent.setDataAndType(Uri.parse("file://" + this.app.getConflictFiles().getWCPath()), mimeType);
         
         
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, myIntent, Intent.FLAG_ACTIVITY_NEW_TASK);

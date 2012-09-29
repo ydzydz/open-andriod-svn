@@ -172,6 +172,39 @@ public class ConnectionBrowse extends ListActivity implements Runnable, OnItemLo
 	}
 	
 	@Override
+	protected void onRestart() {
+		super.onRestart();
+		// check that we have a connection in memory
+		if(this.mApp.getCurrentConnection() != null) {
+			
+		}
+		else {
+			// no ticket was selected go back to ticket screen
+			// tell the user we are going to work
+        	Toast toast=Toast.makeText(this, getString(R.string.no_connection_selected), 2500);
+    		toast.show();
+    		this.finish();
+		}
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		// check that we have a connection in memory
+		if(this.mApp.getCurrentConnection() != null) {
+			
+		}
+		else {
+			// no ticket was selected go back to ticket screen
+			// tell the user we are going to work
+        	Toast toast=Toast.makeText(this, getString(R.string.no_connection_selected), 2500);
+    		toast.show();
+    		this.finish();
+		}
+	}
+	
+	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		SVNDirEntry entry = mDirs.get(position);
 		if (entry.getKind().compareTo(SVNNodeKind.DIR) == 0)

@@ -124,7 +124,8 @@
 	<string name="pro_only">Commit ist nur mit der Pro-Version verfügbar.</string>
 	
 	<!-- Browse -->
-  	<string name="browse">Browse</string>
+  	<string name="browse">"blättern"</string>
+  	<string name="view">Ansehen</string>
   	<string name="remote_browse">Repo Browse</string>
   	<string name="local_browse">Lokale Browse</string>
   	<string name="choose_action">Aktion wählen</string>
@@ -134,6 +135,7 @@
   	<string name="choose_copy_path">Geben Sie bitte neuen Ordner zu Kopieren.</string>
 	<string name="choose_move_path">Geben Sie bitte neuen Ordner zu Bewegen.</string>
 	<string name="performing_move">Führe Bewegen aus!</string>
+	<string name="no_application_found">Keine Anwendung gefunden, um diesen Dateityp zu behandeln:</string>
 	
 	<!-- Conflict -->
 	<string name="conflict">Conflict</string>

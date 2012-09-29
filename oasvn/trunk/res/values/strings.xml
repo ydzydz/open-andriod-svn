@@ -127,6 +127,7 @@
 	
 	<!-- Browse -->
   	<string name="browse">Browse</string>
+  	<string name="view">View</string>
   	<string name="remote_browse">Repo Browse</string>
  	<string name="local_browse">Local Browse</string>
   	<string name="choose_action">Choose action</string>
@@ -136,6 +137,7 @@
 	<string name="choose_copy_path">Please enter the path to copy to.</string>
 	<string name="choose_move_path">Please enter the path to move to.</string>
   	<string name="performing_move">Performing Move!!!</string>
+  	<string name="no_application_found">No application found to handle this file type:</string>
   	
   	<!-- Conflict -->
   	<string name="conflict">Conflict</string>

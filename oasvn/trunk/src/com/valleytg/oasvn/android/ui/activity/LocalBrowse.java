@@ -323,20 +323,34 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.connection_browse);
 		
+		// check that we have a connection in memory
 		try {
-			mContext = this;
-			mApp = (OASVNApplication) getApplication();
-			mDirCache = new ArrayList<List<File>>();
-			mCurDir = mApp.getCurrentConnection().getFolder().toString() + "/";
-			
-			StatusThread statusThread = new StatusThread();
-			statusThread.execute();
-			
-			updateDataAndList();
-			
-			getListView().setOnItemLongClickListener(this);
+			if(this.mApp.getCurrentConnection() != null) {
+				mContext = this;
+				mApp = (OASVNApplication) getApplication();
+				mDirCache = new ArrayList<List<File>>();
+				mCurDir = mApp.getCurrentConnection().getFolder().toString() + "/";
+				
+				StatusThread statusThread = new StatusThread();
+				statusThread.execute();
+				
+				updateDataAndList();
+				
+				getListView().setOnItemLongClickListener(this);
+			}
+			else {
+				// no ticket was selected go back to ticket screen
+				// tell the user we are going to work
+	        	Toast toast=Toast.makeText(this, getString(R.string.no_connection_selected), 2500);
+	    		toast.show();
+	    		this.finish();
+			}
 		}
 		catch(Exception e) {
+			// no ticket was selected go back to ticket screen
+			// tell the user we are going to work
+	    	Toast toast=Toast.makeText(this, getString(R.string.no_connection_selected), 2500);
+			toast.show();
 			this.finish();
 		}
 	}
@@ -374,6 +388,15 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		}
 	}
 	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		
+		if(mLoadingDialog != null) {
+			mLoadingDialog.dismiss();
+		}
+	}
+
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		entry = mDirs.get(position);
@@ -474,7 +497,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 	}
 	
 	private void updateDataAndList() {
-		mLoadingDialog = ProgressDialog.show(this, "", getResources().getString(R.string.loading), true, false);
+		mLoadingDialog = ProgressDialog.show(this.getApplicationContext(), "", getResources().getString(R.string.loading), true, false);
 		mLoadingDialogType = DIALOG_WAIT_LOADING;
 		
 		Thread thread = new Thread(this);

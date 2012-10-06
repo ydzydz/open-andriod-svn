@@ -167,6 +167,9 @@ public class ConnectionBrowse extends ListActivity implements Runnable, OnItemLo
 			getListView().setOnItemLongClickListener(this);
 		}
 		catch(Exception e) {
+			e.printStackTrace();
+			Toast toast=Toast.makeText(this, getString(R.string.no_connection_selected), 2500);
+			toast.show();
 			this.finish();
 		}
 	}
@@ -201,6 +204,15 @@ public class ConnectionBrowse extends ListActivity implements Runnable, OnItemLo
         	Toast toast=Toast.makeText(this, getString(R.string.no_connection_selected), 2500);
     		toast.show();
     		this.finish();
+		}
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		
+		if(mLoadingDialog != null) {
+			mLoadingDialog.dismiss();
 		}
 	}
 	
@@ -298,20 +310,31 @@ public class ConnectionBrowse extends ListActivity implements Runnable, OnItemLo
 		
 		mDirs = new ArrayList<SVNDirEntry>();
 		
-		Collection<SVNDirEntry> coll = mApp.getAllDirectories(mCurRevision, mCurDir);
-		if (coll != null)
-		{
-			Iterator<SVNDirEntry> it = coll.iterator();
-		
-			if (it != null)
-				while (it.hasNext())
-					mDirs.add(it.next());
-		
-			Collections.sort(mDirs);
+		try {
+			Collection<SVNDirEntry> coll = mApp.getAllDirectories(mCurRevision, mCurDir);
+			
+			if (coll != null) {
+				Iterator<SVNDirEntry> it = coll.iterator();
+			
+				if (it != null)
+					while (it.hasNext())
+						mDirs.add(it.next());
+			
+				Collections.sort(mDirs);
+			}
+			else {
+				mDirs.add(new SVNDirEntry(null, null, "- " + getResources().getString(R.string.empty) + " -", SVNNodeKind.NONE, 0, false, 0, null, "", ""));
+			}
 		}
-		else {
-			mDirs.add(new SVNDirEntry(null, null, "- " + getResources().getString(R.string.empty) + " -", SVNNodeKind.NONE, 0, false, 0, null, "", ""));
+		catch(Exception e) {
+			// no ticket was selected go back to ticket screen
+			// tell the user we are going to work
+        	Toast toast=Toast.makeText(this, getString(R.string.no_connection_selected), 2500);
+    		toast.show();
+    		e.printStackTrace();
+    		this.finish();
 		}
+		
 	}
 	
 	private void updateList() {

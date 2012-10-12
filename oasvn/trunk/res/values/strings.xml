@@ -138,6 +138,7 @@
 	<string name="choose_move_path">Please enter the path to move to.</string>
   	<string name="performing_move">Performing Move!!!</string>
   	<string name="no_application_found">No application found to handle this file type:</string>
+  	<string name="no_local_copy">You have not checked out a local copy from the repository</string>
   	
   	<!-- Conflict -->
   	<string name="conflict">Conflict</string>

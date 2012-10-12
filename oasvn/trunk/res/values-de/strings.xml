@@ -136,6 +136,7 @@
 	<string name="choose_move_path">Geben Sie bitte neuen Ordner zu Bewegen.</string>
 	<string name="performing_move">Führe Bewegen aus!</string>
 	<string name="no_application_found">Keine Anwendung gefunden, um diesen Dateityp zu behandeln:</string>
+	<string name="no_local_copy">"Sie haben nicht eine lokale Kopie aus dem Repository Checkout"</string>
 	
 	<!-- Conflict -->
 	<string name="conflict">Conflict</string>

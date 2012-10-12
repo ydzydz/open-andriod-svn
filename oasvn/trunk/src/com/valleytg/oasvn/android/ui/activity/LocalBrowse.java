@@ -325,12 +325,15 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		
 		// check that we have a connection in memory
 		try {
-			if(this.mApp.getCurrentConnection() != null) {
-				mContext = this;
-				mApp = (OASVNApplication) getApplication();
-				mDirCache = new ArrayList<List<File>>();
-				mCurDir = mApp.getCurrentConnection().getFolder().toString() + "/";
-				
+			mContext = this;
+			mApp = (OASVNApplication) getApplication();
+			mDirCache = new ArrayList<List<File>>();
+			mCurDir = mApp.getCurrentConnection().getFolder().toString() + "/";
+			
+			if(mApp.verifyWorkingCopy(mApp.assignPath())) {
+	    	
+		    //if(folder.exists()){
+
 				StatusThread statusThread = new StatusThread();
 				statusThread.execute();
 				
@@ -341,7 +344,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 			else {
 				// no ticket was selected go back to ticket screen
 				// tell the user we are going to work
-	        	Toast toast=Toast.makeText(this, getString(R.string.no_connection_selected), 2500);
+	        	Toast toast=Toast.makeText(this, getString(R.string.no_local_copy), 2500);
 	    		toast.show();
 	    		this.finish();
 			}
@@ -388,15 +391,6 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 		}
 	}
 	
-	@Override
-	protected void onStop() {
-		super.onStop();
-		
-		if(mLoadingDialog != null) {
-			mLoadingDialog.dismiss();
-		}
-	}
-
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		entry = mDirs.get(position);
@@ -497,7 +491,7 @@ public class LocalBrowse extends ListActivity implements Runnable, OnItemLongCli
 	}
 	
 	private void updateDataAndList() {
-		mLoadingDialog = ProgressDialog.show(this.getApplicationContext(), "", getResources().getString(R.string.loading), true, false);
+		mLoadingDialog = ProgressDialog.show(this, "", getResources().getString(R.string.loading), true, false);
 		mLoadingDialogType = DIALOG_WAIT_LOADING;
 		
 		Thread thread = new Thread(this);

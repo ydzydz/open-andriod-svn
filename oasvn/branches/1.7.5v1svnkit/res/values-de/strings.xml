@@ -1,0 +1,152 @@
+<resources>
+
+    <!-- General, logging and errors -->
+    <string name="app_name">"OASVN Pro"</string>
+    <string name="loading">"Wird geladen..."</string>
+    <string name="colon">":"</string>
+    <string name="error">"Fehler"</string>
+    <string name="verify">"Verifizieren"</string>
+    <string name="exception">"Ausnahme:"</string>
+    <string name="revision">"Revision"</string>
+    <string name="FILE">"DATEI:"</string>
+    <string name="file">"Datei:"</string>
+    <string name="files">"Dateien"</string>
+    <string name="directory_created">"Verzeichnis erstellt"</string>
+    <string name="directory_exists">"Verzeichnis bereits vorhanden"</string>
+    <string name="directory_write_fail">"Ungültige Berechtigungen, um in das Verzeichnis schreiben"</string>
+    <string name="no_change">"Keine Änderung"</string>
+    <string name="no_changes_available">"Keine Änderungen für ein Commit in das Repository verfügbar"</string>
+    <string name="commit_success">"Commit erfolgreich"</string>
+    <string name="checkout_successful">"Checkout erfolgreich"</string>
+    <string name="export_successful">Export erfolgreich</string>
+    <string name="update_successful">"Update erfolgreich"</string>
+    <string name="cleanup_successful">"CleanUp erfolgreich"</string>
+    <string name="commit_comments">"Commit-Kommentare"</string>
+    <string name="rev_no">"Rev. Nr."</string>
+    <string name="local_rev_updated">"Lokale Revisionsnummer aktualisiert, Rev. Nr."</string>
+    <string name="alarm">"Alarm"</string>
+    <string name="revision_success">"Revisionsinformationen erfolgreich abgerufen"</string>
+    <string name="unknown">"Unbekannt"</string>
+    <string name="success">"Erfolgreich"</string>
+    
+    <!-- Main Menu -->
+    <string name="new_connection">"Repository hinzufügen"</string>
+    <string name="exit">"Beenden"</string>
+    <string name="no_connections">"Derzeit sind keine Verbindungen gespeichert."</string>
+    <string name="create_connection">"Bitte verwenden Sie die \"Repository hinzufügen\" Schaltfläche unten, um ein Repository zu erstellen"</string>
+    
+    <!-- Add Repository -->
+    <string name="name">"Name"</string>
+    <string name="url">"Repository-URL"</string>
+    <string name="username">"Benutzername"</string>
+    <string name="password">"Passwort"</string>
+    <string name="protocol">"Protokoll"</string>
+    <string name="folder">"Lokales Verzeichnis"</string>
+    <string name="save">"Speichern"</string>
+    <string name="cancel">"Abbrechen"</string>
+	<string name="url_invalid">"Sie haben eine ungültige URL eingegeben. Die URL muss mindestens 7 Zeichen lang sein und mit folgenden beginnen: http://, https://, svn://, svn+ssl://"</string>
+	<string name="folder_invalid">"Das von Ihnen eingegebene Verzeichnisname ist ungültig oder leer."</string>
+	<string name="folder_exists">"Das von Ihnen eingegebene Verzeichnisname wird bereits verwendet."</string>
+	<string name="name_invalid">"Es wird ein eindeutiger Name für das Repository benötigt."</string>
+	<string name="local_folder_warning">"Ein lokales Verzeichnis mit dem gleichen Namen existiert bereits. Sind Sie sicher, dass Sie den vorhandenen Ordner verwenden möchten?"</string>
+    <string name="key">Privater Schlüssel</string>
+    
+    <!-- Connection Details -->
+    <string name="connection">"Verbindung"</string>
+    <string name="no_connection_selected">"Keine Verbindung ausgewählt ..."</string>
+    <string name="choose_revision">"Geben Sie bitte revision Nr."</string>
+    <string name="choose_export_folder">Geben Sie bitte neuen Ordner zu exportieren.</string>
+    <string name="head">"Head"</string>
+    <string name="specified">Specified</string>
+    <string name="checkout">"Checkout"</string>
+    <string name="export">Export</string>
+    <string name="export_local">Export Lokale</string>
+    <string name="commit">"Commit"</string>
+    <string name="update">"Update"</string>
+    <string name="cleanup">"Clean Up"</string>
+	<string name="revert">"Revert"</string>
+    <string name="file_manager">"Verzeichnis öffnen"</string>
+    <string name="checkout_revision">Checkout Revision</string>
+    <string name="delete_folder">"Verzeichnis löschen"</string>
+    <string name="delete_connection">"Repo löschen"</string>
+    <string name="view_logs">"Zeige Log"</string>
+    <string name="view_revisions">"Zeige Revisionen"</string>
+    <string name="performing_checkout">"Führe Checkout aus!"</string>
+    <string name="performing_export">Führe Export aus!</string>
+    <string name="performing_commit">"Führe Commit aus!"</string>
+    <string name="performing_update">"Führe Update aus!"</string>
+    <string name="performing_cleanup">"Führe Update aus!"</string>
+	<string name="performing_revert">"Führe Revert aus!"</string>
+    <string name="idle">"Inaktiv"</string>
+    <string name="complete">"Aktion abgeschlossen!"</string>
+    <string name="in_progress">"Aktion läuft, bitte warten ..."</string>
+    <string name="confirm">"Sinf Sie sicher?"</string>
+	<string name="revert_confirmation">"Sind Sie sicher? Lokalen Arbeitskopie Änderungen gehen verloren!"</string>
+    <string name="delete_message">"Sie löschen das komplette lokale Verzeichnis!"</string>
+    <string name="delete_repo_message">"Sie sind im Begriff, diese Repository-Verbindung zu löschen. Sind Sie sicher?"</string>
+    <string name="delete_folder_too">"Wollen Sie das lokale Verzeichnis ebenfalls löschen?"</string>
+    <string name="yes">"Ja"</string>
+    <string name="no">"Nein"</string>
+    <string name="edit">"Ändern"</string>
+    <string name="file_manager_warning">"Nicht alle Dateimanager unterstützen das öffnen des korrekten Verzeichnisses, Sie müssen möglicherweise dorthin navigieren. Der OI File Manager unterstützt diese Funktion."</string>
+    
+    <!-- Commit -->
+    <string name="comments">"Kommentare"</string>
+    
+    <!-- LogView -->
+    <string name="no_logs">"Es werden keine Protokolle für diese Verbindung erstellt."</string>
+    <string name="delete_all_logs">"Lösche alle Verbindungsprotokolle"</string>
+    <string name="delete_all_logs_warning">"Sind Sie sicher, dass sie alle Log-Einträge für diese Verbindung löschen möchten?"</string>
+    
+    <!-- LogDetails -->
+    <string name="logdetail_header">"Eintragsdetails"</string>
+	<string name="type">"Typ:"</string>
+	<string name="date">"Datum:"</string>
+	<string name="message">"Nachricht:"</string>
+	<string name="author">"Autor:"</string>
+	<string name="delete_entry">"Log-Eintrag löschen"</string>
+	
+	<!-- Revisions -->
+	<string name="no_revisions">"Es sind keine geänderten Revisionen für diese Verbindung verfügbar."</string>
+	<string name="revisions_retrieved">"Revisionen erfolgreich abgerufen"</string>
+	<string name="refresh">"Aktualisieren"</string>
+	<string name="problem">"Es ist ein Problem beim Abrufen von Informationen aufgetreten. Überprüfen Sie für weitere Details die Protokolle."</string>
+	<string name="revisions">Revisions</string>
+	<string name="number_revisions">"Wie viele revisions abgerufen werden soll?"</string>
+	<string name="retrieve">Retrieve</string>
+	
+	<!-- Revision Details -->
+	<string name="revisiondetail_header">"Revisions-Einzelheiten"</string>
+	
+	<!-- Demo -->
+	<string name="three_views">Free-Version erlaubt 3 Revision Detailansichten.</string>
+	<string name="views_used">Demo Detailansichten überschritten. Pro-Version erlaubt die uneingeschränkte Nutzung.</string>
+	<string name="pro_only">Commit ist nur mit der Pro-Version verfügbar.</string>
+	
+	<!-- Browse -->
+  	<string name="browse">"blättern"</string>
+  	<string name="view">Ansehen</string>
+  	<string name="remote_browse">Repo Browse</string>
+  	<string name="local_browse">Lokale Browse</string>
+  	<string name="choose_action">Aktion wählen</string>
+  	<string name="empty">leer</string>
+  	<string name="copy">Kopieren</string>
+  	<string name="move">Bewegen</string>
+  	<string name="choose_copy_path">Geben Sie bitte neuen Ordner zu Kopieren.</string>
+	<string name="choose_move_path">Geben Sie bitte neuen Ordner zu Bewegen.</string>
+	<string name="performing_move">Führe Bewegen aus!</string>
+	<string name="no_application_found">Keine Anwendung gefunden, um diesen Dateityp zu behandeln:</string>
+	<string name="no_local_copy">"Sie haben nicht eine lokale Kopie aus dem Repository Checkout"</string>
+	
+	<!-- Conflict -->
+	<string name="conflict">Conflict</string>
+	<string name="detected">Erkannt</string>
+	<string name="reason">Grund</string>
+	<string name="status">Status</string>
+	<string name="reslove">Resolve</string>
+	<string name="merge">Merge</string>
+  	<string name="theirs">Theirs</string>
+  	<string name="mine">Mine</string>
+  	<string name="base">Base</string>
+  	<string name="postpone">Postpone</string>
+</resources>
